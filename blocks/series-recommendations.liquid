@@ -1,5 +1,8 @@
 {% liquid
   assign product = block.settings.product
+  if product == blank and closest.product != blank
+    assign product = closest.product
+  endif
   if request.visual_preview_mode and product == blank
     assign product = collections.all.products.first
   endif
