@@ -195,7 +195,7 @@
               "block_order": []
             },
             "series_recommendations": {
-              "type": "series-recommendations",
+              "type": "series_recommendations",
               "name": "Series recommendations",
               "settings": {
                 "product": "{{ closest.product }}",
