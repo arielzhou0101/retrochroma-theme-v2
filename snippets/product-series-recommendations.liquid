@@ -1,0 +1,73 @@
+{% liquid
+  assign rec_title = product.metafields.custom.title_for_recs.value
+  assign rec_collection = product.metafields.custom.collection_for_recs.value
+%}
+
+{% if rec_title != blank and rec_collection != blank %}
+  <details class="product-series-recs" open>
+    <summary class="product-series-recs__summary">
+      <span class="product-series-recs__title">{{ rec_title }}</span>
+      <span class="product-series-recs__chevron" aria-hidden="true"></span>
+    </summary>
+
+    <div class="product-series-recs__body">
+      <div class="product-series-recs__rail" role="list">
+        {% for rec_product in rec_collection.products limit: 8 %}
+          {% if rec_product.available %}
+            {% liquid
+              assign is_current = false
+              if rec_product.id == product.id
+                assign is_current = true
+              endif
+
+              assign rec_image = rec_product.metafields.custom.product_card_image.value
+              if rec_image == blank
+                assign rec_image = rec_product.featured_image
+              endif
+            %}
+
+            <a
+              class="product-series-recs__card{% if is_current %} is-current{% endif %}"
+              href="{{ rec_product.url }}"
+              {% if is_current %}
+                aria-current="page"
+              {% endif %}
+              role="listitem"
+            >
+              <span class="product-series-recs__image-wrap">
+                {% if rec_image != blank %}
+                  {{
+                    rec_image
+                    | image_url: width: 360
+                    | image_tag:
+                      widths: '160, 240, 320, 360',
+                      sizes: '(min-width: 750px) 120px, 42vw',
+                      loading: 'lazy',
+                      class: 'product-series-recs__image',
+                      alt: rec_product.title
+                  }}
+                {% else %}
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'product-series-recs__image placeholder-svg' }}
+                {% endif %}
+              </span>
+
+              <span class="product-series-recs__card-text">
+                {% if is_current %}
+                  <span class="product-series-recs__current">Current</span>
+                {% endif %}
+                <span class="product-series-recs__card-title">{{ rec_product.title }}</span>
+                <span class="product-series-recs__price">
+                  {% if rec_product.price_varies %}
+                    From {{ rec_product.price_min | money }}
+                  {% else %}
+                    {{ rec_product.price | money }}
+                  {% endif %}
+                </span>
+              </span>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </details>
+{% endif %}

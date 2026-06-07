@@ -194,6 +194,18 @@
               },
               "block_order": []
             },
+            "series_recommendations": {
+              "type": "series-recommendations",
+              "name": "Series recommendations",
+              "settings": {
+                "product": "{{ closest.product }}",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
             "product_description_LfDYCg": {
               "type": "product-description",
               "name": "t:names.product_description",
@@ -413,6 +425,7 @@
             "price_a7krng",
             "variant_picker_R3rGDr",
             "buy_buttons_eYQEYi",
+            "series_recommendations",
             "product_description_LfDYCg",
             "payment_icons_tUEBdY",
             "ai_gen_block_bdf77c4_a4c6Fa",
