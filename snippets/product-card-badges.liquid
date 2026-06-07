@@ -1,0 +1,104 @@
+{% stylesheet %}
+  .product-badges {
+    position: absolute;
+    z-index: var(--layer-flat);
+    --badge-inset: max(var(--padding-xs), calc((var(--border-radius) + var(--padding-xs)) * (1 - cos(45deg))));
+  }
+
+  .product-badges--bottom-left {
+    bottom: calc(var(--badge-inset) + var(--padding-block-start));
+    left: calc(var(--badge-inset) + var(--padding-inline-start));
+  }
+
+  .product-badges--top-left {
+    top: calc(var(--badge-inset) + var(--padding-block-start));
+    left: calc(var(--badge-inset) + var(--padding-inline-start));
+  }
+
+  .product-badges--top-right {
+    top: calc(var(--badge-inset) + var(--padding-block-start));
+    right: calc(var(--badge-inset) + var(--padding-inline-start));
+  }
+
+  .product-badges__badge {
+    --badge-font-size: var(--font-size--xs);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--color-foreground);
+    background: var(--color-background);
+    font-size: var(--badge-font-size);
+    font-family: var(--badge-font-family);
+    font-weight: var(--badge-font-weight);
+    text-transform: var(--badge-text-transform);
+    border-radius: var(--badge-border-radius);
+  }
+
+  .product-badges__badge--rectangle {
+    padding-block: var(--badge-rectangle-padding-block);
+    padding-inline: var(--badge-rectangle-padding-inline);
+  }
+{% endstylesheet %}
+
+<div
+  class="product-badges product-badges--{{ settings.badge_position }}"
+  style="
+    --badge-border-radius: {{ settings.badge_corner_radius }}px;
+    --badge-font-family: var(--font-{{ settings.badge_font_family }}--family);
+    --badge-font-weight: var(--font-{{ settings.badge_font_family }}--weight);
+    --badge-text-transform: {{ settings.badge_text_transform }};
+  "
+>
+  {% assign custom_tags = "Limited Offer,New Arrival,Bestseller" | split: "," %}
+  {% assign show_badge = false %}
+
+  {%- comment -%}
+  先找自定义标签，如果有多个符合，显示第一个匹配的
+  {%- endcomment -%}
+  {% for tag in product.tags %}
+    {% if tag != 'sale' and custom_tags contains tag %}
+      <div class="product-badges__badge product-badges__badge--rectangle
+        {% case tag %}
+          {% when 'Limited Offer' %} color-{{ settings.badge_limited_offer_color_scheme }}
+          {% when 'New Arrival' %} color-{{ settings.badge_new_arrival_color_scheme }}
+          {% when 'Bestseller' %} color-{{ settings.badge_bestseller_color_scheme }}
+          {% else %} color-scheme-4
+        {% endcase %}
+      ">
+        {{ tag }}
+      </div>
+      {% assign show_badge = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+
+  {%- comment -%}
+  如果没有自定义标签，再判断sold out
+  {%- endcomment -%}
+  {% if show_badge == false %}
+    {% if product.available == false %}
+      <div
+        class="product-badges__badge product-badges__badge--rectangle color-{{ settings.badge_sold_out_color_scheme }}"
+      >
+        {{ 'content.product_badge_sold_out' | t }}
+      </div>
+      {% assign show_badge = true %}
+    {% endif %}
+  {% endif %}
+
+  {%- comment -%}
+  如果既没有自定义标签也没sold out，再判断sale
+  {%- endcomment -%}
+  {% if show_badge == false %}
+    {% if product.compare_at_price > product.price and product.available %}
+      <div
+        class="product-badges__badge product-badges__badge--rectangle color-{{ settings.badge_sale_color_scheme }}"
+      >
+        {{ 'content.product_badge_sale' | t }}
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+

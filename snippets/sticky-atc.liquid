@@ -1,0 +1,243 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign sticky_price = current_variant.price | money
+  assign sticky_compare = current_variant.compare_at_price | money
+  assign can_add = current_variant.available
+-%}
+
+<sticky-atc-bar
+  class="sticky-atc color-scheme-6"
+  data-section-id="{{ section.id }}"
+  aria-hidden="true"
+>
+  <div class="sticky-atc__inner">
+    <div class="sticky-atc__price" ref="stickyPrice">
+      {%- if current_variant.compare_at_price > current_variant.price -%}
+        <s class="compare-at-price">{{ sticky_compare }}</s>
+      {%- endif -%}
+      <span class="price">{{ sticky_price }}</span>
+    </div>
+
+    <button
+      class="sticky-atc__btn button button-primary"
+      ref="stickyBtn"
+      type="button"
+      {%- unless can_add -%} disabled aria-disabled="true"{%- endunless -%}
+    >
+      {%- if can_add -%}
+        {{ 'products.product.add_to_cart' | t }}
+      {%- else -%}
+        {{ 'products.product.sold_out' | t }}
+      {%- endif -%}
+    </button>
+  </div>
+</sticky-atc-bar>
+
+<style>
+  sticky-atc-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-top: 1px solid rgb(var(--color-border));
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+    /* Color scheme 6 CSS variables */
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+
+  sticky-atc-bar.is-visible {
+    transform: translateY(0);
+  }
+
+  .sticky-atc__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.6rem;
+    padding: 1.2rem 2rem;
+    max-width: var(--page-width, 1200px);
+    margin: 0 auto;
+  }
+
+  .sticky-atc__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-shrink: 0;
+  }
+
+  .sticky-atc__price .compare-at-price {
+    opacity: 0.5;
+    font-size: 0.9em;
+    text-decoration: line-through;
+  }
+
+  .sticky-atc__price .price {
+    font-weight: 600;
+  }
+
+  .sticky-atc__btn {
+    flex: 1;
+    max-width: 28rem;
+    padding: 1.2rem 2rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .sticky-atc__btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Safe area for iOS home indicator */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .sticky-atc__inner {
+      padding-bottom: calc(1.2rem + env(safe-area-inset-bottom));
+    }
+
+
+  }
+  .sticky-atc__btn {
+  background-color: var(--color-primary-button-background) !important;
+  color: var(--color-primary-button-text) !important;
+  border-color: var(--color-primary-button-border) !important;
+}
+
+.sticky-atc__btn:hover {
+  background-color: var(--color-primary-button-hover-background) !important;
+  color: var(--color-primary-button-hover-text) !important;
+  border-color: var(--color-primary-button-hover-border) !important;
+}
+</style>
+
+<script>
+(function() {
+  if (customElements.get('sticky-atc-bar')) return;
+
+  class StickyAtcBar extends HTMLElement {
+    #observer = null;
+    #variantId = null;
+    #abortController = new AbortController();
+
+    connectedCallback() {
+      // Wait for DOM to be ready
+      requestAnimationFrame(() => this.#init());
+    }
+
+    disconnectedCallback() {
+      this.#observer?.disconnect();
+      this.#abortController.abort();
+    }
+
+    #init() {
+      const sectionId = this.dataset.sectionId;
+      // Find the original ATC button within the same section
+      const section = document.querySelector(`.shopify-section[id*="${sectionId}"]`);
+      if (!section) return;
+
+      const originalBtn = section.querySelector('[ref="addToCartButton"]');
+      if (!originalBtn) return;
+
+      // Get current variant ID from the form
+      const variantInput = section.querySelector('input[name="id"]');
+      this.#variantId = variantInput?.value;
+
+      // IntersectionObserver: show bar when original button is out of view
+      this.#observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            this.classList.remove('is-visible');
+            this.setAttribute('aria-hidden', 'true');
+          } else {
+            this.classList.add('is-visible');
+            this.setAttribute('aria-hidden', 'false');
+          }
+        },
+        { threshold: 0, rootMargin: '0px' }
+      );
+      this.#observer.observe(originalBtn);
+
+      // Listen for variant changes
+      const { signal } = this.#abortController;
+      section.addEventListener('variant:update', this.#onVariantUpdate, { signal });
+
+      // Sticky button click → submit the original product form
+      this.refs.stickyBtn?.addEventListener('click', this.#onStickyBtnClick, { signal });
+    }
+
+    #onVariantUpdate = (event) => {
+      const variant = event.detail?.resource;
+      if (!variant) return;
+
+      this.#variantId = variant.id;
+
+      // Update price display
+      const priceEl = this.refs.stickyPrice;
+      if (priceEl) {
+        const price = this.#formatMoney(variant.price);
+        const compareAt = variant.compare_at_price;
+        let html = '';
+        if (compareAt && compareAt > variant.price) {
+          html += `<s class="compare-at-price">${this.#formatMoney(compareAt)}</s>`;
+        }
+        html += `<span class="price">${price}</span>`;
+        priceEl.innerHTML = html;
+      }
+
+      // Update button state
+      const btn = this.refs.stickyBtn;
+      if (btn) {
+        if (variant.available) {
+          btn.removeAttribute('disabled');
+          btn.removeAttribute('aria-disabled');
+          btn.textContent = window.Theme?.translations?.add_to_cart || 'Add to cart';
+        } else {
+          btn.setAttribute('disabled', 'true');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.textContent = window.Theme?.translations?.sold_out || 'Sold out';
+        }
+      }
+    };
+
+    #onStickyBtnClick = () => {
+      const sectionId = this.dataset.sectionId;
+      const section = document.querySelector(`.shopify-section[id*="${sectionId}"]`);
+      const form = section?.querySelector('form[data-type="add-to-cart-form"]');
+      if (!form) return;
+
+      // Sync variant ID just in case
+      const variantInput = form.querySelector('input[name="id"]');
+      if (variantInput && this.#variantId) {
+        variantInput.value = this.#variantId;
+      }
+
+      // Submit the form (triggers the existing product-form-component logic)
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    };
+
+    #formatMoney(cents) {
+      // Use Shopify's built-in formatter if available
+      if (window.Shopify?.formatMoney) {
+        return window.Shopify.formatMoney(cents, window.Theme?.moneyFormat || '$ {{amount}}');
+      }
+      return '$' + (cents / 100).toFixed(2);
+    }
+
+    // Support ref="..." attribute pattern used by this theme
+    get refs() {
+      if (!this._refs) {
+        this._refs = new Proxy({}, {
+          get: (_, key) => this.querySelector(`[ref="${key}"]`)
+        });
+      }
+      return this._refs;
+    }
+  }
+
+  customElements.define('sticky-atc-bar', StickyAtcBar);
+})();
+</script>

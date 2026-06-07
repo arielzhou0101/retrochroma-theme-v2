@@ -1,0 +1,75 @@
+{% for block in section.blocks %}
+  {% case block.type %}
+    {% when 'full_image' %}
+      <div class="feature full-image">
+        <img src="{{ block.settings.image | image_url: width: 2000 }}" alt="{{ block.settings.alt }}">
+      </div>
+
+    {% when 'image_text' %}
+      <div class="feature image-text">
+        <div class="image">
+          <img src="{{ block.settings.image | image_url: width: 1000 }}" alt="{{ block.settings.alt }}">
+        </div>
+        <div class="text">
+          <h3>{{ block.settings.heading }}</h3>
+          <p>{{ block.settings.text }}</p>
+        </div>
+      </div>
+
+    {% when 'text_only' %}
+      <div class="feature text-only">
+        <h3>{{ block.settings.heading }}</h3>
+        <p>{{ block.settings.text }}</p>
+      </div>
+
+    {% when 'square_image' %}
+      <div class="feature square-image">
+        <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.alt }}">
+      </div>
+  {% endcase %}
+{% endfor %}
+
+{% schema %}
+{
+  "name": "Product Feature Blocks",
+  "blocks": [
+    {
+      "type": "full_image",
+      "name": "横版大图",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "图片" },
+        { "type": "text", "id": "alt", "label": "图片 Alt" }
+      ]
+    },
+    {
+      "type": "image_text",
+      "name": "左图右文",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "图片" },
+        { "type": "text", "id": "alt", "label": "图片 Alt" },
+        { "type": "text", "id": "heading", "label": "标题" },
+        { "type": "textarea", "id": "text", "label": "文字内容" }
+      ]
+    },
+    {
+      "type": "text_only",
+      "name": "纯文字",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "标题" },
+        { "type": "textarea", "id": "text", "label": "文字内容" }
+      ]
+    },
+    {
+      "type": "square_image",
+      "name": "方形图片",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "图片" },
+        { "type": "text", "id": "alt", "label": "图片 Alt" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "产品图文模块" }
+  ]
+}
+{% endschema %}

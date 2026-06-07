@@ -1,0 +1,172 @@
+<section
+  id="section-{{ section.id }}"
+  class="countdown-timer section section--page-width spacing-style gap-style {% if section.settings.color_scheme == 'light' %}is-light{% else %}is-dark{% endif %}"
+  style="
+    --bg: {{ section.settings.background_color }};
+    --txt: {{ section.settings.text_color }};
+    --heading-gap: {{ section.settings.heading_spacing }}px;
+    --block-gap-mobile: {{ section.settings.block_spacing_mobile }}px;
+    --section-padding: {{ section.settings.section_vertical_padding }}px;
+  "
+
+  data-end-time="{{ section.settings.end_time | escape }}"
+>
+  <div class="page-width countdown-layout">
+    <!-- 左侧：标题 -->
+    <div class="countdown-heading">
+      {%- assign h_tag = section.settings.heading_typography | replace: 'heading-', 'h' -%}
+      <{{ h_tag }} class="heading">{{ section.settings.heading_main }}</{{ h_tag }}>
+
+      {%- assign sh_tag = section.settings.subheading_typography | replace: 'heading-', 'h' -%}
+      <{{ sh_tag }} class="subheading">{{ section.settings.heading_sub }}</{{ sh_tag }}>
+    </div>
+
+    <!-- 中间：倒计时 -->
+    <div class="countdown-center">
+      <div class="countdown"></div>
+    </div>
+
+    <!-- 右侧：按钮 -->
+    {% if section.settings.button_label != blank %}
+      <div class="countdown-button">
+        <a href="{{ section.settings.button_link }}" class="button">
+          {{ section.settings.button_label }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{{ 'countdown-timer.css' | asset_url | stylesheet_tag }}
+{{ 'countdown-timer.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "Countdown Timer",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "文案部分"
+    },
+    {
+      "type": "text",
+      "id": "heading_main",
+      "label": "Main Heading",
+      "default": "Limited Time Offer!"
+    },
+    {
+      "type": "text",
+      "id": "heading_sub",
+      "label": "Sub Heading",
+      "default": "Limited Time Offer!"
+    },
+    {
+      "type": "select",
+      "id": "heading_typography",
+      "label": "Heading Typography",
+      "default": "heading-3",
+      "options": [
+        { "value": "heading-1", "label": "Heading 1" },
+        { "value": "heading-2", "label": "Heading 2" },
+        { "value": "heading-3", "label": "Heading 3" },
+        { "value": "heading-4", "label": "Heading 4" },
+        { "value": "heading-5", "label": "Heading 5" },
+        { "value": "heading-6", "label": "Heading 6" },
+        { "value": "body", "label": "Body" },
+        { "value": "caption", "label": "Caption" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "subheading_typography",
+      "label": "Subheading Typography",
+      "default": "heading-4",
+      "options": [
+        { "value": "heading-1", "label": "Heading 1" },
+        { "value": "heading-2", "label": "Heading 2" },
+        { "value": "heading-3", "label": "Heading 3" },
+        { "value": "heading-4", "label": "Heading 4" },
+        { "value": "heading-5", "label": "Heading 5" },
+        { "value": "heading-6", "label": "Heading 6" },
+        { "value": "body", "label": "Body" },
+        { "value": "caption", "label": "Caption" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "label": "Spacing between headings (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "结束时间"
+    },
+    {
+      "type": "text",
+      "id": "end_time",
+      "label": "Countdown End Time (in ISO format, e.g. 2025-06-20T23:59:00Z)",
+      "default": "2025-06-20T23:59:00Z"
+    },
+    {
+      "type": "header",
+      "content": "CTA 按钮"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#f6f6f6"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Padding和间距"
+    },
+    {
+      "type": "range",
+      "id": "block_spacing_mobile",
+      "label": "Spacing between blocks (mobile, px)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "section_vertical_padding",
+      "label": "Section vertical padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 32
+    }
+  ],
+  "presets": [
+    {
+      "name": "Countdown Timer"
+    }
+  ]
+}
+{% endschema %}
