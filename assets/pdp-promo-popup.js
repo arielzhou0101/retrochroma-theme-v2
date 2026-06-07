@@ -107,12 +107,15 @@
     });
 
     copyButton?.addEventListener('click', async () => {
+      const copyLabel = copyButton.dataset.copyLabel || 'Copy';
+      const copiedLabel = copyButton.dataset.copiedLabel || 'Copied';
+
       try {
         await copyText(code);
         writeStorage(window.sessionStorage, STORAGE_KEYS.sessionCopied, 'true');
-        copyButton.textContent = 'Copied';
+        copyButton.textContent = copiedLabel;
         window.setTimeout(() => {
-          copyButton.textContent = 'Copy';
+          copyButton.textContent = copyLabel;
         }, 1800);
       } catch {
         copyButton.textContent = code;
@@ -122,7 +125,7 @@
     form?.addEventListener('submit', () => {
       if (!submitButton) return;
       submitButton.disabled = true;
-      submitButton.textContent = 'Sending...';
+      submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
     });
 
     if (hasSuccess) {
