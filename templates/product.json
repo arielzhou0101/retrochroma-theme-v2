@@ -1738,6 +1738,24 @@
         "padding-block-start": 0,
         "padding-block-end": 0
       }
+    },
+    "pdp_promo_popup_Xx9LbH": {
+      "type": "pdp-promo-popup",
+      "name": "PDP Promo Popup",
+      "settings": {
+        "enable_popup": true,
+        "trigger_delay": 10,
+        "use_theme_font": true,
+        "popup_font": "work_sans_n4",
+        "popup_background": "#FFFFFF",
+        "primary_text": "#211F1B",
+        "secondary_text": "#706D66",
+        "accent_color": "#8F293D",
+        "accent_text": "#FFFFFF",
+        "border_color": "#CBC8BF",
+        "mobile_safe_area": 82,
+        "desktop_safe_area": 94
+      }
     }
   },
   "order": [
@@ -1748,6 +1766,7 @@
     "divider_kw73rq",
     "media_with_content_6rnEEy",
     "product_list_kqbaWd",
-    "17702098286709f19d"
+    "17702098286709f19d",
+    "pdp_promo_popup_Xx9LbH"
   ]
 }
