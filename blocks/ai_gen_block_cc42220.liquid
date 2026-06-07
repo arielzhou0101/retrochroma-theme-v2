@@ -117,11 +117,23 @@
     }
 
     .customer-closeups-grid-{{ ai_gen_id }} {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax({{ block.settings.card_min_width }}px, 1fr));
-      gap: {{ block.settings.card_gap }}px;
-      margin-bottom: {{ block.settings.footer_spacing }}px;
-    }
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax({{ block.settings.card_min_width }}px, 1fr));
+  gap: {{ block.settings.card_gap }}px;
+  margin-bottom: {{ block.settings.footer_spacing }}px;
+}
+
+@media screen and (min-width: 750px) {
+  .customer-closeups-grid-{{ ai_gen_id }} {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-content: start;
+  }
+
+  .customer-closeups-card-{{ ai_gen_id }} {
+    max-width: 100%;
+  }
+}
+
 
     .customer-closeups-card-{{ ai_gen_id }} {
       display: flex;
