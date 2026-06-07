@@ -1,14 +1,21 @@
 {% liquid
-  assign product = block.settings.product
-  if product == blank and closest.product != blank
-    assign product = closest.product
+  assign series_product = block.settings.product
+  if series_product == blank and section.settings.product != blank
+    assign series_product = section.settings.product
   endif
-  if request.visual_preview_mode and product == blank
-    assign product = collections.all.products.first
+  if series_product == blank and product != blank
+    assign series_product = product
+  endif
+  if series_product == blank and closest.product != blank
+    assign series_product = closest.product
+  endif
+  if request.visual_preview_mode and series_product == blank
+    assign series_product = collections.all.products.first
   endif
 
-  assign rec_title = product.metafields.custom.title_for_recs.value
-  assign rec_collection = product.metafields.custom.collection_for_recs.value
+  assign rec_title = series_product.metafields.custom.title_for_recs.value
+  assign rec_collection = series_product.metafields.custom.collection_for_recs.value
+
 %}
 
 {% stylesheet %}
@@ -149,9 +156,9 @@
   }
 {% endstylesheet %}
 
-{% if product != blank and rec_title != blank and rec_collection != blank %}
+{% if series_product != blank and rec_title != blank and rec_collection != blank %}
   <div class="series-recommendations-block spacing-style" style="{% render 'spacing-style', settings: block.settings %}" {{ block.shopify_attributes }}>
-    {% render 'product-series-recommendations', product: product %}
+    {% render 'product-series-recommendations', product: series_product %}
   </div>
 {% endif %}
 
