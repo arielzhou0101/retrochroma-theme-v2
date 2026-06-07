@@ -1747,12 +1747,12 @@
         "trigger_delay": 10,
         "use_theme_font": true,
         "popup_font": "work_sans_n4",
-        "popup_background": "#FFFFFF",
-        "primary_text": "#211F1B",
-        "secondary_text": "#706D66",
-        "accent_color": "#8F293D",
-        "accent_text": "#FFFFFF",
-        "border_color": "#CBC8BF",
+        "popup_background": "#ffffff",
+        "primary_text": "#211f1b",
+        "secondary_text": "#706d66",
+        "accent_color": "#7e876d",
+        "accent_text": "#ffffff",
+        "border_color": "#cbc8bf",
         "mobile_safe_area": 82,
         "desktop_safe_area": 94
       }
