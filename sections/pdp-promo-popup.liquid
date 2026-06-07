@@ -1,0 +1,250 @@
+{%- liquid
+  assign should_render = section.settings.enable_popup
+
+  unless request.page_type == 'product'
+    assign should_render = false
+  endunless
+
+  if customer
+    if customer.accepts_marketing or customer.orders_count > 0
+      assign should_render = false
+    endif
+  endif
+
+  assign form_id = 'PdpPromoPopupForm-' | append: section.id
+  assign heading_id = 'PdpPromoPopupHeading-' | append: section.id
+  assign popup_font = section.settings.popup_font
+-%}
+
+{%- if should_render or request.design_mode -%}
+  {{ 'pdp-promo-popup.css' | asset_url | stylesheet_tag }}
+
+  {%- unless section.settings.use_theme_font -%}
+    {{ popup_font | font_face: font_display: 'swap' }}
+  {%- endunless -%}
+
+  {%- style -%}
+    #shopify-section-{{ section.id }} .pdp-promo-popup {
+      --pdp-popup-background: {{ section.settings.popup_background }};
+      --pdp-popup-primary-text: {{ section.settings.primary_text }};
+      --pdp-popup-secondary-text: {{ section.settings.secondary_text }};
+      --pdp-popup-accent: {{ section.settings.accent_color }};
+      --pdp-popup-accent-text: {{ section.settings.accent_text }};
+      --pdp-popup-border: {{ section.settings.border_color }};
+      --pdp-popup-mobile-safe-area: {{ section.settings.mobile_safe_area }}px;
+      --pdp-popup-desktop-safe-area: {{ section.settings.desktop_safe_area }}px;
+      --pdp-popup-font:
+        {%- if section.settings.use_theme_font -%}
+          var(--font-body--family)
+        {%- else -%}
+          {{ popup_font.family }}, {{ popup_font.fallback_families }}
+        {%- endif -%};
+    }
+  {%- endstyle -%}
+
+  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form' -%}
+    <aside
+      class="pdp-promo-popup"
+      data-pdp-promo-popup
+      data-trigger-delay="{{ section.settings.trigger_delay }}"
+      data-design-mode="{{ request.design_mode }}"
+      data-form-success="{{ form.posted_successfully? }}"
+      data-form-error="{% if form.errors %}true{% else %}false{% endif %}"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="{{ heading_id }}"
+      aria-hidden="true"
+    >
+      <button
+        class="pdp-promo-popup__close"
+        type="button"
+        aria-label="Close offer"
+        data-pdp-promo-close
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+
+      {%- if form.posted_successfully? -%}
+        <div class="pdp-promo-popup__success" data-pdp-promo-success tabindex="-1">
+          <span class="pdp-promo-popup__success-mark" aria-hidden="true">&#10003;</span>
+          <h2 class="pdp-promo-popup__success-heading" id="{{ heading_id }}">Saved for later</h2>
+          <p class="pdp-promo-popup__success-copy">
+            <strong>WELCOME10</strong> has been sent to your email.
+          </p>
+        </div>
+      {%- else -%}
+        <div class="pdp-promo-popup__content">
+          <span class="pdp-promo-popup__spark" aria-hidden="true">&#10022;</span>
+
+          <h2 class="pdp-promo-popup__heading" id="{{ heading_id }}">
+            Still thinking about this lamp?
+          </h2>
+          <p class="pdp-promo-popup__intro">Here&rsquo;s a first-order perk for this visit.</p>
+
+          <div class="pdp-promo-popup__code-row">
+            <span class="pdp-promo-popup__code" data-pdp-promo-code>WELCOME10</span>
+            <button class="pdp-promo-popup__copy" type="button" data-pdp-promo-copy>
+              Copy
+            </button>
+          </div>
+
+          <p class="pdp-promo-popup__prompt">
+            Want to keep it for later?<br>
+            Send this code to your email.
+          </p>
+
+          <input type="hidden" name="contact[tags]" value="newsletter,pdp-promo-popup">
+
+          <label class="visually-hidden" for="PdpPromoEmail-{{ section.id }}">Email address</label>
+          <input
+            class="pdp-promo-popup__email"
+            id="PdpPromoEmail-{{ section.id }}"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            placeholder="Email address"
+            required
+            {% if form.errors %}
+              autofocus
+              aria-invalid="true"
+              aria-describedby="PdpPromoError-{{ section.id }}"
+            {% endif %}
+          >
+
+          {%- if form.errors -%}
+            <p class="pdp-promo-popup__error" id="PdpPromoError-{{ section.id }}" tabindex="-1">
+              Please enter a valid email address.
+            </p>
+          {%- endif -%}
+
+          <button class="pdp-promo-popup__submit" type="submit" data-pdp-promo-submit>
+            Send me the code
+          </button>
+
+          <p class="pdp-promo-popup__fine-print">
+            We&rsquo;ll send this code and occasional Retro Chroma updates. Unsubscribe anytime.
+          </p>
+        </div>
+      {%- endif -%}
+    </aside>
+  {%- endform -%}
+
+  <script src="{{ 'pdp-promo-popup.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PDP Promo Popup",
+  "tag": "section",
+  "class": "pdp-promo-popup-section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_popup",
+      "label": "Enable popup",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "trigger_delay",
+      "label": "Delay before showing",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "unit": "sec",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_theme_font",
+      "label": "Use theme body font",
+      "default": true
+    },
+    {
+      "type": "font_picker",
+      "id": "popup_font",
+      "label": "Popup font",
+      "default": "work_sans_n4"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "popup_background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "primary_text",
+      "label": "Primary text",
+      "default": "#211F1B"
+    },
+    {
+      "type": "color",
+      "id": "secondary_text",
+      "label": "Secondary text",
+      "default": "#706D66"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#8F293D"
+    },
+    {
+      "type": "color",
+      "id": "accent_text",
+      "label": "Text on accent",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#CBC8BF"
+    },
+    {
+      "type": "header",
+      "content": "Sticky add-to-cart clearance"
+    },
+    {
+      "type": "range",
+      "id": "mobile_safe_area",
+      "label": "Reserved height on mobile",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 82
+    },
+    {
+      "type": "range",
+      "id": "desktop_safe_area",
+      "label": "Reserved height on desktop",
+      "min": 0,
+      "max": 180,
+      "step": 2,
+      "unit": "px",
+      "default": 94
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP Promo Popup"
+    }
+  ]
+}
+{% endschema %}
