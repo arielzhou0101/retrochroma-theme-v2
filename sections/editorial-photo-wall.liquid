@@ -1,0 +1,244 @@
+{% comment %}
+  Editorial Photo Wall section - based on Collection List (editorial layout)
+  Data source changed to image picker with metadata
+{% endcomment %}
+
+<style>
+  /* 默认保持你原有的网格布局逻辑 (针对电脑端) */
+  .editorial-collection__grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr); /* 假设是12列网格 */
+    gap: 20px; /* 间距 */
+    width: 100%;
+  }
+
+  /* ！！！核心修复代码：针对手机端的样式覆盖！！！ */
+  @media screen and (max-width: 768px) {
+    /* 1. 把容器改为单列弹性布局 */
+    .editorial-collection__grid {
+      display: flex !important;
+      flex-direction: column;
+      gap: 30px; /* 图片之间的垂直间距 */
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+
+    /* 2. 强制重置所有图片/文字块的网格坐标 */
+    .editorial-collection__grid > div {
+      /* 使用 !important 覆盖掉 Liquid 生成的行内样式 */
+      grid-column: auto !important; 
+      grid-row: auto !important;
+      width: 100% !important;
+      margin: 0 !important;
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+    }
+
+    /* 3. 隐藏那个在手机上没用的占位符 spacer */
+    .editorial-collection__spacer {
+      display: none !important;
+    }
+    
+    /* 4. 修复文字排版，让它在图片下方或者自然排列 */
+    .collection-card__content {
+       width: 100%;
+       padding: 10px 0;
+    }
+  }
+</style>
+
+<section class="section editorial-collection color-{{ section.settings.color_scheme }}">
+  <div class="section__content section__content--{{ section.settings.section_width }}" style="padding-block-start: {{ section.settings.padding_block_start | append: 'px' }}; padding-block-end: {{ section.settings.padding_block_end | append: 'px' }};">
+    <div class="editorial-collection__grid">
+      <div class="editorial-collection__spacer"></div>
+
+      {% for block in section.blocks %}
+        {% if block.type == 'image' %}
+          {% assign image = block.settings.image %}
+          {% assign caption = block.settings.caption %}
+          {% assign link = block.settings.link %}
+          {% assign alt = block.settings.alt %}
+
+          {% liquid
+            assign current_grid_index = forloop.index0 | divided_by: 8
+            assign current_item_index = forloop.index0 | modulo: 8
+
+            case current_item_index
+              when 0
+                assign grid_column = '2 / span 4'
+                assign grid_row = 1
+                assign grid_row_span = 5
+              when 1
+                assign grid_column = '7 / span 5'
+                assign grid_row = 3
+                assign grid_row_span = 5
+              when 2
+                assign grid_column = '1 / span 8'
+                assign grid_row = 9
+                assign grid_row_span = 6
+              when 3
+                assign grid_column = '3 / span 8'
+                assign grid_row = 16
+                assign grid_row_span = 6
+              when 4
+                assign grid_column = '7 / span 5'
+                assign grid_row = 23
+                assign grid_row_span = 5
+              when 5
+                assign grid_column = '2 / span 4'
+                assign grid_row = 25
+                assign grid_row_span = 5
+              when 6
+                assign grid_column = '5 / span 8'
+                assign grid_row = 31
+                assign grid_row_span = 6
+              when 7
+                assign grid_column = '2 / span 8'
+                assign grid_row = 38
+                assign grid_row_span = 6
+            endcase
+
+            assign full_grid_rows = current_grid_index | times: 44
+            assign grid_row = grid_row | plus: full_grid_rows
+          %}
+
+          <div
+            class="editorial-collection__item-{{ forloop.index0 | modulo: 4 }}"
+            style="grid-column: {{ grid_column }}; grid-row: {{ grid_row }} / span {{ grid_row_span }};"
+          >
+            <div class="collection-card collection-card--image-bg collection-card--flexible-aspect-ratio">
+              {% if link != blank %}<a class="collection-card__link" href="{{ link }}">{% endif %}
+                <div class="collection-card__image">
+                  {% if image != blank %}
+                    {{ image | image_url: width: 1500 | image_tag: loading: 'lazy', alt: alt }}
+                  {% else %}
+                    {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {% endif %}
+                </div>
+              {% if link != blank %}</a>{% endif %}
+
+              <div class="collection-card__inner">
+                <div class="collection-card__content layout-panel-flex--column">
+                  {% if caption != blank %}
+                    <p class="collection-card__caption">{{ caption }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% elsif block.type == 'text' %}
+          {% render 'text', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Editorial Photo Wall",
+  "class": "editorial-photo-wall",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page"
+        },
+        {
+          "value": "full-width",
+          "label": "Full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "padding_block_start",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_block_end",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Section heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Heading text",
+          "default": "<h2>Shop by image</h2>"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "default": "Placeholder alt text"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption",
+          "default": "Placeholder caption"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "default": "/"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial Photo Wall",
+      "blocks": [
+        { "type": "text" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

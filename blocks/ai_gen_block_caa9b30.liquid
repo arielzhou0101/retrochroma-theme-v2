@@ -1,0 +1,737 @@
+{% doc %}
+  @prompt
+    a section that duplicates the existing image with text section, enable a setting for the two buttons: can be removed, enable two settings for the image: desktop width: fit/fill/custom，mobile width: fit/fill/custom, request 1: the maximum custom desktop width of the image can be 100%, which means, if there are no elements other than the image it self, the image can take up all the horizontal space (but still keep the padding settings). request 2: fix the current image width settings. the status quo seem to be problematic, the 'custom width' setting for both desktop and mobile should be hidden if the custom is not selected. and make sure fill=100% width. these are all the same logic as the original image with text section. make sure to duplicate the original logic, request1: do not render the default fall-back image in the front-end if the image picker gets nothing. request 2: he 'custom width' setting for both desktop and mobile should be hidden if the custom is not selected. and make sure if user selected 'fill' it means 100% width.( now it seems to be set as 50% for desktop width), request 1: no border radius for image by default; request2: enable two width settings for image: desktop width and mobile width. desktop width: fit/fill/custom, when custom is selected, the range is 0-100%, mobile width is the same. default settings are both 'fill'; request 3: when there's nothing besides the image itself, the image can take up all the width within the padding limit of the block if the user sets the width to full or custom 100%. 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+
+  {% assign has_content = false %}
+    {% if block.settings.heading != blank or block.settings.text != blank %}
+      {% assign has_content = true %}
+    {% endif %}
+    {% if block.settings.show_button and block.settings.button_label != blank %}
+      {% assign has_content = true %}
+    {% endif %}
+    {% if block.settings.show_button_secondary and block.settings.button_secondary_label != blank %}
+      {% assign has_content = true %}
+    {% endif %}
+
+  .ai-image-text-{{ ai_gen_id }} {
+  display: block;
+  width: 100%; /* 移动端默认全宽 */
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+@media screen and (min-width: 750px) {
+  .ai-image-text-{{ ai_gen_id }} {
+    /* width 用 vw 而非 %，因为 shopify-block 容器宽度不一致导致 % 基准错误 */
+    width: {{ block.settings.desktop_width_percent }}vw;
+    padding-top: {{ block.settings.padding_top }}px;
+    padding-bottom: {{ block.settings.padding_bottom }}px;
+    padding-left: {{ block.settings.padding_left }}px;
+    padding-right: {{ block.settings.padding_right }}px;
+  }
+}
+
+
+  .ai-image-text-container-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: {{ block.settings.flex_direction }};
+    align-items: {{ block.settings.vertical_alignment }};
+    gap: {{ block.settings.spacing }}px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+
+  @media screen and (max-width: 749px) {
+    .ai-image-text-container-{{ ai_gen_id }} {
+      flex-direction: column;
+      width: 100%;
+    }
+  }
+
+  .ai-image-text-container-{{ ai_gen_id }}--reverse {
+    flex-direction: row-reverse;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-image-text-container-{{ ai_gen_id }}--reverse {
+      flex-direction: column;
+    }
+  }
+
+    .ai-image-text-image-wrapper-{{ ai_gen_id }} {
+    {% if block.settings.image_desktop_width == 'fit' %}
+      flex: 0 0 auto;
+    {% elsif block.settings.image_desktop_width == 'fill' %}
+      flex: 0 0 100%;
+      width: 100%;
+    {% else %}
+      flex: 0 0 {{ block.settings.image_desktop_width_custom }}%;
+      width: {{ block.settings.image_desktop_width_custom }}%;
+    {% endif %}
+    position: relative;
+  }
+
+  @media screen and (max-width: 749px) {
+  .ai-image-text-image-wrapper-{{ ai_gen_id }} {
+    {% if block.settings.image_mobile_width == 'fit' %}
+      flex: 0 0 auto;
+      width: auto;
+    {% elsif block.settings.image_mobile_width == 'fill' %}
+      flex: 0 0 100%;
+      width: 100%;
+    {% else %}
+      flex: 0 0 {{ block.settings.image_mobile_width_custom }}%;
+      width: {{ block.settings.image_mobile_width_custom }}%;
+    {% endif %}
+  }
+}
+
+
+  .ai-image-text-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    object-fit: cover;
+  }
+
+  .ai-image-text-content-{{ ai_gen_id }} {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: {{ block.settings.vertical_alignment }};
+    gap: {{ block.settings.content_spacing }}px;
+  }
+
+  .ai-image-text-heading-{{ ai_gen_id }} {
+    color: {{ block.settings.heading_color }};
+    font-size: {{ block.settings.heading_size }}px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-image-text-heading-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.heading_size }}px * 0.8);
+    }
+  }
+
+  .ai-image-text-text-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.text_size }}px;
+    line-height: 1.6;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-image-text-text-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.text_size }}px * 0.9);
+    }
+  }
+
+  .ai-image-text-text-{{ ai_gen_id }} p {
+    margin: 0;
+  }
+
+  .ai-image-text-button-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .ai-image-text-button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: {{ block.settings.button_border_width }}px solid {{ block.settings.button_border_color }};
+    border-radius: {{ block.settings.button_border_radius }}px;
+    text-decoration: none;
+    font-size: {{ block.settings.button_text_size }}px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .ai-image-text-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+    color: {{ block.settings.button_hover_text_color }};
+    border-color: {{ block.settings.button_hover_border_color }};
+  }
+
+  .ai-image-text-button-secondary-{{ ai_gen_id }} {
+    background-color: {{ block.settings.button_secondary_background }};
+    color: {{ block.settings.button_secondary_text_color }};
+    border-color: {{ block.settings.button_secondary_border_color }};
+  }
+
+  .ai-image-text-button-secondary-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_secondary_hover_background }};
+    color: {{ block.settings.button_secondary_hover_text_color }};
+    border-color: {{ block.settings.button_secondary_hover_border_color }};
+  }
+
+  /* Text-only: no image in block */
+  .ai-image-text-container-{{ ai_gen_id }}:not(:has(img)) {
+    justify-content: center;
+  }
+
+  .ai-image-text-container-{{ ai_gen_id }}:not(:has(img)) .ai-image-text-content-{{ ai_gen_id }} {
+    flex: 0 0 100%;
+    width: 100%;
+    align-items: center;
+  }
+
+  .ai-image-text-container-{{ ai_gen_id }}:not(:has(img)) .ai-image-text-content-{{ ai_gen_id }},
+  .ai-image-text-container-{{ ai_gen_id }}:not(:has(img)) .ai-image-text-content-{{ ai_gen_id }} *,
+  .ai-image-text-container-{{ ai_gen_id }}:not(:has(img)) .metafield-rich_text_field,
+  .ai-image-text-container-{{ ai_gen_id }}:not(:has(img)) .metafield-rich_text_field * {
+    --text-align-default: center;
+    --horizontal-alignment: center;
+    text-align: center !important;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-image-text-container-{{ ai_gen_id }}:not(:has(img)) .ai-image-text-content-{{ ai_gen_id }} {
+      padding-left: 80px;
+      padding-right: 80px;
+    }
+  }
+{% endstyle %}
+
+
+{% assign has_image = false %}
+{% if block.settings.image != blank and block.settings.image.src != blank %}
+  {% assign has_image = true %}
+{% endif %}
+
+{% if has_image or has_content %}
+  <div
+    class="ai-image-text-{{ ai_gen_id }}"
+    {{ block.shopify_attributes }}
+  >
+    <div class="ai-image-text-container-{{ ai_gen_id }} {% unless has_image %}ai-image-text-no-image-{{ ai_gen_id }}{% endunless %} {% if block.settings.flex_direction == 'row' and block.settings.image_position == 'right' %}ai-image-text-container-{{ ai_gen_id }}--reverse{% endif %}
+">
+
+      {% if has_image %}
+        <div class="ai-image-text-image-wrapper-{{ ai_gen_id }}">
+          <img
+            src="{{ block.settings.image | image_url: width: 1500 }}"
+            alt="{{ block.settings.image.alt | escape }}"
+            loading="lazy"
+            class="ai-image-text-image-{{ ai_gen_id }}"
+            style="aspect-ratio: {{ block.settings.image_aspect_ratio }};"
+          >
+        </div>
+      {% endif %}
+
+      {% if has_content %}
+        <div class="ai-image-text-content-{{ ai_gen_id }}">
+          {% if block.settings.heading != blank %}
+            <h2 class="ai-image-text-heading-{{ ai_gen_id }}">
+              {{ block.settings.heading }}
+            </h2>
+          {% endif %}
+
+          {% if block.settings.text != blank %}
+            <div class="ai-image-text-text-{{ ai_gen_id }}">
+              {{ block.settings.text }}
+            </div>
+          {% endif %}
+
+          {% if block.settings.show_button and block.settings.button_label != blank or block.settings.show_button_secondary and block.settings.button_secondary_label != blank %}
+            <div class="ai-image-text-button-wrapper-{{ ai_gen_id }}">
+              {% if block.settings.show_button and block.settings.button_label != blank %}
+                <a
+                  href="{{ block.settings.button_link }}"
+                  class="ai-image-text-button-{{ ai_gen_id }}"
+                >
+                  {{ block.settings.button_label }}
+                </a>
+              {% endif %}
+
+              {% if block.settings.show_button_secondary and block.settings.button_secondary_label != blank %}
+                <a
+                  href="{{ block.settings.button_secondary_link }}"
+                  class="ai-image-text-button-{{ ai_gen_id }} ai-image-text-button-secondary-{{ ai_gen_id }}"
+                >
+                  {{ block.settings.button_secondary_label }}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    function applyNoImageClass() {
+      document.querySelectorAll('[class*="ai-image-text-container-"]').forEach(function(container) {
+        if (!container.querySelector('img')) {
+          var classes = Array.from(container.classList);
+          var containerClass = classes.find(function(c) { return c.startsWith('ai-image-text-container-'); });
+          if (containerClass) {
+            var id = containerClass.replace('ai-image-text-container-', '');
+            container.classList.add('ai-image-text-no-image-' + id);
+          }
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', applyNoImageClass);
+    } else {
+      applyNoImageClass();
+    }
+  })();
+</script>
+
+
+{% endif %}
+
+
+{% schema %}
+{
+  "name": "Image with text",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+      {
+    "type": "select",
+    "id": "flex_direction",
+    "label": "桌面端布局方向",
+    "options": [
+      { "value": "row", "label": "左图右文" },
+      { "value": "column", "label": "上图下文" }
+    ],
+    "default": "column"
+  },
+    {
+  "type": "header",
+  "content": "Padding (Desktop Only)"
+},
+{
+  "type": "range",
+  "id": "padding_top",
+  "label": "Top padding",
+  "min": 0,
+  "max": 100,
+  "step": 4,
+  "unit": "px",
+  "default": 20
+},
+{
+  "type": "range",
+  "id": "padding_bottom",
+  "label": "Bottom padding",
+  "min": 0,
+  "max": 100,
+  "step": 4,
+  "unit": "px",
+  "default": 20
+},
+{
+  "type": "range",
+  "id": "padding_left",
+  "label": "Left padding",
+  "min": 0,
+  "max": 100,
+  "step": 4,
+  "unit": "px",
+  "default": 60
+},
+{
+  "type": "range",
+  "id": "padding_right",
+  "label": "Right padding",
+  "min": 0,
+  "max": 100,
+  "step": 4,
+  "unit": "px",
+  "default": 60
+},
+
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Vertical alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Spacing between image and text",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "content_spacing",
+      "label": "Content spacing",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_desktop_width",
+      "label": "Desktop width",
+      "options": [
+        {
+          "value": "fit",
+          "label": "Fit"
+        },
+        {
+          "value": "fill",
+          "label": "Fill"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "image_desktop_width_custom",
+      "label": "Custom desktop width",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.image_desktop_width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "image_mobile_width",
+      "label": "Mobile width",
+      "options": [
+        {
+          "value": "fit",
+          "label": "Fit"
+        },
+        {
+          "value": "fill",
+          "label": "Fill"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "image_mobile_width_custom",
+      "label": "Custom mobile width",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.image_mobile_width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Aspect ratio",
+      "options": [
+        {
+          "value": "1/1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "4/3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "16/9",
+          "label": "Wide (16:9)"
+        },
+        {
+          "value": "3/4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#000000"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Primary button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "label": "Show button",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Link"
+    },
+    {
+      "type": "range",
+      "id": "button_text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Background",
+      "default": "#c3cca6"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Border",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "label": "Border width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Hover text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_border_color",
+      "label": "Hover border",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Secondary button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button_secondary",
+      "label": "Show button",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "button_secondary_label",
+      "label": "Label"
+    },
+    {
+      "type": "url",
+      "id": "button_secondary_link",
+      "label": "Link"
+    },
+    {
+      "type": "color",
+      "id": "button_secondary_background",
+      "label": "Background",
+      "default": "#efefef"
+    },
+    {
+      "type": "color",
+      "id": "button_secondary_text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_secondary_border_color",
+      "label": "Border",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_secondary_hover_background",
+      "label": "Hover background",
+      "default": "#dedede"
+    },
+    {
+      "type": "color",
+      "id": "button_secondary_hover_text_color",
+      "label": "Hover text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_secondary_hover_border_color",
+      "label": "Hover border",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with text"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,365 @@
+{% doc %}
+  @prompt
+    Create a reusable Shopify product-page reassurance component for Retro Chroma.
+    
+    Goal:
+    Add a compact vertical reassurance block directly below the purchase buttons on the product page.
+    
+    Component structure:
+    - 3 stacked rows
+    - each row has:
+      - one uploaded PNG icon on the left
+      - one single-line text on the right
+    - no heading
+    - no subtext
+    - no badges
+    - no stars
+    - no loud trust styling
+    
+    Important:
+    The icons will be uploaded manually as PNG files, so build the component to support merchant-selected image icons for each row.
+    Do not generate icons with CSS or use emoji.
+    Use image blocks / image picker settings for each icon.
+    
+    Design direction:
+    This must match the current Retro Chroma PDP style:
+    - calm, editorial, understated
+    - warm neutrals and soft contrast
+    - premium but quiet
+    - not app-like
+    - not marketplace-like
+    - not conversion-widget style
+    
+    Layout rules:
+    - On desktop: show as a vertical 3-row list inside the purchase column
+    - On mobile: keep the same vertical 3-row layout
+    - do not convert to 3 columns on any breakpoint
+    - align the block width with the Add to cart area above
+    - keep spacing elegant and compact
+    - optimize readability on mobile
+    
+    Visual requirements:
+    - icon on the left, text on the right
+    - icons should be small and consistent in size
+    - single-line text should be easy to scan
+    - use subtle spacing between rows
+    - optional very light dividers are okay, but keep them minimal
+    - typography should feel native to the current product page
+    - do not make the text too small on mobile
+    
+    Content:
+    Use these default single-line texts for now:
+    1. Free shipping to most U.S. regions
+    2. Solid wood base with a warm, grounded feel
+    3. Mohair shade adds softness, warmth, and depth
+    
+    Theme editor settings:
+    Make all 3 rows editable in the Shopify theme editor.
+    For each row, allow:
+    - icon image picker (PNG upload)
+    - single-line text field
+    - show/hide row toggle
+    
+    Also add:
+    - top spacing setting
+    - bottom spacing setting
+    - icon size setting
+    - row gap setting
+    - optional toggle for subtle row separators
+    
+    Placement:
+    - place this component directly below the Add to cart / dynamic payment buttons
+    - place it above the Specifications / Shipping & Returns accordion
+    
+    Implementation requirements:
+    - build as a reusable Shopify section or snippet suitable for product pages
+    - keep the code clean and easy to adjust later
+    - make the styling feel integrated with the current theme, not bolted on
+    
+    Do not:
+    - use headings or subtext
+    - use multi-line copy
+    - use bright colors
+    - use badge-style backgrounds
+    - use 3-column desktop layout
+    - repeat long shipping or returns policy text already shown elsewhere
+    
+    Output:
+    1. implement the component
+    2. add theme editor settings
+    3. integrate it below the purchase buttons on the product page
+    4. keep the result visually quiet and native to the current Retro Chroma PDP
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-reassurance-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    margin-top: {{ block.settings.spacing_top }}px;
+    margin-bottom: {{ block.settings.spacing_bottom }}px;
+  }
+
+  .ai-reassurance-list-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.row_gap }}px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ai-reassurance-item-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    {% if block.settings.show_dividers %}
+      padding-bottom: {{ block.settings.row_gap }}px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    {% endif %}
+  }
+
+  .ai-reassurance-item-{{ ai_gen_id }}:last-child {
+    {% if block.settings.show_dividers %}
+      border-bottom: none;
+      padding-bottom: 0;
+    {% endif %}
+  }
+
+  .ai-reassurance-icon-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-reassurance-icon-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .ai-reassurance-icon-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    border-radius: 2px;
+  }
+
+  .ai-reassurance-text-{{ ai_gen_id }} {
+    flex: 1;
+    font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    font-weight: {{ settings.type_body_font.weight }};
+    font-size: 14px;
+    line-height: 1.5;
+    color: #222222;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-reassurance-text-{{ ai_gen_id }} {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .ai-reassurance-icon-{{ ai_gen_id }} {
+      width: {{ block.settings.icon_size | times: 0.9 }}px;
+      height: {{ block.settings.icon_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-reassurance-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <ul class="ai-reassurance-list-{{ ai_gen_id }}">
+    {% if block.settings.row_1_enabled %}
+      <li class="ai-reassurance-item-{{ ai_gen_id }}">
+        <div class="ai-reassurance-icon-{{ ai_gen_id }}">
+          {% if block.settings.row_1_icon %}
+            <img
+              src="{{ block.settings.row_1_icon | image_url: width: 100 }}"
+              alt=""
+              loading="lazy"
+              width="100"
+              height="100"
+            >
+          {% else %}
+            <div class="ai-reassurance-icon-placeholder-{{ ai_gen_id }}"></div>
+          {% endif %}
+        </div>
+        {% if block.settings.row_1_text != blank %}
+          <p class="ai-reassurance-text-{{ ai_gen_id }}">{{ block.settings.row_1_text }}</p>
+        {% endif %}
+      </li>
+    {% endif %}
+
+    {% if block.settings.row_2_enabled %}
+      <li class="ai-reassurance-item-{{ ai_gen_id }}">
+        <div class="ai-reassurance-icon-{{ ai_gen_id }}">
+          {% if block.settings.row_2_icon %}
+            <img
+              src="{{ block.settings.row_2_icon | image_url: width: 100 }}"
+              alt=""
+              loading="lazy"
+              width="100"
+              height="100"
+            >
+          {% else %}
+            <div class="ai-reassurance-icon-placeholder-{{ ai_gen_id }}"></div>
+          {% endif %}
+        </div>
+        {% if block.settings.row_2_text != blank %}
+          <p class="ai-reassurance-text-{{ ai_gen_id }}">{{ block.settings.row_2_text }}</p>
+        {% endif %}
+      </li>
+    {% endif %}
+
+    {% if block.settings.row_3_enabled %}
+      <li class="ai-reassurance-item-{{ ai_gen_id }}">
+        <div class="ai-reassurance-icon-{{ ai_gen_id }}">
+          {% if block.settings.row_3_icon %}
+            <img
+              src="{{ block.settings.row_3_icon | image_url: width: 100 }}"
+              alt=""
+              loading="lazy"
+              width="100"
+              height="100"
+            >
+          {% else %}
+            <div class="ai-reassurance-icon-placeholder-{{ ai_gen_id }}"></div>
+          {% endif %}
+        </div>
+        {% if block.settings.row_3_text != blank %}
+          <p class="ai-reassurance-text-{{ ai_gen_id }}">{{ block.settings.row_3_text }}</p>
+        {% endif %}
+      </li>
+    {% endif %}
+  </ul>
+</div>
+
+{% schema %}
+{
+  "name": "Product reassurance",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Row 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "row_1_enabled",
+      "label": "Show row 1",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "row_1_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "row_1_text",
+      "label": "Text",
+      "default": "Free shipping to most U.S. regions"
+    },
+    {
+      "type": "header",
+      "content": "Row 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "row_2_enabled",
+      "label": "Show row 2",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "row_2_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "row_2_text",
+      "label": "Text",
+      "default": "Solid wood base with a warm, grounded feel"
+    },
+    {
+      "type": "header",
+      "content": "Row 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "row_3_enabled",
+      "label": "Show row 3",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "row_3_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "row_3_text",
+      "label": "Text",
+      "default": "Mohair shade adds softness, warmth, and depth"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "spacing_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "spacing_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "label": "Row gap",
+      "min": 8,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dividers",
+      "label": "Show row dividers",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product reassurance"
+    }
+  ]
+}
+{% endschema %}

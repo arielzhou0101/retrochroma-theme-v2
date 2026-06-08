@@ -1,0 +1,558 @@
+{%- liquid
+  assign should_render = section.settings.enable_popup
+
+  unless request.page_type == 'product'
+    assign should_render = false
+  endunless
+
+  if customer
+    if customer.accepts_marketing or customer.orders_count > 0
+      assign should_render = false
+    endif
+  endif
+
+  assign form_id = 'PdpPromoPopupForm-' | append: section.id
+  assign popup_font = section.settings.popup_font
+-%}
+
+{%- if should_render or request.design_mode -%}
+  {{ 'pdp-promo-popup.css' | asset_url | stylesheet_tag }}
+
+  {%- style -%}
+    {{ popup_font | font_face: font_display: 'swap' }}
+
+    #shopify-section-{{ section.id }} .pdp-promo-popup {
+      --pdp-popup-background: {{ section.settings.popup_background }};
+      --pdp-popup-primary-text: {{ section.settings.primary_text }};
+      --pdp-popup-secondary-text: {{ section.settings.secondary_text }};
+      --pdp-popup-accent: {{ section.settings.accent_color }};
+      --pdp-popup-accent-text: {{ section.settings.accent_text }};
+      --pdp-popup-border: {{ section.settings.border_color }};
+      --pdp-popup-font: {{ popup_font.family }}, {{ popup_font.fallback_families }};
+      --pdp-popup-heading-size: {{ section.settings.heading_size }}px;
+      --pdp-popup-intro-size: {{ section.settings.intro_size }}px;
+      --pdp-popup-code-size: {{ section.settings.code_size }}px;
+      --pdp-popup-copy-size: {{ section.settings.copy_size }}px;
+      --pdp-popup-prompt-size: {{ section.settings.prompt_size }}px;
+      --pdp-popup-email-size: {{ section.settings.email_size }}px;
+      --pdp-popup-submit-size: {{ section.settings.submit_size }}px;
+      --pdp-popup-fine-print-size: {{ section.settings.fine_print_size }}px;
+      --pdp-popup-error-size: {{ section.settings.error_size }}px;
+      --pdp-popup-success-heading-size: {{ section.settings.success_heading_size }}px;
+      --pdp-popup-success-message-size: {{ section.settings.success_message_size }}px;
+    }
+  {%- endstyle -%}
+
+  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form' -%}
+    <aside
+      class="pdp-promo-popup"
+      data-pdp-promo-popup
+      data-trigger-delay="{{ section.settings.trigger_delay }}"
+      data-design-mode="{{ request.design_mode }}"
+      data-form-success="{{ form.posted_successfully? }}"
+      data-form-error="{% if form.errors %}true{% else %}false{% endif %}"
+      role="dialog"
+      aria-modal="false"
+      aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Saved for later' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
+      aria-hidden="true"
+    >
+      <button
+        class="pdp-promo-popup__close"
+        type="button"
+        aria-label="Close offer"
+        data-pdp-promo-close
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+
+      {%- if form.posted_successfully? -%}
+        <div class="pdp-promo-popup__success" data-pdp-promo-success tabindex="-1">
+          {%- if section.settings.show_success_heading -%}
+            <h2 class="pdp-promo-popup__success-heading">
+              {{ section.settings.success_heading_text | escape }}
+            </h2>
+          {%- endif -%}
+          {%- if section.settings.show_success_message -%}
+            <p class="pdp-promo-popup__success-copy">
+              {{ section.settings.success_message_text | escape }}
+            </p>
+          {%- endif -%}
+        </div>
+      {%- else -%}
+        <div class="pdp-promo-popup__content">
+          {%- if section.settings.show_heading -%}
+            <h2 class="pdp-promo-popup__heading">
+              {{ section.settings.heading_text | escape }}
+            </h2>
+          {%- endif -%}
+
+          {%- if section.settings.show_intro -%}
+            <p class="pdp-promo-popup__intro">
+              {{ section.settings.intro_text | escape }}
+            </p>
+          {%- endif -%}
+
+          {%- if section.settings.show_code or section.settings.show_copy -%}
+            <div class="pdp-promo-popup__code-row{% unless section.settings.show_code %} pdp-promo-popup__code-row--copy-only{% endunless %}">
+              {%- if section.settings.show_code -%}
+                <span class="pdp-promo-popup__code" data-pdp-promo-code>
+                  {{ section.settings.code_text | escape }}
+                </span>
+              {%- else -%}
+                <span class="visually-hidden" data-pdp-promo-code>
+                  {{ section.settings.code_text | escape }}
+                </span>
+              {%- endif -%}
+              {%- if section.settings.show_copy -%}
+                <button
+                  class="pdp-promo-popup__copy"
+                  type="button"
+                  data-pdp-promo-copy
+                  data-copy-label="{{ section.settings.copy_text | escape }}"
+                  data-copied-label="{{ section.settings.copied_text | escape }}"
+                >
+                  {{ section.settings.copy_text | escape }}
+                </button>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.show_prompt -%}
+            <p class="pdp-promo-popup__prompt">
+              {{ section.settings.prompt_text | escape | newline_to_br }}
+            </p>
+          {%- endif -%}
+
+          <input type="hidden" name="contact[tags]" value="newsletter,pdp-promo-popup">
+
+          {%- if section.settings.show_email -%}
+            <label class="visually-hidden" for="PdpPromoEmail-{{ section.id }}">
+              {{ section.settings.email_placeholder | escape }}
+            </label>
+            <input
+              class="pdp-promo-popup__email"
+              id="PdpPromoEmail-{{ section.id }}"
+              type="email"
+              name="contact[email]"
+              value="{{ form.email }}"
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+              placeholder="{{ section.settings.email_placeholder | escape }}"
+              required
+              {% if form.errors %}
+                autofocus
+                aria-invalid="true"
+                aria-describedby="PdpPromoError-{{ section.id }}"
+              {% endif %}
+            >
+          {%- endif -%}
+
+          {%- if form.errors and section.settings.show_error -%}
+            <p class="pdp-promo-popup__error" id="PdpPromoError-{{ section.id }}" tabindex="-1">
+              {{ section.settings.error_text | escape }}
+            </p>
+          {%- endif -%}
+
+          {%- if section.settings.show_submit -%}
+            <button
+              class="pdp-promo-popup__submit"
+              type="submit"
+              data-pdp-promo-submit
+              data-sending-label="{{ section.settings.sending_text | escape }}"
+            >
+              {{ section.settings.submit_text | escape }}
+            </button>
+          {%- endif -%}
+
+          {%- if section.settings.show_fine_print -%}
+            <p class="pdp-promo-popup__fine-print">
+              {{ section.settings.fine_print_text | escape | newline_to_br }}
+            </p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </aside>
+  {%- endform -%}
+
+  <script src="{{ 'pdp-promo-popup.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PDP Promo Popup",
+  "tag": "section",
+  "class": "pdp-promo-popup-section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_popup",
+      "label": "Enable popup",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "trigger_delay",
+      "label": "Delay before showing",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "unit": "sec",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Font"
+    },
+    {
+      "type": "font_picker",
+      "id": "popup_font",
+      "label": "Font for all popup text",
+      "default": "quicksand_n5"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_heading",
+      "label": "Show heading",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Text",
+      "default": "Still thinking about this lamp?"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Font size",
+      "min": 14,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "header",
+      "content": "Offer description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_intro",
+      "label": "Show description",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "intro_text",
+      "label": "Text",
+      "default": "Here's a first-order perk for this visit."
+    },
+    {
+      "type": "range",
+      "id": "intro_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Promo code"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_code",
+      "label": "Show promo code",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "code_text",
+      "label": "Promo code",
+      "info": "This must match the discount created in Shopify.",
+      "default": "WELCOME10"
+    },
+    {
+      "type": "range",
+      "id": "code_size",
+      "label": "Promo code font size",
+      "min": 14,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 21
+    },
+    {
+      "type": "checkbox",
+      "id": "show_copy",
+      "label": "Show copy button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "copy_text",
+      "label": "Copy button text",
+      "default": "Copy"
+    },
+    {
+      "type": "text",
+      "id": "copied_text",
+      "label": "Copied state text",
+      "default": "Copied"
+    },
+    {
+      "type": "range",
+      "id": "copy_size",
+      "label": "Copy button font size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "Email prompt"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_prompt",
+      "label": "Show email prompt",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "prompt_text",
+      "label": "Text",
+      "default": "Want to keep it for later?\nSend this code to your email."
+    },
+    {
+      "type": "range",
+      "id": "prompt_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Email field"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_email",
+      "label": "Show email field",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Placeholder",
+      "default": "Email address"
+    },
+    {
+      "type": "range",
+      "id": "email_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Submit button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_submit",
+      "label": "Show submit button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "submit_text",
+      "label": "Button text",
+      "default": "Send me the code"
+    },
+    {
+      "type": "text",
+      "id": "sending_text",
+      "label": "Sending state text",
+      "default": "Sending..."
+    },
+    {
+      "type": "range",
+      "id": "submit_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Consent note"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fine_print",
+      "label": "Show consent note",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "fine_print_text",
+      "label": "Text",
+      "default": "We'll send this code and occasional Retro Chroma updates. Unsubscribe anytime."
+    },
+    {
+      "type": "range",
+      "id": "fine_print_size",
+      "label": "Font size",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "header",
+      "content": "Error message"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_error",
+      "label": "Show error message",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "error_text",
+      "label": "Text",
+      "default": "Please enter a valid email address."
+    },
+    {
+      "type": "range",
+      "id": "error_size",
+      "label": "Font size",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Success heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_success_heading",
+      "label": "Show success heading",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "success_heading_text",
+      "label": "Text",
+      "default": "Saved for later"
+    },
+    {
+      "type": "range",
+      "id": "success_heading_size",
+      "label": "Font size",
+      "min": 14,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "header",
+      "content": "Success message"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_success_message",
+      "label": "Show success message",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "success_message_text",
+      "label": "Text",
+      "default": "WELCOME10 has been sent to your email."
+    },
+    {
+      "type": "range",
+      "id": "success_message_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "popup_background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "primary_text",
+      "label": "Primary text",
+      "default": "#211F1B"
+    },
+    {
+      "type": "color",
+      "id": "secondary_text",
+      "label": "Secondary text",
+      "default": "#706D66"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#8F293D"
+    },
+    {
+      "type": "color",
+      "id": "accent_text",
+      "label": "Text on accent",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#CBC8BF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "PDP Promo Popup"
+    }
+  ]
+}
+{% endschema %}

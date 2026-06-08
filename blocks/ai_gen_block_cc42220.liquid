@@ -1,0 +1,783 @@
+{% doc %}
+  @prompt
+    Please create a new reusable Shopify product page section for Retro Chroma called “Customer-shared close-ups”.
+    
+    Goal:
+    Add a compact trust-building media section on product pages using product-specific customer-shared photos or close-up reference photos. This is not a testimonials/reviews section. Do not add stars, buyer names, fake quotes, “verified buyer” badges, or review counts.
+    
+    Default section copy:
+    Heading: Customer-shared close-ups
+    Body text: Photos shared after delivery, showing real-life details, lighting, and scale.
+    Footer note: Shared snapshots are shown for real-life reference; colors may vary slightly by lighting.
+    
+    Design:
+    Use small, polished image cards rather than large hero images.
+    Desktop: show cards in a clean row/grid.
+    Mobile: stack vertically or use a clean horizontal scroll, whichever fits the theme better.
+    Use the existing theme typography, spacing, card styles, and colors.
+    Keep the section visually restrained, warm, and editorial, consistent with Retro Chroma product pages.
+    Image cards should have consistent aspect ratio, object-fit: cover, subtle border, and short configurable captions.
+    Do not make this section look like a review carousel or a main product gallery.
+    
+    Configuration:
+    Make the whole section fully configurable in the Shopify theme editor.
+    The merchant should be able to configure:
+    - section heading
+    - section body text
+    - optional footer note
+    - card count
+    - each card image
+    - each card caption
+    - optional card subtext
+    
+    Use flexible blocks for the cards, not fixed hardcoded labels.
+    Support at least 1 to 6 cards.
+    If possible, allow dynamic sources/metafields for each image and text field so different products can have different images and captions.
+    
+    Behavior:
+    If no card images are configured for a product, hide the entire section.
+    If only 1 or 2 cards are configured, show only those cards and keep the layout balanced.
+    If more cards are configured, keep the layout clean and responsive.
+    Please create this as a new theme section and do not publish theme changes automatically.
+{% enddoc %}
+{% liquid
+  assign card_1_visible = false
+  assign card_2_visible = false
+  assign card_3_visible = false
+  assign card_4_visible = false
+  assign card_5_visible = false
+  assign card_6_visible = false
+
+  if block.settings.card_1_image != blank
+    assign card_1_visible = true
+  endif
+  if block.settings.card_2_image != blank
+    assign card_2_visible = true
+  endif
+  if block.settings.card_3_image != blank
+    assign card_3_visible = true
+  endif
+  if block.settings.card_4_image != blank
+    assign card_4_visible = true
+  endif
+  if block.settings.card_5_image != blank
+    assign card_5_visible = true
+  endif
+  if block.settings.card_6_image != blank
+    assign card_6_visible = true
+  endif
+
+  assign has_visible_cards = false
+  if card_1_visible or card_2_visible or card_3_visible or card_4_visible or card_5_visible or card_6_visible
+    assign has_visible_cards = true
+  endif
+%}
+
+{% if has_visible_cards %}
+  {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+  {% style %}
+    .customer-closeups-{{ ai_gen_id }} {
+      display: block;
+      width: 100%;
+      padding: {{ block.settings.padding_top }}px 0 {{ block.settings.padding_bottom }}px;
+      background-color: {{ block.settings.background_color }};
+      color: {{ block.settings.text_color }};
+    }
+
+    .customer-closeups-container-{{ ai_gen_id }} {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .customer-closeups-header-{{ ai_gen_id }} {
+      text-align: {{ block.settings.text_alignment }};
+      margin-bottom: 32px;
+    }
+
+    .customer-closeups-heading-{{ ai_gen_id }} {
+      font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+      font-weight: {{ block.settings.heading_font.weight }};
+      font-size: {{ block.settings.heading_size }}px;
+      line-height: 1.2;
+      margin: 0 0 12px;
+      color: {{ block.settings.heading_color }};
+    }
+
+    .customer-closeups-body-{{ ai_gen_id }} {
+      font-size: {{ block.settings.body_size }}px;
+      line-height: 1.5;
+      margin: 0;
+      max-width: 600px;
+      {% if block.settings.text_alignment == 'center' %}
+        margin-left: auto;
+        margin-right: auto;
+      {% endif %}
+    }
+
+    .customer-closeups-grid-{{ ai_gen_id }} {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax({{ block.settings.card_min_width }}px, 1fr));
+  gap: {{ block.settings.card_gap }}px;
+  margin-bottom: {{ block.settings.footer_spacing }}px;
+}
+
+@media screen and (min-width: 750px) {
+  .customer-closeups-grid-{{ ai_gen_id }} {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-content: start;
+  }
+
+  .customer-closeups-card-{{ ai_gen_id }} {
+    max-width: 100%;
+  }
+}
+
+
+    .customer-closeups-card-{{ ai_gen_id }} {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .customer-closeups-image-wrapper-{{ ai_gen_id }} {
+      position: relative;
+      width: 100%;
+      padding-bottom: {{ block.settings.image_aspect_ratio }}%;
+      overflow: hidden;
+      border-radius: {{ block.settings.card_border_radius }}px;
+      border: {{ block.settings.card_border_width }}px solid {{ block.settings.border_color }};
+      background-color: {{ block.settings.card_background }};
+    }
+
+    .customer-closeups-image-{{ ai_gen_id }} {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .customer-closeups-caption-{{ ai_gen_id }} {
+      font-size: {{ block.settings.caption_size }}px;
+      line-height: 1.4;
+      margin: 0;
+      font-weight: 500;
+      color: {{ block.settings.text_color }};
+    }
+
+    .customer-closeups-subtext-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subtext_size }}px;
+      line-height: 1.4;
+      margin: 0;
+      opacity: 0.7;
+      color: {{ block.settings.text_color }};
+    }
+
+    .customer-closeups-footer-{{ ai_gen_id }} {
+      text-align: {{ block.settings.text_alignment }};
+      font-size: {{ block.settings.footer_size }}px;
+      line-height: 1.5;
+      opacity: 0.6;
+      max-width: 700px;
+      color: {{ block.settings.text_color }};
+      {% if block.settings.text_alignment == 'center' %}
+        margin-left: auto;
+        margin-right: auto;
+      {% endif %}
+    }
+
+    @media screen and (max-width: 749px) {
+      .customer-closeups-{{ ai_gen_id }} {
+        padding: {{ block.settings.padding_top | times: 0.7 }}px 0 {{ block.settings.padding_bottom | times: 0.7 }}px;
+      }
+
+      .customer-closeups-container-{{ ai_gen_id }} {
+        padding: 0 16px;
+      }
+
+      .customer-closeups-heading-{{ ai_gen_id }} {
+        font-size: {{ block.settings.heading_size | times: 0.7 }}px;
+      }
+
+      .customer-closeups-body-{{ ai_gen_id }} {
+        font-size: {{ block.settings.body_size | times: 0.9 }}px;
+      }
+
+      .customer-closeups-grid-{{ ai_gen_id }} {
+        {% if block.settings.mobile_layout == 'scroll' %}
+          display: flex;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          gap: 16px;
+          padding-bottom: 8px;
+          -webkit-overflow-scrolling: touch;
+        {% else %}
+          grid-template-columns: 1fr;
+        {% endif %}
+      }
+
+      {% if block.settings.mobile_layout == 'scroll' %}
+        .customer-closeups-card-{{ ai_gen_id }} {
+          flex: 0 0 280px;
+          scroll-snap-align: start;
+        }
+      {% endif %}
+    }
+  {% endstyle %}
+
+  <customer-closeups-{{ ai_gen_id }} class="customer-closeups-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+    <div class="customer-closeups-container-{{ ai_gen_id }}">
+      {% if block.settings.heading != blank or block.settings.body_text != blank %}
+        <div class="customer-closeups-header-{{ ai_gen_id }}">
+          {% if block.settings.heading != blank %}
+            <h2 class="customer-closeups-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+          {% endif %}
+          {% if block.settings.body_text != blank %}
+            <div class="customer-closeups-body-{{ ai_gen_id }}">{{ block.settings.body_text }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="customer-closeups-grid-{{ ai_gen_id }}">
+        {% if card_1_visible %}
+          <div class="customer-closeups-card-{{ ai_gen_id }}">
+            <div class="customer-closeups-image-wrapper-{{ ai_gen_id }}">
+              <img
+                src="{{ block.settings.card_1_image | image_url: width: 600 }}"
+                alt="{{ block.settings.card_1_image.alt | default: block.settings.card_1_caption | escape }}"
+                loading="lazy"
+                width="600"
+                height="{{ 600 | times: block.settings.image_aspect_ratio | divided_by: 100 }}"
+                class="customer-closeups-image-{{ ai_gen_id }}"
+              >
+            </div>
+            {% if block.settings.card_1_caption != blank %}
+              <p class="customer-closeups-caption-{{ ai_gen_id }}">{{ block.settings.card_1_caption }}</p>
+            {% endif %}
+            {% if block.settings.card_1_subtext != blank %}
+              <p class="customer-closeups-subtext-{{ ai_gen_id }}">{{ block.settings.card_1_subtext }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if card_2_visible %}
+          <div class="customer-closeups-card-{{ ai_gen_id }}">
+            <div class="customer-closeups-image-wrapper-{{ ai_gen_id }}">
+              <img
+                src="{{ block.settings.card_2_image | image_url: width: 600 }}"
+                alt="{{ block.settings.card_2_image.alt | default: block.settings.card_2_caption | escape }}"
+                loading="lazy"
+                width="600"
+                height="{{ 600 | times: block.settings.image_aspect_ratio | divided_by: 100 }}"
+                class="customer-closeups-image-{{ ai_gen_id }}"
+              >
+            </div>
+            {% if block.settings.card_2_caption != blank %}
+              <p class="customer-closeups-caption-{{ ai_gen_id }}">{{ block.settings.card_2_caption }}</p>
+            {% endif %}
+            {% if block.settings.card_2_subtext != blank %}
+              <p class="customer-closeups-subtext-{{ ai_gen_id }}">{{ block.settings.card_2_subtext }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if card_3_visible %}
+          <div class="customer-closeups-card-{{ ai_gen_id }}">
+            <div class="customer-closeups-image-wrapper-{{ ai_gen_id }}">
+              <img
+                src="{{ block.settings.card_3_image | image_url: width: 600 }}"
+                alt="{{ block.settings.card_3_image.alt | default: block.settings.card_3_caption | escape }}"
+                loading="lazy"
+                width="600"
+                height="{{ 600 | times: block.settings.image_aspect_ratio | divided_by: 100 }}"
+                class="customer-closeups-image-{{ ai_gen_id }}"
+              >
+            </div>
+            {% if block.settings.card_3_caption != blank %}
+              <p class="customer-closeups-caption-{{ ai_gen_id }}">{{ block.settings.card_3_caption }}</p>
+            {% endif %}
+            {% if block.settings.card_3_subtext != blank %}
+              <p class="customer-closeups-subtext-{{ ai_gen_id }}">{{ block.settings.card_3_subtext }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if card_4_visible %}
+          <div class="customer-closeups-card-{{ ai_gen_id }}">
+            <div class="customer-closeups-image-wrapper-{{ ai_gen_id }}">
+              <img
+                src="{{ block.settings.card_4_image | image_url: width: 600 }}"
+                alt="{{ block.settings.card_4_image.alt | default: block.settings.card_4_caption | escape }}"
+                loading="lazy"
+                width="600"
+                height="{{ 600 | times: block.settings.image_aspect_ratio | divided_by: 100 }}"
+                class="customer-closeups-image-{{ ai_gen_id }}"
+              >
+            </div>
+            {% if block.settings.card_4_caption != blank %}
+              <p class="customer-closeups-caption-{{ ai_gen_id }}">{{ block.settings.card_4_caption }}</p>
+            {% endif %}
+            {% if block.settings.card_4_subtext != blank %}
+              <p class="customer-closeups-subtext-{{ ai_gen_id }}">{{ block.settings.card_4_subtext }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if card_5_visible %}
+          <div class="customer-closeups-card-{{ ai_gen_id }}">
+            <div class="customer-closeups-image-wrapper-{{ ai_gen_id }}">
+              <img
+                src="{{ block.settings.card_5_image | image_url: width: 600 }}"
+                alt="{{ block.settings.card_5_image.alt | default: block.settings.card_5_caption | escape }}"
+                loading="lazy"
+                width="600"
+                height="{{ 600 | times: block.settings.image_aspect_ratio | divided_by: 100 }}"
+                class="customer-closeups-image-{{ ai_gen_id }}"
+              >
+            </div>
+            {% if block.settings.card_5_caption != blank %}
+              <p class="customer-closeups-caption-{{ ai_gen_id }}">{{ block.settings.card_5_caption }}</p>
+            {% endif %}
+            {% if block.settings.card_5_subtext != blank %}
+              <p class="customer-closeups-subtext-{{ ai_gen_id }}">{{ block.settings.card_5_subtext }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if card_6_visible %}
+          <div class="customer-closeups-card-{{ ai_gen_id }}">
+            <div class="customer-closeups-image-wrapper-{{ ai_gen_id }}">
+              <img
+                src="{{ block.settings.card_6_image | image_url: width: 600 }}"
+                alt="{{ block.settings.card_6_image.alt | default: block.settings.card_6_caption | escape }}"
+                loading="lazy"
+                width="600"
+                height="{{ 600 | times: block.settings.image_aspect_ratio | divided_by: 100 }}"
+                class="customer-closeups-image-{{ ai_gen_id }}"
+              >
+            </div>
+            {% if block.settings.card_6_caption != blank %}
+              <p class="customer-closeups-caption-{{ ai_gen_id }}">{{ block.settings.card_6_caption }}</p>
+            {% endif %}
+            {% if block.settings.card_6_subtext != blank %}
+              <p class="customer-closeups-subtext-{{ ai_gen_id }}">{{ block.settings.card_6_subtext }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if block.settings.footer_note != blank %}
+        <div class="customer-closeups-footer-{{ ai_gen_id }}">{{ block.settings.footer_note }}</div>
+      {% endif %}
+    </div>
+  </customer-closeups-{{ ai_gen_id }}>
+
+  <script>
+    (function() {
+      class CustomerCloseups{{ ai_gen_id }} extends HTMLElement {
+        constructor() {
+          super();
+        }
+
+        connectedCallback() {
+          const grid = this.querySelector('.customer-closeups-grid-{{ ai_gen_id }}');
+          if (!grid) return;
+
+          if (window.innerWidth <= 749) {
+            const computedStyle = window.getComputedStyle(grid);
+            if (computedStyle.overflowX === 'auto') {
+              grid.addEventListener('scroll', this.handleScroll.bind(this));
+            }
+          }
+        }
+
+        handleScroll(event) {
+          const grid = event.target;
+          const scrollLeft = grid.scrollLeft;
+          const scrollWidth = grid.scrollWidth;
+          const clientWidth = grid.clientWidth;
+
+          if (scrollLeft + clientWidth >= scrollWidth - 10) {
+            grid.setAttribute('data-scroll-end', 'true');
+          } else {
+            grid.removeAttribute('data-scroll-end');
+          }
+        }
+      }
+
+      customElements.define('customer-closeups-{{ ai_gen_id }}', CustomerCloseups{{ ai_gen_id }});
+    })();
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Customer-shared close-ups",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Customer-shared close-ups"
+    },
+    {
+      "type": "richtext",
+      "id": "body_text",
+      "label": "Body text",
+      "default": "<p>Photos shared after delivery, showing real-life details, lighting, and scale.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "footer_note",
+      "label": "Footer note",
+      "default": "<p>Shared snapshots are shown for real-life reference; colors may vary slightly by lighting.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "card_min_width",
+      "label": "Card minimum width",
+      "min": 200,
+      "max": 400,
+      "step": 20,
+      "unit": "px",
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Card spacing",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        {
+          "value": "stack",
+          "label": "Stack vertically"
+        },
+        {
+          "value": "scroll",
+          "label": "Horizontal scroll"
+        }
+      ],
+      "default": "scroll"
+    },
+    {
+      "type": "header",
+      "content": "Card 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "card_1_caption",
+      "label": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "card_1_subtext",
+      "label": "Subtext"
+    },
+    {
+      "type": "header",
+      "content": "Card 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "card_2_caption",
+      "label": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "card_2_subtext",
+      "label": "Subtext"
+    },
+    {
+      "type": "header",
+      "content": "Card 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "card_3_caption",
+      "label": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "card_3_subtext",
+      "label": "Subtext"
+    },
+    {
+      "type": "header",
+      "content": "Card 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_4_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "card_4_caption",
+      "label": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "card_4_subtext",
+      "label": "Subtext"
+    },
+    {
+      "type": "header",
+      "content": "Card 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_5_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "card_5_caption",
+      "label": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "card_5_subtext",
+      "label": "Subtext"
+    },
+    {
+      "type": "header",
+      "content": "Card 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_6_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "card_6_caption",
+      "label": "Caption"
+    },
+    {
+      "type": "text",
+      "id": "card_6_subtext",
+      "label": "Subtext"
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "range",
+      "id": "image_aspect_ratio",
+      "label": "Image aspect ratio",
+      "min": 75,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "100% = square, 75% = landscape, 125% = portrait"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "card_border_width",
+      "label": "Border width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading font",
+      "default": "abel_n4"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body text size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "caption_size",
+      "label": "Caption size",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "subtext_size",
+      "label": "Subtext size",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "footer_size",
+      "label": "Footer note size",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "footer_spacing",
+      "label": "Footer spacing",
+      "min": 12,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Color"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#e6e6e6"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer-shared close-ups"
+    }
+  ]
+}
+{% endschema %}
