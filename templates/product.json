@@ -1773,7 +1773,7 @@
         "copied_text": "Copied",
         "copy_size": 13,
         "show_prompt": true,
-        "prompt_text": "Want to save it for later?\nSend the code to your inbox and get occasional Retro Chroma updates.",
+        "prompt_text": "Want to save it for later?\nSend it to your inbox and get occasional Retro Chroma updates.",
         "prompt_size": 14,
         "show_email": true,
         "email_placeholder": "Email address",
