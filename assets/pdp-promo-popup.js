@@ -1,4 +1,6 @@
 (() => {
+  const EVENT_SOURCE = 'pdp_promo_popup';
+
   const STORAGE_KEYS = {
     subscribed: 'rcPdpPromoEmailSubmitted',
     impressions: 'rcPdpPromoImpressions',
@@ -24,6 +26,30 @@
     } catch {
       // Storage may be unavailable in privacy mode; the popup should still work.
     }
+  };
+
+  const removeBlankParams = (params) =>
+    Object.fromEntries(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== '')
+    );
+
+  const buildEventParams = (popup, code) =>
+    removeBlankParams({
+      product_id: popup.dataset.productId,
+      product_handle: popup.dataset.productHandle,
+      promo_code: popup.dataset.promoCode || code,
+      source: EVENT_SOURCE,
+    });
+
+  const trackEvent = (eventName, params) => {
+    const payload = removeBlankParams({
+      event: eventName,
+      ...params,
+    });
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(payload);
+    window.dispatchEvent(new CustomEvent('pdpPromoPopup:analytics', { detail: payload }));
   };
 
   const getRecentImpressions = () => {
@@ -87,12 +113,18 @@
     const code = popup.querySelector('[data-pdp-promo-code]')?.textContent.trim() || 'WELCOME10';
     const form = popup.closest('form');
     const submitButton = popup.querySelector('[data-pdp-promo-submit]');
+    const eventParams = buildEventParams(popup, code);
+    let hasTrackedView = false;
     let timer;
 
-    const show = ({ record = true } = {}) => {
+    const show = ({ record = true, trackView = true } = {}) => {
       window.clearTimeout(timer);
       popup.classList.add('is-visible');
       popup.setAttribute('aria-hidden', 'false');
+      if (trackView && !isDesignMode && !hasTrackedView) {
+        trackEvent('pdp_promo_view', eventParams);
+        hasTrackedView = true;
+      }
       if (record && !isDesignMode) recordImpression();
     };
 
@@ -103,6 +135,7 @@
 
     closeButton?.addEventListener('click', () => {
       writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
+      if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
       hide();
     });
 
@@ -113,6 +146,7 @@
       try {
         await copyText(code);
         writeStorage(window.sessionStorage, STORAGE_KEYS.sessionCopied, 'true');
+        if (!isDesignMode) trackEvent('pdp_promo_copy', eventParams);
         copyButton.textContent = copiedLabel;
         window.setTimeout(() => {
           copyButton.textContent = copyLabel;
@@ -123,6 +157,7 @@
     });
 
     form?.addEventListener('submit', () => {
+      if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
       if (!submitButton) return;
       submitButton.disabled = true;
       submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
@@ -130,14 +165,15 @@
 
     if (hasSuccess) {
       writeStorage(window.localStorage, STORAGE_KEYS.subscribed, 'true');
-      show({ record: false });
+      if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
+      show({ record: false, trackView: false });
       popup.querySelector('[data-pdp-promo-success]')?.focus();
       window.setTimeout(hide, 2200);
       return;
     }
 
     if (hasError || isDesignMode) {
-      show({ record: false });
+      show({ record: false, trackView: false });
       return;
     }
 
