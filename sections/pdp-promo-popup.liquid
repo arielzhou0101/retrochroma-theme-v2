@@ -17,9 +17,10 @@
 
 {%- if should_render or request.design_mode -%}
   {{ 'pdp-promo-popup.css' | asset_url | stylesheet_tag }}
-  {{ popup_font | font_face: font_display: 'swap' }}
 
   {%- style -%}
+    {{ popup_font | font_face: font_display: 'swap' }}
+
     #shopify-section-{{ section.id }} .pdp-promo-popup {
       --pdp-popup-background: {{ section.settings.popup_background }};
       --pdp-popup-primary-text: {{ section.settings.primary_text }};
