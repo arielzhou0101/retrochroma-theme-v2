@@ -1757,7 +1757,7 @@
       "name": "PDP Promo Popup",
       "settings": {
         "enable_popup": true,
-        "trigger_delay": 10,
+        "trigger_delay": 5,
         "popup_font": "abel_n4",
         "show_heading": true,
         "heading_text": "Your welcome code is ready",
