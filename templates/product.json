@@ -1758,7 +1758,7 @@
       "settings": {
         "enable_popup": true,
         "trigger_delay": 10,
-        "popup_font": "quicksand_n5",
+        "popup_font": "abel_n4",
         "show_heading": true,
         "heading_text": "Here's a first-order perk for this visit.",
         "heading_size": 22,
