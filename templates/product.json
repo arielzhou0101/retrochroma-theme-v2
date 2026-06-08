@@ -1784,7 +1784,7 @@
         "submit_size": 15,
         "show_fine_print": true,
         "fine_print_text": "We'll send this code and occasional Retro Chroma updates. Unsubscribe anytime.",
-        "fine_print_size": 11,
+        "fine_print_size": 14,
         "show_error": true,
         "error_text": "Please enter a valid email address.",
         "error_size": 12,
