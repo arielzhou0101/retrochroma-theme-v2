@@ -1794,7 +1794,7 @@
         "show_success_message": true,
         "success_message_text": "WELCOME10 has been sent to your email.",
         "success_message_size": 15,
-        "popup_background": "#ffffff",
+        "popup_background": "#f5f2ef",
         "primary_text": "#211f1b",
         "secondary_text": "#706d66",
         "accent_color": "#7e876d",
