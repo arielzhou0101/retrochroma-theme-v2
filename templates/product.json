@@ -194,6 +194,38 @@
               },
               "block_order": []
             },
+            "payment_icons_tUEBdY": {
+              "type": "payment-icons",
+              "name": "t:names.payment_icons",
+              "settings": {
+                "horizontal_alignment": "flex-start",
+                "gap": 10,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "ai_gen_block_bdf77c4_a4c6Fa": {
+              "type": "ai_gen_block_bdf77c4",
+              "settings": {
+                "row_1_enabled": true,
+                "row_1_icon": "shopify://shop_images/truck.svg",
+                "row_1_text": "Free shipping to most U.S. regions (8-15 business days)",
+                "row_2_enabled": true,
+                "row_2_icon": "shopify://shop_images/box_7b731e62-12da-44dd-a13d-39f45f817730.svg",
+                "row_2_text": "No hassle returns within 30 days",
+                "row_3_enabled": false,
+                "row_3_text": "Mohair shade adds softness, warmth, and depth",
+                "spacing_top": 12,
+                "spacing_bottom": 0,
+                "row_gap": 8,
+                "icon_size": 28,
+                "show_dividers": false
+              },
+              "blocks": {}
+            },
             "series_recommendations": {
               "type": "series_recommendations",
               "name": "Series recommendations",
@@ -230,38 +262,6 @@
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "payment_icons_tUEBdY": {
-              "type": "payment-icons",
-              "name": "t:names.payment_icons",
-              "settings": {
-                "horizontal_alignment": "flex-start",
-                "gap": 10,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "ai_gen_block_bdf77c4_a4c6Fa": {
-              "type": "ai_gen_block_bdf77c4",
-              "settings": {
-                "row_1_enabled": true,
-                "row_1_icon": "shopify://shop_images/truck.svg",
-                "row_1_text": "Free shipping to most U.S. regions (8-15 business days)",
-                "row_2_enabled": true,
-                "row_2_icon": "shopify://shop_images/box_7b731e62-12da-44dd-a13d-39f45f817730.svg",
-                "row_2_text": "No hassle returns within 30 days",
-                "row_3_enabled": false,
-                "row_3_text": "Mohair shade adds softness, warmth, and depth",
-                "spacing_top": 12,
-                "spacing_bottom": 0,
-                "row_gap": 8,
-                "icon_size": 28,
-                "show_dividers": false
               },
               "blocks": {}
             },
@@ -425,10 +425,10 @@
             "price_a7krng",
             "variant_picker_R3rGDr",
             "buy_buttons_eYQEYi",
-            "series_recommendations",
-            "product_description_LfDYCg",
             "payment_icons_tUEBdY",
             "ai_gen_block_bdf77c4_a4c6Fa",
+            "series_recommendations",
+            "product_description_LfDYCg",
             "text_AVg9L8",
             "accordion_CWUgfK",
             "text_3kG4a6"
