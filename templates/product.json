@@ -139,6 +139,10 @@
               },
               "blocks": {}
             },
+            "judge_me_reviews_preview_badge_Qtq8fK": {
+              "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+              "settings": {}
+            },
             "variant_picker_R3rGDr": {
               "type": "variant-picker",
               "settings": {
@@ -423,6 +427,7 @@
             "heading_m7KmQQ",
             "text_FqENNL",
             "price_a7krng",
+            "judge_me_reviews_preview_badge_Qtq8fK",
             "variant_picker_R3rGDr",
             "buy_buttons_eYQEYi",
             "payment_icons_tUEBdY",
