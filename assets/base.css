@@ -3935,3 +3935,11 @@ text-component {
   transform: none;
   box-shadow: none;
 }
+.card__media img,
+.product-card img,
+[class*="product-card"] img {
+  object-fit: cover;
+  object-position: center;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+}
