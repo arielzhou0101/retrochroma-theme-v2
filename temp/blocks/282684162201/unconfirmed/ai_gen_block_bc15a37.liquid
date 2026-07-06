@@ -1,6 +1,210 @@
+{% doc %}
+  @prompt
+    Add custom CSS to make all product card images use object-fit: cover and object-position: center, so that non-square images are automatically cropped to fill the square product card container without distortion or white space. The CSS should target product card image elements globally across the store.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-product-card-image-fix-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-product-card-image-fix-{{ ai_gen_id }} .card__media img,
+  .ai-product-card-image-fix-{{ ai_gen_id }} .card-wrapper img,
+  .ai-product-card-image-fix-{{ ai_gen_id }} .product-card img,
+  .ai-product-card-image-fix-{{ ai_gen_id }} .product-grid-item img,
+  .ai-product-card-image-fix-{{ ai_gen_id }} .grid-product__image img,
+  .ai-product-card-image-fix-{{ ai_gen_id }} .product__media img,
+  .ai-product-card-image-fix-{{ ai_gen_id }} img[class*="product"] {
+    object-fit: {{ block.settings.object_fit }} !important;
+    object-position: {{ block.settings.object_position_x }} {{ block.settings.object_position_y }} !important;
+  }
+
+  {% if block.settings.apply_to_featured_images %}
+    .ai-product-card-image-fix-{{ ai_gen_id }} .featured-product img,
+    .ai-product-card-image-fix-{{ ai_gen_id }} .product-single__media img,
+    .ai-product-card-image-fix-{{ ai_gen_id }} .product__main-photos img {
+      object-fit: {{ block.settings.object_fit }} !important;
+      object-position: {{ block.settings.object_position_x }} {{ block.settings.object_position_y }} !important;
+    }
+  {% endif %}
+
+  {% if block.settings.apply_to_collection_images %}
+    .ai-product-card-image-fix-{{ ai_gen_id }} .collection-card img,
+    .ai-product-card-image-fix-{{ ai_gen_id }} .collection-grid-item img,
+    .ai-product-card-image-fix-{{ ai_gen_id }} .collection__image img {
+      object-fit: {{ block.settings.object_fit }} !important;
+      object-position: {{ block.settings.object_position_x }} {{ block.settings.object_position_y }} !important;
+    }
+  {% endif %}
+{% endstyle %}
+
+<div class="ai-product-card-image-fix-{{ ai_gen_id }}" {{ block.shopify_attributes }}></div>
+
+<script>
+  (function() {
+    class ProductCardImageFix{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        const targetNode = document.body;
+        const config = { childList: true, subtree: true };
+
+        const callback = (mutationsList) => {
+          for (const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+              mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1) {
+                  this.applyStyles(node);
+                }
+              });
+            }
+          }
+        };
+
+        const observer = new MutationObserver(callback);
+        observer.observe(targetNode, config);
+
+        this.applyStyles(document.body);
+      }
+
+      applyStyles(element) {
+        const images = element.querySelectorAll(
+          '.card__media img, .card-wrapper img, .product-card img, .product-grid-item img, .grid-product__image img, .product__media img, img[class*="product"]'
+        );
+
+        images.forEach((img) => {
+          if (!img.closest('.ai-product-card-image-fix-{{ ai_gen_id }}')) {
+            img.style.objectFit = '{{ block.settings.object_fit }}';
+            img.style.objectPosition = '{{ block.settings.object_position_x }} {{ block.settings.object_position_y }}';
+          }
+        });
+
+        {% if block.settings.apply_to_featured_images %}
+          const featuredImages = element.querySelectorAll(
+            '.featured-product img, .product-single__media img, .product__main-photos img'
+          );
+          featuredImages.forEach((img) => {
+            if (!img.closest('.ai-product-card-image-fix-{{ ai_gen_id }}')) {
+              img.style.objectFit = '{{ block.settings.object_fit }}';
+              img.style.objectPosition = '{{ block.settings.object_position_x }} {{ block.settings.object_position_y }}';
+            }
+          });
+        {% endif %}
+
+        {% if block.settings.apply_to_collection_images %}
+          const collectionImages = element.querySelectorAll(
+            '.collection-card img, .collection-grid-item img, .collection__image img'
+          );
+          collectionImages.forEach((img) => {
+            if (!img.closest('.ai-product-card-image-fix-{{ ai_gen_id }}')) {
+              img.style.objectFit = '{{ block.settings.object_fit }}';
+              img.style.objectPosition = '{{ block.settings.object_position_x }} {{ block.settings.object_position_y }}';
+            }
+          });
+        {% endif %}
+      }
+    }
+
+    customElements.define('product-card-image-fix-{{ ai_gen_id }}', ProductCardImageFix{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Product card image fix",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image display settings"
+    },
+    {
+      "type": "select",
+      "id": "object_fit",
+      "label": "Image fit",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Cover (crop to fill)"
+        },
+        {
+          "value": "contain",
+          "label": "Contain (fit inside)"
+        },
+        {
+          "value": "fill",
+          "label": "Fill (stretch)"
+        }
+      ],
+      "default": "cover",
+      "info": "Cover crops images to fill the container without distortion"
+    },
+    {
+      "type": "select",
+      "id": "object_position_x",
+      "label": "Horizontal position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "object_position_y",
+      "label": "Vertical position",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Additional targets"
+    },
+    {
+      "type": "checkbox",
+      "id": "apply_to_featured_images",
+      "label": "Apply to product page images",
+      "default": false,
+      "info": "Also apply to main product images on product pages"
+    },
+    {
+      "type": "checkbox",
+      "id": "apply_to_collection_images",
+      "label": "Apply to collection images",
+      "default": false,
+      "info": "Also apply to collection card images"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product card image fix"
+    }
+  ]
+}
 {% endschema %}
