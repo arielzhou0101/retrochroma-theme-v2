@@ -688,7 +688,8 @@
             "show_drop_shadow": false,
             "transition_speed": 5,
             "header_text": "Customers are saying",
-            "show_average_rating": true
+            "show_average_rating": true,
+            "rating_display": "default"
           }
         }
       },
@@ -912,6 +913,52 @@
         "padding-block-start": 48,
         "padding-block-end": 100
       }
+    },
+    "1783338826157d83c3": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_bc15a37_BUzUCg": {
+          "type": "ai_gen_block_bc15a37",
+          "settings": {
+            "object_fit": "cover",
+            "object_position_x": "center",
+            "object_position_y": "center",
+            "apply_to_featured_images": false,
+            "apply_to_collection_images": false
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_bc15a37_BUzUCg"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
     }
   },
   "order": [
@@ -919,6 +966,7 @@
     "product_list_EDUBdR",
     "product_list_LfM6bf",
     "175463979590106bf9",
-    "product_list_BgxtQy"
+    "product_list_BgxtQy",
+    "1783338826157d83c3"
   ]
 }
