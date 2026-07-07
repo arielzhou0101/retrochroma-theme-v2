@@ -399,6 +399,7 @@
             "text_3kG4a6": {
               "type": "text",
               "name": "t:names.text",
+              "disabled": true,
               "settings": {
                 "text": "<ul><li><a href=\"/pages/how-to-install-different-types-of-retro-chroma-table-lamps\" target=\"_blank\" title=\"How to Install Different Types of Retro Chroma Table Lamps\">Lamp Installation Guide</a></li></ul>",
                 "width": "fit-content",
