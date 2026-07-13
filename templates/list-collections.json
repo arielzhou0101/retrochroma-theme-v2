@@ -89,7 +89,7 @@
           "static": true,
           "settings": {
             "collection": "{{ closest.collection }}",
-            "placement": "on_image",
+            "placement": "below_image",
             "horizontal_alignment": "flex-start",
             "vertical_alignment": "flex-end",
             "collection_card_gap": 8,
@@ -168,7 +168,7 @@
         "columns": 3,
         "mobile_columns": "2",
         "columns_gap": 12,
-        "bento_gap": 16,
+        "bento_gap": 15,
         "rows_gap": 12,
         "max_collections": 4,
         "icons_style": "arrow",
