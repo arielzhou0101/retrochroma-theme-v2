@@ -69,6 +69,7 @@
             "image_border_radius": 0,
             "product_title_case": "default",
             "collection_title_case": "uppercase",
+            "desktop_image_collections": "table-lamps, soft-comforts",
             "color_scheme": "scheme-3",
             "menu_font_style": "inverse",
             "type_font_primary_link": "heading",

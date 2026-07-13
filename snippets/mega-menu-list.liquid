@@ -9,6 +9,7 @@
   - menu_content_type {string}: The type of content to render, options: ['featured_products', 'featured_collections', 'collection_images', 'text'] (default: 'text')
   - content_aspect_ratio {number}: The aspect ratio to display the content images if applicable (optional)
   - image_border_radius {number}: The border radius used for the content images (optional)
+  - desktop_image_collections {string}: Comma-separated collection handles selected to show images in the desktop menu (optional)
 {% endcomment %}
 
 {% liquid
@@ -21,8 +22,9 @@
   assign links_before_wrap = 10
   assign max_menu_columns = grid_columns_count | default: 6
   assign max_menu_columns_tablet = grid_columns_count_tablet | default: 4
+  assign desktop_image_collection_handles = desktop_image_collections | remove: ' ' | prepend: ',' | append: ','
 
-  if menu_content_type == 'collection_images'
+  if menu_content_type == 'collection_images' and desktop_image_collections == blank
     assign collection_links = parent_link.links | where: 'type', 'collection_link'
     if collection_links.size != parent_link.links.size
       assign menu_content_type = 'text'
@@ -55,6 +57,31 @@
 >
   {% for link in parent_link.links %}
     {% liquid
+      assign render_link_image = false
+
+      if menu_content_type == 'collection_images'
+        assign link_collection_handle = ''
+
+        if link.url contains '/collections/'
+          assign link_collection_handle = link.url | split: '/collections/' | last | split: '?' | first | split: '#' | first
+        elsif link.type == 'collection_link'
+          assign link_collection_handle = link.object.handle
+        endif
+
+        if link_collection_handle != blank
+          if desktop_image_collections == blank
+            assign render_link_image = true
+          endif
+
+          assign link_handle_match = ',' | append: link_collection_handle | append: ','
+          if desktop_image_collection_handles contains link_handle_match
+            assign render_link_image = true
+          endif
+        endif
+      endif
+    %}
+
+    {% liquid
       # Decide whether to open a column span, and how many columns of the grid to span
       if forloop.first or open_column_span == false
         assign open_column_span = true
@@ -82,10 +109,10 @@
     <li>
       <a
         href="{{ link.url }}"
-        class="mega-menu__link {% if link.links != blank %}mega-menu__link--parent{% endif %}"
+        class="mega-menu__link{% if link.links != blank %} mega-menu__link--parent{% endif %}{% if render_link_image %} mega-menu__link--with-image{% endif %}"
         role="menuitem"
       >
-        {% if menu_content_type == 'collection_images' %}
+        {% if render_link_image %}
           {{
             link.object.featured_image
             | image_url: width: 1024
@@ -107,7 +134,31 @@
           role="menu"
         >
           {% for childLink in link.links %}
-            {% assign break_after_modulo = forloop.index | modulo: links_before_wrap %}
+            {% liquid
+              assign break_after_modulo = forloop.index | modulo: links_before_wrap
+              assign render_child_link_image = false
+
+              if menu_content_type == 'collection_images'
+                assign child_link_collection_handle = ''
+
+                if childLink.url contains '/collections/'
+                  assign child_link_collection_handle = childLink.url | split: '/collections/' | last | split: '?' | first | split: '#' | first
+                elsif childLink.type == 'collection_link'
+                  assign child_link_collection_handle = childLink.object.handle
+                endif
+
+                if child_link_collection_handle != blank
+                  if desktop_image_collections == blank
+                    assign render_child_link_image = true
+                  endif
+
+                  assign child_link_handle_match = ',' | append: child_link_collection_handle | append: ','
+                  if desktop_image_collection_handles contains child_link_handle_match
+                    assign render_child_link_image = true
+                  endif
+                endif
+              endif
+            %}
             <li
               {% if break_after_modulo == 0 and should_break_columns %}
                 style="break-after: column;"
@@ -115,9 +166,16 @@
             >
               <a
                 href="{{ childLink.url }}"
-                class="mega-menu__link"
+                class="mega-menu__link{% if render_child_link_image %} mega-menu__link--with-image{% endif %}"
                 role="menuitem"
               >
+                {% if render_child_link_image %}
+                  {{
+                    childLink.object.featured_image
+                    | image_url: width: 1024
+                    | image_tag: loading: 'lazy', class: 'mega-menu__link-image', sizes: 'auto'
+                  }}
+                {% endif %}
                 <span class="mega-menu__link-title">{{- childLink.title -}}</span>
               </a>
             </li>

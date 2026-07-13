@@ -8,6 +8,7 @@
   - menu_content_type {string}: The type of content to render, options: ['featured_products', 'featured_collections', 'collection_images', 'text'] (default: 'text')
   - content_aspect_ratio {number}: The aspect ratio to display the content if applicable (optional)
   - image_border_radius {number}: The border radius used for the content images (optional)
+  - desktop_image_collections {string}: Comma-separated collection handles selected to show images in the desktop menu (optional)
 {% endcomment %}
 
 <div class="mega-menu section section--full-width-margin section--{{ section.settings.section_width }}">
@@ -23,7 +24,8 @@
       grid_columns_count_collection_images: 8,
       menu_content_type: menu_content_type,
       content_aspect_ratio: content_aspect_ratio,
-      image_border_radius: image_border_radius
+      image_border_radius: image_border_radius,
+      desktop_image_collections: desktop_image_collections
     %}
   </div>
 </div>

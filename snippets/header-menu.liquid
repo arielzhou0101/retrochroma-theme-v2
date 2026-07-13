@@ -1,6 +1,7 @@
 {% liquid
   assign menu_content_type = block.settings.menu_style | default: 'text'
   assign image_border_radius = block.settings.image_border_radius
+  assign desktop_image_collections = block.settings.desktop_image_collections
   assign color_scheme_classes = ''
   assign color_scheme_setting_id = 'color_scheme_' | append: section.settings.menu_row
   assign current_color_scheme = block.settings.color_scheme
@@ -72,7 +73,8 @@
               id: list_id,
               menu_content_type: menu_content_type,
               content_aspect_ratio: ratio,
-              image_border_radius: image_border_radius
+              image_border_radius: image_border_radius,
+              desktop_image_collections: desktop_image_collections
             %}
           </div>
         </div>
