@@ -29,7 +29,8 @@
 
 @media screen and (min-width: 750px) {
   .ai-image-text-{{ ai_gen_id }} {
-    width: clamp(420px, {{ block.settings.desktop_width_percent }}vw, 520px);
+    /* width 用 vw 而非 %，因为 shopify-block 容器宽度不一致导致 % 基准错误 */
+    width: clamp({{ block.settings.desktop_min_width_px }}px, {{ block.settings.desktop_width_percent }}vw, {{ block.settings.desktop_max_width_px }}px);
     padding-top: {{ block.settings.padding_top }}px;
     padding-bottom: {{ block.settings.padding_bottom }}px;
     padding-left: {{ block.settings.padding_left }}px;
@@ -370,6 +371,26 @@
       "step": 5,
       "unit": "%",
       "default": 100
+    },
+    {
+      "type": "range",
+      "id": "desktop_min_width_px",
+      "label": "Desktop min width",
+      "min": 300,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 360
+    },
+    {
+      "type": "range",
+      "id": "desktop_max_width_px",
+      "label": "Desktop max width",
+      "min": 400,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 520
     },
     {
       "type": "select",
