@@ -24,9 +24,27 @@
 
 {% capture children %}
   {% for link in block.settings.menu.links %}
+    {% liquid
+      assign has_nested_links = false
+      assign list_item_modifier_classes = ''
+      assign submenu_modifier_classes = ''
+
+      if link.links != blank
+        for child_link in link.links
+          if child_link.links != blank
+            assign has_nested_links = true
+          endif
+        endfor
+
+        if link.links.size <= 5 and has_nested_links == false
+          assign list_item_modifier_classes = ' menu-list__list-item--compact-submenu'
+          assign submenu_modifier_classes = ' menu-list__submenu--compact'
+        endif
+      endif
+    %}
     <li
       role="presentation"
-      class="menu-list__list-item"
+      class="menu-list__list-item{{ list_item_modifier_classes }}"
       on:focus="/activate"
       on:blur="/deactivate"
       on:pointerenter="/activate"
@@ -43,7 +61,7 @@
         <span class="menu-list__link-title">{{- link.title -}}</span>
       </a>
       {%- if link.links != blank -%}
-        <div class="menu-list__submenu{{ color_scheme_classes }}" ref="submenu[]">
+        <div class="menu-list__submenu{{ color_scheme_classes }}{{ submenu_modifier_classes }}" ref="submenu[]">
           <div
             class="menu-list__submenu-inner"
             style="{% render 'submenu-font-styles', settings: block.settings %}"

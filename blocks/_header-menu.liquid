@@ -301,6 +301,54 @@
     transition: var(--submenu-content-animation);
   }
 
+  @media screen and (width >= 990px) {
+    .menu-list__list-item--compact-submenu {
+      position: relative;
+    }
+
+    .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu--compact {
+      width: max-content;
+      min-width: 220px;
+      max-width: min(320px, calc(100vw - (var(--page-margin) * 2)));
+      left: 0;
+      padding-inline: 0;
+      box-shadow: none;
+    }
+
+    .menu-list__submenu--compact .menu-list__submenu-inner {
+      display: block;
+      padding-inline: 0;
+    }
+
+    .menu-list__submenu--compact .mega-menu {
+      display: block;
+      width: max-content;
+      max-width: 100%;
+    }
+
+    .menu-list__submenu--compact .mega-menu.section--full-width-margin > * {
+      padding-inline: 0;
+    }
+
+    .menu-list__submenu--compact .mega-menu__grid,
+    .menu-list__submenu--compact .mega-menu__list {
+      display: block;
+      width: max-content;
+      max-width: 100%;
+    }
+
+    .menu-list__submenu--compact .mega-menu__column {
+      display: block;
+    }
+
+    .menu-list__submenu--compact .mega-menu__link {
+      display: flex;
+      width: 100%;
+      min-width: 180px;
+      padding-block: var(--padding-xs);
+    }
+  }
+
   .mega-menu__link {
     font-family: var(--menu-child-font-family);
     font-style: var(--menu-child-font-style);
