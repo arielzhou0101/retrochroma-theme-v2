@@ -29,15 +29,14 @@
 
 @media screen and (min-width: 750px) {
   .ai-image-text-{{ ai_gen_id }} {
-    /* width 用 vw 而非 %，因为 shopify-block 容器宽度不一致导致 % 基准错误 */
-    width: {{ block.settings.desktop_width_percent }}vw;
+    box-sizing: border-box;
+    width: clamp(420px, {{ block.settings.desktop_width_percent }}vw, 520px);
     padding-top: {{ block.settings.padding_top }}px;
     padding-bottom: {{ block.settings.padding_bottom }}px;
     padding-left: {{ block.settings.padding_left }}px;
     padding-right: {{ block.settings.padding_right }}px;
   }
 }
-
 
   .ai-image-text-container-{{ ai_gen_id }} {
     display: flex;
