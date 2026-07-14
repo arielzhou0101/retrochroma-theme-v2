@@ -402,7 +402,14 @@
   }
 
   .menu-drawer__close-button {
-    background-color: transparent;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    flex-shrink: 0;
+    background-color: var(--color-background);
     color: var(--color-foreground);
     padding: var(--padding-xl);
     box-shadow: none;
