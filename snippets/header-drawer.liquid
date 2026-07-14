@@ -273,6 +273,14 @@
     margin-block-end: var(--margin-md);
   }
 
+  .menu-drawer__menu--inline > .menu-drawer__list-item--inline-link {
+    margin-block-end: var(--margin-sm);
+  }
+
+  .menu-drawer__menu--inline > .menu-drawer__list-item--inline-link:last-child {
+    margin-block-end: 0;
+  }
+
   .menu-drawer__menu--inline .menu-drawer__menu--grandchildlist {
     width: 100%;
     padding-inline: 0;
@@ -776,12 +784,12 @@
                     tabindex="-1"
                   >
                     {%- for childlink in link.links -%}
-                      <li class="menu-drawer__list-item{% if childlink.links != blank %} menu-drawer__list-item--flat{% endif %}">
+                      <li class="menu-drawer__list-item{% if childlink.links != blank %} menu-drawer__list-item--flat{% else %} menu-drawer__list-item--inline-link{% endif %}">
                         {%- if childlink.links == blank -%}
                           <a
                             id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
                             href="{{ childlink.url }}"
-                            class="menu-drawer__menu-item menu-drawer__menu-item--parent focus-inset{% if childlink.current %} menu-drawer__menu-item--active{% endif %}"
+                            class="menu-drawer__menu-item menu-drawer__menu-item--child focus-inset{% if childlink.current %} menu-drawer__menu-item--active{% endif %}"
                             {% if childlink.current %}
                               aria-current="page"
                             {% endif %}
