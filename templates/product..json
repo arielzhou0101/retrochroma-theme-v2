@@ -277,8 +277,7 @@
                 "accordion_row_VyFryh": {
                   "type": "_accordion-row",
                   "settings": {
-                    "heading": "Details",
-                    "open_by_default": false
+                    "heading": "Details"
                   },
                   "blocks": {
                     "text_McjMWz": {
@@ -314,8 +313,7 @@
                 "accordion_row_aaFerA": {
                   "type": "_accordion-row",
                   "settings": {
-                    "heading": "Shipping & Returns",
-                    "open_by_default": false
+                    "heading": "Shipping & Returns"
                   },
                   "blocks": {
                     "text_DNPAct": {
