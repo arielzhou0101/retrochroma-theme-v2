@@ -47,6 +47,7 @@
     <aside
       class="pdp-promo-popup"
       data-pdp-promo-popup
+      data-nosnippet
       data-trigger-delay="{{ section.settings.trigger_delay }}"
       data-design-mode="{{ request.design_mode }}"
       data-form-success="{{ form.posted_successfully? }}"
@@ -178,7 +179,7 @@
     </aside>
   {%- endform -%}
 
-  <script src="{{ 'pdp-promo-popup.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url }}" defer="defer"></script>
 {%- endif -%}
 
 {% schema %}

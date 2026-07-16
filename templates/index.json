@@ -830,7 +830,7 @@
       },
       "name": "t:names.products_editorial",
       "settings": {
-        "collection": "test",
+        "collection": "editorial-pick",
         "layout_type": "editorial",
         "carousel_on_mobile": false,
         "max_products": 4,
