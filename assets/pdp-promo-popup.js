@@ -1,6 +1,5 @@
 (() => {
   const EVENT_SOURCE = 'pdp_promo_popup';
-  const GA4_FALLBACK_DESTINATION = 'G-31MDPZJ274';
 
   const STORAGE_KEYS = {
     subscribed: 'rcPdpPromoEmailSubmitted',
@@ -42,19 +41,6 @@
       source: EVENT_SOURCE,
     });
 
-  const getGa4Destination = () => {
-    const dataLayer = window.dataLayer || [];
-
-    for (let index = dataLayer.length - 1; index >= 0; index -= 1) {
-      const entry = dataLayer[index];
-      if (entry?.[0] === 'config' && typeof entry[1] === 'string' && entry[1].startsWith('G-')) {
-        return entry[1];
-      }
-    }
-
-    return GA4_FALLBACK_DESTINATION;
-  };
-
   const trackEvent = (eventName, params) => {
     const payload = removeBlankParams({
       event: eventName,
@@ -63,10 +49,6 @@
 
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push(payload);
-    const ga4Destination = getGa4Destination();
-    if (typeof window.gtag === 'function' && ga4Destination) {
-      window.gtag('event', eventName, removeBlankParams({ send_to: ga4Destination, ...params }));
-    }
     window.dispatchEvent(new CustomEvent('pdpPromoPopup:analytics', { detail: payload }));
   };
 
