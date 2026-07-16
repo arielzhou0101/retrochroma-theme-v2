@@ -27,6 +27,15 @@
 
         window.history.replaceState({}, document.title, window.location.pathname);
       }
+
+      if (document.cookie.includes('internal_user=true') ||
+          localStorage.getItem('internal_user') === 'true') {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function() {
+          window.dataLayer.push(arguments);
+        };
+        window.gtag('set', { traffic_type: 'internal' });
+      }
     })();
     </script>
 
