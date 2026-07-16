@@ -231,6 +231,8 @@
         height: section.settings.image_1.height,
         alt: section.settings.image_1.alt,
         class: 'hero__image',
+        loading: 'eager',
+        fetchpriority: 'high',
         sizes: sizes
     }}
   {%- endif -%}
@@ -260,6 +262,8 @@
         height: section.settings.image_2.height,
         alt: section.settings.image_2.alt,
         class: 'hero__image',
+        loading: 'eager',
+        fetchpriority: 'high',
         sizes: sizes
     }}
   {%- endif -%}
