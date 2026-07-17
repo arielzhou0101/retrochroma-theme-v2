@@ -194,6 +194,29 @@
 {% liquid
   assign product = block.settings.product
 
+  assign product_card_index = 0
+  assign first_row_product_count = section.settings.mobile_columns | default: 2 | plus: 0
+  if first_row_product_count < 1
+    assign first_row_product_count = 2
+  endif
+
+  if section.settings.collection != blank and product != blank
+    for collection_product in section.settings.collection.products limit: section.settings.max_products
+      if collection_product.id == product.id
+        assign product_card_index = forloop.index
+        break
+      endif
+    endfor
+  endif
+
+  assign should_eager_first_card_image = false
+  if product_card_index > 0 and product_card_index <= first_row_product_count
+    if section.index == nil or section.index < 5
+      assign should_eager_first_card_image = true
+    endif
+  endif
+
+  assign eager_card_image_used = false
   assign lazy_image_sizes = 'auto, ' | append: image_sizes
 
   assign image_ratio_setting = block.settings.image_ratio
@@ -312,14 +335,14 @@
       {%- comment -%}
         ① 如果产品有自定义卡片图 (custom.product_card_image)，先输出一张静态 slide
       {%- endcomment -%}
-      {% assign card_image_metafield = product.metafields.custom.product_card_image %}
-      {% if card_image_metafield != blank %}
-        {%- comment -%}   图的加载策略：首屏前 5 个 section 用 eager，其余 lazy {%- endcomment -%}
+        {% assign card_image_metafield = product.metafields.custom.product_card_image %}
+        {% if card_image_metafield != blank %}
         {% assign loading = 'lazy' %}
         {% assign sizes   = lazy_image_sizes %}
-        {% if section.index == nil or section.index < 5 %}
+        {% if should_eager_first_card_image and eager_card_image_used == false %}
           {% assign loading = 'eager' %}
           {% assign sizes   = image_sizes %}
+          {% assign eager_card_image_used = true %}
         {% endif %}
     
         {%- capture slideshow_children -%}
@@ -348,9 +371,10 @@
       {% for media in all_media %}
         {% assign loading = 'lazy' %}
         {% assign sizes   = lazy_image_sizes %}
-        {% if forloop.first and section.index == nil or section.index < 5 %}
+        {% if forloop.first and should_eager_first_card_image and eager_card_image_used == false %}
           {% assign loading = 'eager' %}
           {% assign sizes   = image_sizes %}
+          {% assign eager_card_image_used = true %}
         {% endif %}
     
         {% assign attributes = '' %}
