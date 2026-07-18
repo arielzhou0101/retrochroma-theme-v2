@@ -216,7 +216,7 @@
               "settings": {
                 "row_1_enabled": true,
                 "row_1_icon": "shopify://shop_images/truck.svg",
-                "row_1_text": "Free, trackable shipping to most U.S. regions, usually 10–15 business days",
+                "row_1_text": "Free, trackable shipping to most U.S. regions",
                 "row_2_enabled": true,
                 "row_2_icon": "shopify://shop_images/box_7b731e62-12da-44dd-a13d-39f45f817730.svg",
                 "row_2_text": "No hassle returns within 30 days",
