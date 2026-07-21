@@ -106,8 +106,8 @@
               "name": "Text",
               "settings": {
                 "text": "{{ closest.collection.description }}",
-                "width": "fit-content",
-                "max_width": "narrow",
+                "width": "100%",
+                "max_width": "none",
                 "alignment": "left",
                 "type_preset": "paragraph",
                 "font": "var(--font-primary--family)",
