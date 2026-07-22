@@ -58,8 +58,11 @@
         "disabled": false,
         "settings": {
           "greeting_message": "Welcome to Retro Chroma 👋\nNeed help choosing a piece? Ask us about dimensions, materials, shipping, returns, or an existing order.",
-          "show_featured_products": false,
-          "featured_products": [],
+          "show_featured_products": true,
+          "featured_products": [
+            "mid-century-modern-table-lamp",
+            "lilas-purple-mohair-oak-table-lamp"
+          ],
           "background_color": "#ffffff",
           "font_color": "#000000",
           "button_color": "#000000",
