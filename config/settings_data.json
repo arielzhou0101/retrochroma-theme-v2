@@ -52,6 +52,31 @@
         "type": "shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
         "disabled": false,
         "settings": {}
+      },
+      "15683396631634586217": {
+        "type": "shopify://apps/inbox/blocks/chat/841fc607-4181-4ad1-842d-e24d7f8bad6b",
+        "disabled": false,
+        "settings": {
+          "greeting_message": "Welcome to Retro Chroma 👋\nNeed help choosing a piece? Ask us about dimensions, materials, shipping, returns, or an existing order.",
+          "show_featured_products": true,
+          "featured_products": [
+            "lilas-purple-mohair-oak-table-lamp",
+            "mid-century-modern-table-lamp",
+            "polka-dot-linen-moon-body-pillow-cushion"
+          ],
+          "background_color": "#ffffff",
+          "font_color": "#000000",
+          "button_color": "#000000",
+          "secondary_color": "#ffffff",
+          "ternary_color": "#6A6A6A",
+          "button_icon": "chat_bubble",
+          "button_text": "chat_with_us",
+          "button_horizontal_position": "bottom_right",
+          "button_vertical_position": "lowest",
+          "agent_inherit_fonts": true,
+          "agent_font": "system_ui_n4",
+          "agent_border_radius": 10
+        }
       }
     },
     "color_schemes": {
