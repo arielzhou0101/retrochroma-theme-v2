@@ -274,8 +274,8 @@
               "name": "t:names.text",
               "settings": {
                 "text": "{{ closest.product.description }}",
-                "width": "fit-content",
-                "max_width": "normal",
+                "width": "100%",
+                "max_width": "none",
                 "alignment": "left",
                 "type_preset": "rte",
                 "font": "var(--font-body--family)",
@@ -339,7 +339,7 @@
                       "settings": {
                         "text": "{{ closest.product.metafields.custom.product_details_text | metafield_tag }}",
                         "width": "100%",
-                        "max_width": "normal",
+                        "max_width": "none",
                         "alignment": "left",
                         "type_preset": "rte",
                         "font": "var(--font-primary--family)",
