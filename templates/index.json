@@ -54,7 +54,7 @@
             "text_BMWcJT": {
               "type": "text",
               "settings": {
-                "text": "<h1>YOUR HOME DESERVES</h1><h3>A <strong>PLOT TWIST</strong></h3>",
+                "text": "<h1>YOUR HOME DESERVES</h1><h1>A <strong>PLOT TWIST</strong></h1>",
                 "width": "fit-content",
                 "max_width": "narrow",
                 "alignment": "left",
