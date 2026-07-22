@@ -72,7 +72,7 @@
           "button_icon": "smiley_face",
           "button_text": "need_help",
           "button_horizontal_position": "bottom_right",
-          "button_vertical_position": "lowest",
+          "button_vertical_position": "higher",
           "agent_inherit_fonts": true,
           "agent_font": "system_ui_n4",
           "agent_border_radius": 10
