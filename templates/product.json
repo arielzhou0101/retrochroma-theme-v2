@@ -1428,7 +1428,7 @@
                   "type": "text",
                   "name": "t:names.heading",
                   "settings": {
-                    "text": "<p>From material to mood</p>",
+                    "text": "<p>Retro Chroma is an independent home decor brand for people who want home to feel less prescribed and more their own.</p>",
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -1453,7 +1453,7 @@
                 "text_pyDJT6": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Retro Chroma was started by two friends drawn to home objects with texture, a sense of time, and a touch of playfulness.<br/><br/>We look for pieces that feel lived-in rather than mass-produced — lamps, textiles, and small objects that can shift the mood of an everyday corner.<br/><br/>Some come from small workshops. Some are shaped by hand. All are chosen for the character they bring into everyday spaces.</p>",
+                    "text": "<p>We look for pieces that feel lived-in rather than mass-produced — lamps, textiles, and small objects that can shift the mood of an everyday corner.<br/><br/>Some come from small workshops. Some are shaped by hand. All are chosen for the character they bring into everyday spaces.</p>",
                     "width": "100%",
                     "max_width": "none",
                     "alignment": "left",
@@ -1483,7 +1483,7 @@
                     "font": "heading",
                     "unit": "pixel",
                     "percent_width": 100,
-                    "pixel_height": 64,
+                    "pixel_height": 80,
                     "custom_mobile_size": false,
                     "unit_mobile": "percent",
                     "percent_width_mobile": 100,
