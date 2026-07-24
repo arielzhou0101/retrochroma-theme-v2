@@ -1027,6 +1027,7 @@
         "text_CHXPBK": {
           "type": "text",
           "name": "t:names.heading",
+          "disabled": true,
           "settings": {
             "text": "<h3>Beyond the First Look</h3>",
             "width": "fit-content",
