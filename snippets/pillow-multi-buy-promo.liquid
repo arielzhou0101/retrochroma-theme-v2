@@ -12,7 +12,12 @@
 
 {% if is_eligible %}
   <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
-    <span class="pillow-multi-buy-promo__badge">{{ promotion_badge_text | escape }}</span>
+    <span class="pillow-multi-buy-promo__badge">
+      <span class="pillow-multi-buy-promo__badge-icon" aria-hidden="true">
+        {{ 'icon-discount.svg' | inline_asset_content }}
+      </span>
+      {{ promotion_badge_text | escape }}
+    </span>
     <span class="pillow-multi-buy-promo__copy">
       <span class="pillow-multi-buy-promo__line">{{ promotion_text | escape }}</span>
     </span>
