@@ -118,6 +118,8 @@
     let hasTrackedView = false;
     let timer;
     let isSubmitting = false;
+    let submissionAbortController;
+    let submissionCancelled = false;
 
     const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
@@ -177,7 +179,10 @@
     };
 
     closeButton?.addEventListener('click', () => {
-      if (isSubmitting) return;
+      if (isSubmitting) {
+        submissionCancelled = true;
+        submissionAbortController?.abort();
+      }
       writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
       if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
       hide();
@@ -213,17 +218,17 @@
       event.preventDefault();
 
       isSubmitting = true;
+      submissionCancelled = false;
       if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
       popup.setAttribute('aria-busy', 'true');
-      closeButton?.setAttribute('disabled', '');
       const submitLabel = submitButton?.textContent;
       if (submitButton) {
         submitButton.disabled = true;
         submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
       }
 
-      const abortController = new AbortController();
-      const requestTimeout = window.setTimeout(() => abortController.abort(), 15000);
+      submissionAbortController = new AbortController();
+      const requestTimeout = window.setTimeout(() => submissionAbortController?.abort(), 15000);
 
       try {
         const response = await fetch(form.action, {
@@ -231,7 +236,7 @@
           body: new FormData(form),
           credentials: 'same-origin',
           redirect: 'follow',
-          signal: abortController.signal,
+          signal: submissionAbortController.signal,
         });
         const responseHtml = await response.text();
         const responsePopup = new DOMParser()
@@ -247,14 +252,16 @@
         showSubmitSuccess();
         window.setTimeout(hide, 2200);
       } catch {
-        showSubmitError();
-        closeButton?.removeAttribute('disabled');
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.textContent = submitLabel || 'Unlock my 10% off';
+        if (!submissionCancelled) {
+          showSubmitError();
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = submitLabel || 'Unlock my 10% off';
+          }
         }
       } finally {
         window.clearTimeout(requestTimeout);
+        submissionAbortController = undefined;
         isSubmitting = false;
         popup.removeAttribute('aria-busy');
       }
