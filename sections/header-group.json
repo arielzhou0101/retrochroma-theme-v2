@@ -156,7 +156,7 @@
         "fine_print_text": "We’ll send your code and occasional Retro Chroma updates. Unsubscribe anytime.",
         "fine_print_size": 14,
         "show_error": true,
-        "error_text": "Please enter a valid email address.",
+        "error_text": "Something went wrong. Please try again.",
         "error_size": 12,
         "show_success_heading": true,
         "success_heading_text": "Check your inbox",
