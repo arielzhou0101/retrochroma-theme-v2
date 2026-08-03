@@ -202,6 +202,18 @@
       </div>
       </aside>
     </div>
+    {%- if section.settings.show_reopen_tab -%}
+      <button
+        class="pdp-promo-popup__reopen"
+        type="button"
+        data-pdp-promo-reopen
+        aria-label="Reopen welcome offer"
+        hidden
+      >
+        <span aria-hidden="true">✦</span>
+        <span>{{ section.settings.reopen_tab_text | escape }}</span>
+      </button>
+    {%- endif -%}
   {%- endform -%}
 
   <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url }}" defer="defer"></script>
@@ -231,6 +243,22 @@
       "step": 1,
       "unit": "sec",
       "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Collapsed tab"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reopen_tab",
+      "label": "Show tab after closing popup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "reopen_tab_text",
+      "label": "Tab text",
+      "default": "10% OFF"
     },
     {
       "type": "header",

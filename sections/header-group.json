@@ -123,6 +123,8 @@
       "settings": {
         "enable_popup": true,
         "trigger_delay": 5,
+        "show_reopen_tab": true,
+        "reopen_tab_text": "10% OFF",
         "popup_image": "shopify://shop_images/retro-chroma-mohair-lamp-color-material-language.png",
         "image_position": "left",
         "show_image_on_mobile": true,

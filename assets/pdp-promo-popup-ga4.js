@@ -114,6 +114,7 @@
     const copyButton = popup.querySelector('[data-pdp-promo-copy]');
     const code = popup.querySelector('[data-pdp-promo-code]')?.textContent.trim() || 'WELCOME10';
     const form = popup.closest('form');
+    const reopenButton = form?.querySelector('[data-pdp-promo-reopen]');
     const submitButton = popup.querySelector('[data-pdp-promo-submit]');
     const eventParams = buildEventParams(popup, code);
     let hasTrackedView = false;
@@ -128,6 +129,7 @@
     const show = ({ record = true, trackView = true } = {}) => {
       if (isCartDrawerOpen()) return false;
       window.clearTimeout(timer);
+      if (reopenButton) reopenButton.hidden = true;
       overlay?.classList.add('is-visible');
       overlay?.setAttribute('aria-hidden', 'false');
       popup.setAttribute('aria-hidden', 'false');
@@ -139,10 +141,11 @@
       return true;
     };
 
-    const hide = () => {
+    const hide = ({ showReopenTab = false } = {}) => {
       overlay?.classList.remove('is-visible');
       overlay?.setAttribute('aria-hidden', 'true');
       popup.setAttribute('aria-hidden', 'true');
+      if (reopenButton) reopenButton.hidden = !showReopenTab;
     };
 
     const showSubmitError = () => {
@@ -186,7 +189,7 @@
       }
       writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
       if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
-      hide();
+      hide({ showReopenTab: true });
     });
 
     overlay?.addEventListener('click', (event) => {
@@ -194,7 +197,11 @@
       if (isSubmitting) return;
       writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
       if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
-      hide();
+      hide({ showReopenTab: true });
+    });
+
+    reopenButton?.addEventListener('click', () => {
+      show({ record: false });
     });
 
     copyButton?.addEventListener('click', async () => {
@@ -290,6 +297,9 @@
       readStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed) === 'true';
 
     if (permanentlyExcluded || shownThisSession || dismissedThisSession || isFrequencyCapped()) {
+      if (dismissedThisSession && !permanentlyExcluded) {
+        hide({ showReopenTab: true });
+      }
       return;
     }
 
