@@ -123,7 +123,7 @@
       "settings": {
         "enable_popup": true,
         "trigger_delay": 5,
-        "popup_image": null,
+        "popup_image": "shopify://shop_images/retro-chroma-mohair-lamp-color-material-language.png",
         "image_position": "left",
         "show_image_on_mobile": true,
         "popup_font": "abel_n4",
@@ -141,7 +141,7 @@
         "copied_text": "Copied",
         "copy_size": 13,
         "show_prompt": true,
-        "prompt_text": "A little welcome treat, plus occasional Retro Chroma updates.",
+        "prompt_text": "A little welcome treat.",
         "prompt_size": 14,
         "show_email": true,
         "email_placeholder": "Email address",
