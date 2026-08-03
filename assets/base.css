@@ -2015,6 +2015,10 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
   transform: none;
 }
 
+product-price.product-price--stacked-label {
+  margin-block-end: 2.2rem;
+}
+
 .unit-price {
   display: block;
   font-size: 0.85em;

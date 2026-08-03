@@ -63,6 +63,7 @@ class ProductPrice extends HTMLElement {
     if (!priceContainer || !saleLabel || !productCard) return;
 
     saleLabel.classList.remove('sale-price-label--compact', 'sale-price-label--stacked');
+    this.classList.remove('product-price--stacked-label');
 
     const cardRect = productCard.getBoundingClientRect();
 
@@ -71,6 +72,7 @@ class ProductPrice extends HTMLElement {
 
       if (saleLabel.getBoundingClientRect().right > cardRect.right) {
         saleLabel.classList.add('sale-price-label--stacked');
+        this.classList.add('product-price--stacked-label');
       }
     }
   };
