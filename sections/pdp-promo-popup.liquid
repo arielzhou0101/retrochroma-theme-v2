@@ -44,14 +44,14 @@
   {%- endstyle -%}
 
   {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form', onsubmit: 'return false;' -%}
-    <dialog-component class="pdp-promo-popup__dialog-component" data-pdp-promo-dialog-component>
-      <dialog
-        ref="dialog"
-        class="pdp-promo-popup__overlay dialog-modal"
-        data-pdp-promo-overlay
-        scroll-lock
-        aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Check your inbox' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
-      >
+    <div
+      class="pdp-promo-popup__overlay"
+      data-pdp-promo-overlay
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Check your inbox' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
+    >
       <aside
         class="pdp-promo-popup"
         data-pdp-promo-popup
@@ -65,6 +65,7 @@
         data-promo-code="{{ section.settings.code_text | escape }}"
         data-success-heading="{{ section.settings.success_heading_text | escape }}"
         data-success-message="{{ section.settings.success_message_text | escape }}"
+        data-success-note="{% if section.settings.show_success_note %}{{ section.settings.success_note_text | escape }}{% endif %}"
         data-submit-error="{{ section.settings.error_text | escape }}"
       >
       <button
@@ -106,6 +107,11 @@
           {%- if section.settings.show_success_message -%}
             <p class="pdp-promo-popup__success-copy">
               {{ section.settings.success_message_text | escape }}
+            </p>
+          {%- endif -%}
+          {%- if section.settings.show_success_note -%}
+            <p class="pdp-promo-popup__success-copy pdp-promo-popup__success-note">
+              {{ section.settings.success_note_text | escape }}
             </p>
           {%- endif -%}
         </div>
@@ -207,8 +213,7 @@
         </div>
       </div>
       </aside>
-      </dialog>
-    </dialog-component>
+    </div>
     {%- if section.settings.show_reopen_tab -%}
       <button
         class="pdp-promo-popup__reopen"
@@ -598,7 +603,19 @@
       "type": "text",
       "id": "success_message_text",
       "label": "Text",
-      "default": "You're subscribed. Your welcome email should arrive shortly—please check your spam folder too."
+      "default": "Thanks! Please check your inbox. Your welcome email should arrive shortly—please check your spam folder too."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_success_note",
+      "label": "Show subscription note",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "success_note_text",
+      "label": "Subscription note",
+      "default": "If no email arrives, this address may already be subscribed."
     },
     {
       "type": "range",

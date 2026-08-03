@@ -120,7 +120,6 @@
     const isPreviewForced = new URLSearchParams(window.location.search).get('welcome_popup_preview') === '1';
     const delay = Math.max(0, Number(popup.dataset.triggerDelay) || 10) * 1000;
     const overlay = popup.closest('[data-pdp-promo-overlay]');
-    const dialogComponent = popup.closest('[data-pdp-promo-dialog-component]');
     const closeButton = popup.querySelector('[data-pdp-promo-close]');
     const copyButton = popup.querySelector('[data-pdp-promo-copy]');
     const popupImage = popup.querySelector('[data-pdp-promo-image]');
@@ -136,12 +135,7 @@
     let isAwaitingCaptcha = false;
     let submissionStartedAt = 0;
     let submitLabel;
-    let pendingCloseOptions;
     let previouslyFocusedElement;
-    let closeWasHandled = true;
-    let openedWithDialogComponent = false;
-    let dialogWasYieldedForCaptcha = false;
-    let focusBeforeCaptcha;
 
     const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
@@ -176,43 +170,24 @@
       popupImage.dataset.loaded = 'true';
     };
 
-    const applyClosedState = ({ userDismissal = false, restoreFocus = true } = {}) => {
-      if (userDismissal) {
-        writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
-        if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
-      }
-
-      if (
-        restoreFocus &&
-        previouslyFocusedElement instanceof HTMLElement &&
-        previouslyFocusedElement.isConnected
-      ) {
-        previouslyFocusedElement.focus();
-      }
-      previouslyFocusedElement = undefined;
-    };
-
-    const handleDialogClosed = () => {
-      if (closeWasHandled) return;
-      closeWasHandled = true;
-      const closeOptions = pendingCloseOptions || { userDismissal: true };
-      pendingCloseOptions = undefined;
-      applyClosedState(closeOptions);
-    };
+    const getFocusableElements = () =>
+      [...(overlay?.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ) || [])].filter((element) => element instanceof HTMLElement && element.offsetParent !== null);
 
     const show = ({ record = true, trackView = true } = {}) => {
       if (isCartDrawerOpen()) return false;
       window.clearTimeout(timer);
       loadPopupImage();
-      if (!overlay?.open) {
+      if (overlay && !overlay.classList.contains('is-visible')) {
         previouslyFocusedElement = document.activeElement;
-        closeWasHandled = false;
-        openedWithDialogComponent = typeof dialogComponent?.showDialog === 'function';
-        if (openedWithDialogComponent) {
-          dialogComponent.showDialog();
-        } else {
-          overlay?.showModal();
-        }
+        overlay.classList.add('is-visible');
+        overlay.setAttribute('aria-hidden', 'false');
+        popup.setAttribute('aria-hidden', 'false');
+        document.documentElement.setAttribute('data-pdp-promo-popup-open', '');
+        window.requestAnimationFrame(() => {
+          (popup.querySelector('[autofocus]') || emailInput || closeButton)?.focus();
+        });
       }
       if (trackView && !isDesignMode && !hasTrackedView) {
         trackEvent('pdp_promo_view', eventParams);
@@ -223,19 +198,24 @@
     };
 
     const hide = ({ userDismissal = false, restoreFocus = true } = {}) => {
-      const closeOptions = { userDismissal, restoreFocus };
-      if (!overlay?.open) {
-        applyClosedState(closeOptions);
-        return;
+      if (userDismissal) {
+        writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
+        if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
       }
 
-      pendingCloseOptions = closeOptions;
-      if (typeof dialogComponent?.closeDialog === 'function') {
-        dialogComponent.closeDialog();
-      } else {
-        overlay.close();
-        handleDialogClosed();
+      overlay?.classList.remove('is-visible');
+      overlay?.setAttribute('aria-hidden', 'true');
+      popup.setAttribute('aria-hidden', 'true');
+      document.documentElement.removeAttribute('data-pdp-promo-popup-open');
+
+      if (
+        restoreFocus &&
+        previouslyFocusedElement instanceof HTMLElement &&
+        previouslyFocusedElement.isConnected
+      ) {
+        previouslyFocusedElement.focus();
       }
+      previouslyFocusedElement = undefined;
     };
 
     const showSubmitError = () => {
@@ -267,39 +247,55 @@
       message.className = 'pdp-promo-popup__success-copy';
       message.textContent =
         popup.dataset.successMessage ||
-        "You're subscribed. Your welcome email should arrive shortly—please check your spam folder too.";
+        'Thanks! Please check your inbox. Your welcome email should arrive shortly—please check your spam folder too.';
 
       success.append(heading, message);
+      if (popup.dataset.successNote) {
+        const note = document.createElement('p');
+        note.className = 'pdp-promo-popup__success-copy pdp-promo-popup__success-note';
+        note.textContent = popup.dataset.successNote;
+        success.append(note);
+      }
       content.replaceWith(success);
       overlay?.setAttribute('aria-label', heading.textContent);
-      if (overlay?.open) success.focus();
+      if (overlay?.classList.contains('is-visible')) success.focus();
     };
 
     closeButton?.addEventListener('click', () => {
       hide({ userDismissal: true });
     });
 
-    dialogComponent?.addEventListener('dialog:close', handleDialogClosed);
-    overlay?.addEventListener('close', handleDialogClosed);
-    overlay?.addEventListener('cancel', (event) => {
-      if (openedWithDialogComponent) return;
-      event.preventDefault();
-      hide({ userDismissal: true });
-    });
     overlay?.addEventListener('keydown', (event) => {
-      if (openedWithDialogComponent || event.key !== 'Escape') return;
-      event.preventDefault();
-      hide({ userDismissal: true });
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        hide({ userDismissal: true });
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusableElements = getFocusableElements();
+      if (!focusableElements.length) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
     });
     overlay?.addEventListener('click', (event) => {
-      if (openedWithDialogComponent || event.target !== overlay) return;
+      if (event.target !== overlay) return;
       hide({ userDismissal: true });
     });
 
     reopenButton?.addEventListener('click', () => {
-      if (isAwaitingCaptcha && dialogWasYieldedForCaptcha) {
-        dialogWasYieldedForCaptcha = false;
-        focusBeforeCaptcha = undefined;
+      if (isAwaitingCaptcha) {
         isAwaitingCaptcha = false;
         popup.removeAttribute('aria-busy');
         if (submitButton) {
@@ -339,23 +335,6 @@
       }
     };
 
-    const yieldDialogForCaptcha = () => {
-      dialogWasYieldedForCaptcha = Boolean(overlay?.open);
-      if (!dialogWasYieldedForCaptcha) return;
-
-      focusBeforeCaptcha = previouslyFocusedElement;
-      hide({ restoreFocus: false });
-    };
-
-    const restoreDialogAfterCaptcha = () => {
-      if (!dialogWasYieldedForCaptcha) return;
-
-      show({ record: false, trackView: false });
-      previouslyFocusedElement = focusBeforeCaptcha;
-      focusBeforeCaptcha = undefined;
-      dialogWasYieldedForCaptcha = false;
-    };
-
     const submitForm = async (event, { captchaReady = false } = {}) => {
       event?.preventDefault();
       if (isDesignMode) return;
@@ -363,7 +342,6 @@
       if (captchaReady) {
         if (!isAwaitingCaptcha || isSubmitting) return;
         isAwaitingCaptcha = false;
-        restoreDialogAfterCaptcha();
       } else {
         if (isSubmitting || isAwaitingCaptcha) return;
         if (!form?.reportValidity()) return;
@@ -371,7 +349,6 @@
         startSubmissionState();
         if (form.dataset.hcaptchaBound === 'true') {
           isAwaitingCaptcha = true;
-          yieldDialogForCaptcha();
           return;
         }
       }
