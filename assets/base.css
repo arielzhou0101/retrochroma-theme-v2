@@ -1986,6 +1986,33 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
   text-transform: none;
 }
 
+.price-container__content {
+  display: inline-block;
+}
+
+.price-container--card .price-container__content {
+  position: relative;
+}
+
+.price-container--card .sale-price-label {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: calc(100% + 0.35em);
+  margin-inline-start: 0;
+  transform: translateY(-50%);
+}
+
+product-card {
+  container-type: inline-size;
+}
+
+@container (width < 36rem) {
+  .price-container--card .sale-price-label__promotion,
+  .price-container--card .sale-price-label__separator {
+    display: none;
+  }
+}
+
 @media screen and (width < 750px) {
   .sale-price-label__promotion,
   .sale-price-label__separator {
