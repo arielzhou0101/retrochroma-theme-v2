@@ -11,8 +11,6 @@ class ProductPrice extends HTMLElement {
   connectedCallback() {
     this.resizeObserver = new ResizeObserver(this.updateSaleLabelLayout);
     this.resizeObserver.observe(this);
-    const productCard = this.closest('product-card');
-    if (productCard) this.resizeObserver.observe(productCard);
     requestAnimationFrame(this.updateSaleLabelLayout);
 
     const closestSection = this.closest('.shopify-section, dialog');
@@ -52,7 +50,8 @@ class ProductPrice extends HTMLElement {
 
   /**
    * Keeps the price itself in its original position. The promotion name is
-   * hidden only when the label would overflow the product card.
+   * hidden when needed; if even the compact discount cannot fit to its right,
+   * only that compact discount moves below the price row.
    */
   updateSaleLabelLayout = () => {
     const priceContainer = this.querySelector("[ref='priceContainer'].price-container--card");
@@ -61,13 +60,18 @@ class ProductPrice extends HTMLElement {
 
     if (!priceContainer || !saleLabel || !productCard) return;
 
-    saleLabel.classList.remove('sale-price-label--compact');
+    saleLabel.classList.remove('sale-price-label--compact', 'sale-price-label--stacked');
+    this.classList.remove('product-price--stacked-label');
 
-    const labelRect = saleLabel.getBoundingClientRect();
     const cardRect = productCard.getBoundingClientRect();
 
-    if (labelRect.right > cardRect.right) {
+    if (saleLabel.getBoundingClientRect().right > cardRect.right) {
       saleLabel.classList.add('sale-price-label--compact');
+
+      if (saleLabel.getBoundingClientRect().right > cardRect.right) {
+        saleLabel.classList.add('sale-price-label--stacked');
+        this.classList.add('product-price--stacked-label');
+      }
     }
   };
 }

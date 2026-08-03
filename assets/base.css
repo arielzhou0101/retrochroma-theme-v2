@@ -2007,6 +2007,18 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
   display: none;
 }
 
+/* On the narrowest cards, keep the price row intact and move only the compact
+ * discount to its own line rather than allowing the label to be clipped. */
+.price-container--card .sale-price-label--stacked {
+  top: calc(100% + 0.4rem);
+  inset-inline-start: 0;
+  transform: none;
+}
+
+product-price.product-price--stacked-label {
+  margin-block-end: 2.2rem;
+}
+
 .unit-price {
   display: block;
   font-size: 0.85em;

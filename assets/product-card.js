@@ -114,10 +114,12 @@ export class ProductCard extends Component {
    */
   updatePrice(event) {
     const priceContainer = this.querySelectorAll(`product-price [ref='priceContainer']`)[1];
-    const newPriceElement = event.detail.data.html.querySelector(`product-price [ref='priceContainer']`);
+    const newPriceElements = event.detail.data.html.querySelectorAll(`product-price [ref='priceContainer']`);
+    const newPriceElement = newPriceElements[1] ?? newPriceElements[0];
 
     if (newPriceElement && priceContainer) {
       morph(priceContainer, newPriceElement);
+      requestAnimationFrame(() => priceContainer.closest('product-price')?.updateSaleLabelLayout?.());
     }
   }
 

@@ -23,6 +23,12 @@
     assign is_product_page_price = true
   endif
 
+  # Product-card updates are rendered through a separate section request.
+  # Keep its sale-price order consistent with the initially rendered card.
+  unless is_product_page_price
+    assign show_sale_price_first = true
+  endunless
+
   if compare_at_price > price
     assign is_sale = true
     assign discount_amount = compare_at_price | minus: price
