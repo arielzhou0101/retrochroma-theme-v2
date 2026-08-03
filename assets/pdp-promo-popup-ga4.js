@@ -133,6 +133,7 @@
     let timer;
     let isSubmitting = false;
     let isAwaitingCaptcha = false;
+    let captchaTokenPoll;
     let submissionStartedAt = 0;
     let submitLabel;
     let previouslyFocusedElement;
@@ -141,6 +142,15 @@
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
     const isSubscriptionConfirmed = () =>
       readStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed) === 'true';
+    const hasCaptchaToken = () =>
+      Boolean(
+        form?.querySelector('[name="h-captcha-response"]')?.value?.trim() ||
+          form?.querySelector('[name="g-recaptcha-response"]')?.value?.trim()
+      );
+    const stopCaptchaTokenPoll = () => {
+      window.clearInterval(captchaTokenPoll);
+      captchaTokenPoll = undefined;
+    };
 
     const initializeCapsule = () => {
       if (!reopenButton) return;
@@ -296,6 +306,7 @@
 
     reopenButton?.addEventListener('click', () => {
       if (isAwaitingCaptcha) {
+        stopCaptchaTokenPoll();
         isAwaitingCaptcha = false;
         popup.removeAttribute('aria-busy');
         if (submitButton) {
@@ -341,6 +352,8 @@
 
       if (captchaReady) {
         if (!isAwaitingCaptcha || isSubmitting) return;
+        if (form.dataset.hcaptchaBound === 'true' && !hasCaptchaToken()) return;
+        stopCaptchaTokenPoll();
         isAwaitingCaptcha = false;
       } else {
         if (isSubmitting || isAwaitingCaptcha) return;
@@ -349,6 +362,10 @@
         startSubmissionState();
         if (form.dataset.hcaptchaBound === 'true') {
           isAwaitingCaptcha = true;
+          stopCaptchaTokenPoll();
+          captchaTokenPoll = window.setInterval(() => {
+            if (hasCaptchaToken()) submitForm(undefined, { captchaReady: true });
+          }, 200);
           return;
         }
       }

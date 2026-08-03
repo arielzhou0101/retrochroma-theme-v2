@@ -6,6 +6,10 @@ html[data-pdp-promo-popup-open] {
   overflow: hidden;
 }
 
+html[data-pdp-promo-popup-open] shopify-chat {
+  z-index: 1999999998 !important;
+}
+
 .pdp-promo-popup__reopen {
   position: fixed;
   z-index: 219;
@@ -49,7 +53,7 @@ html[data-pdp-promo-popup-open] {
 
 .pdp-promo-popup__overlay {
   position: fixed;
-  z-index: 2147483647;
+  z-index: 1999999999;
   inset: 0;
   display: grid;
   padding: 24px;
