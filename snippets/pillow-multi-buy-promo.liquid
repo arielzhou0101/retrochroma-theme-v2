@@ -1,0 +1,23 @@
+{% liquid
+  assign is_eligible = false
+
+  if context == 'collection'
+    if collection_handle == 'soft-comforts'
+      assign is_eligible = true
+    endif
+  elsif context == 'pdp' and product != blank
+    for product_collection in product.collections
+      if product_collection.handle == 'soft-comforts'
+        assign is_eligible = true
+        break
+      endif
+    endfor
+  endif
+%}
+
+{% if is_eligible %}
+  <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
+    <span class="pillow-multi-buy-promo__line">Buy 2, save 15% automatically.</span>
+    <span class="pillow-multi-buy-promo__line">Mix &amp; match eligible items.</span>
+  </div>
+{% endif %}
