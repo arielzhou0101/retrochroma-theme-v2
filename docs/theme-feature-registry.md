@@ -17,7 +17,7 @@ For each feature, record:
 - Feature branch: `feature/pillow-multi-buy-ui`
 - Eligibility: Only the PDP with handle `leopard-print-22-momme-silk-front-pillowcase`.
 - Storefront location: The eligible PDP, below the tax note. No collection or recommendations component displays this promotion.
-- Badge: `2ND SILK PILLOWCASE · 15% OFF`
+- Badge: `SPECIAL OFFER`
 - PDP copy: `Get 15% off your second silk pillowcase automatically.`
 
 ### Configuration
