@@ -43,7 +43,7 @@
     }
   {%- endstyle -%}
 
-  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form' -%}
+  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form', onsubmit: 'return false;' -%}
     <div class="pdp-promo-popup__overlay" data-pdp-promo-overlay aria-hidden="true">
       <aside
         class="pdp-promo-popup"
@@ -183,7 +183,7 @@
           {%- if section.settings.show_submit -%}
             <button
               class="pdp-promo-popup__submit"
-              type="submit"
+              type="button"
               data-pdp-promo-submit
               data-sending-label="{{ section.settings.sending_text | escape }}"
             >

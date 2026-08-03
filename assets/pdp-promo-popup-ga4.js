@@ -222,8 +222,8 @@
       }
     });
 
-    form?.addEventListener('submit', async (event) => {
-      event.preventDefault();
+    const submitForm = async (event) => {
+      event?.preventDefault();
       if (isDesignMode || isSubmitting) return;
 
       isSubmitting = true;
@@ -279,7 +279,10 @@
         isSubmitting = false;
         popup.removeAttribute('aria-busy');
       }
-    });
+    };
+
+    form?.addEventListener('submit', submitForm);
+    submitButton?.addEventListener('click', submitForm);
 
     if (hasSuccess) {
       writeStorage(window.localStorage, STORAGE_KEYS.subscribed, 'true');
