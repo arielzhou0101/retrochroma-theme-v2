@@ -1,7 +1,7 @@
 {%- liquid
   assign should_render = section.settings.enable_popup
 
-  unless request.page_type == 'product'
+  unless request.page_type == 'index' or request.page_type == 'collection' or request.page_type == 'product' or request.page_type == 'page' or request.page_type == 'blog' or request.page_type == 'article' or request.page_type == 'search'
     assign should_render = false
   endunless
 
@@ -44,22 +44,23 @@
   {%- endstyle -%}
 
   {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form' -%}
-    <aside
-      class="pdp-promo-popup"
-      data-pdp-promo-popup
-      data-nosnippet
-      data-trigger-delay="{{ section.settings.trigger_delay }}"
-      data-design-mode="{{ request.design_mode }}"
-      data-form-success="{{ form.posted_successfully? }}"
-      data-form-error="{% if form.errors %}true{% else %}false{% endif %}"
-      data-product-id="{{ product.id }}"
-      data-product-handle="{{ product.handle | escape }}"
-      data-promo-code="{{ section.settings.code_text | escape }}"
-      role="dialog"
-      aria-modal="false"
-      aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Saved for later' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
-      aria-hidden="true"
-    >
+    <div class="pdp-promo-popup__overlay" data-pdp-promo-overlay aria-hidden="true">
+      <aside
+        class="pdp-promo-popup"
+        data-pdp-promo-popup
+        data-nosnippet
+        data-trigger-delay="{{ section.settings.trigger_delay }}"
+        data-design-mode="{{ request.design_mode }}"
+        data-form-success="{{ form.posted_successfully? }}"
+        data-form-error="{% if form.errors %}true{% else %}false{% endif %}"
+        data-product-id="{{ product.id }}"
+        data-product-handle="{{ product.handle | escape }}"
+        data-promo-code="{{ section.settings.code_text | escape }}"
+        role="dialog"
+        aria-modal="true"
+        aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Check your inbox' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
+        aria-hidden="true"
+      >
       <button
         class="pdp-promo-popup__close"
         type="button"
@@ -69,6 +70,23 @@
         <span aria-hidden="true">&times;</span>
       </button>
 
+      <div class="pdp-promo-popup__panel pdp-promo-popup__panel--image-{{ section.settings.image_position }}{% unless section.settings.popup_image %} pdp-promo-popup__panel--no-image{% endunless %}">
+        {%- if section.settings.popup_image -%}
+          <div class="pdp-promo-popup__media{% unless section.settings.show_image_on_mobile %} pdp-promo-popup__media--desktop-only{% endunless %}">
+            {{
+              section.settings.popup_image
+              | image_url: width: 900
+              | image_tag:
+                class: 'pdp-promo-popup__image',
+                loading: 'lazy',
+                widths: '320, 450, 640, 900',
+                sizes: '(max-width: 749px) min(100vw - 40px, 440px), 280px',
+                alt: section.settings.popup_image.alt
+            }}
+          </div>
+        {%- endif -%}
+
+        <div class="pdp-promo-popup__body">
       {%- if form.posted_successfully? -%}
         <div class="pdp-promo-popup__success" data-pdp-promo-success tabindex="-1">
           {%- if section.settings.show_success_heading -%}
@@ -128,6 +146,7 @@
           {%- endif -%}
 
           <input type="hidden" name="contact[tags]" value="newsletter,pdp-promo-popup">
+          <input type="hidden" name="contact[accepts_marketing]" value="true">
 
           {%- if section.settings.show_email -%}
             <label class="visually-hidden" for="PdpPromoEmail-{{ section.id }}">
@@ -176,7 +195,10 @@
           {%- endif -%}
         </div>
       {%- endif -%}
-    </aside>
+        </div>
+      </div>
+      </aside>
+    </div>
   {%- endform -%}
 
   <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url | split: '?' | first }}?rcv=20260716_gtm1" defer="defer"></script>
@@ -184,11 +206,11 @@
 
 {% schema %}
 {
-  "name": "PDP Promo Popup",
+  "name": "Welcome Email Popup",
   "tag": "section",
   "class": "pdp-promo-popup-section",
   "enabled_on": {
-    "templates": ["product"]
+    "groups": ["header"]
   },
   "settings": [
     {
@@ -206,6 +228,31 @@
       "step": 1,
       "unit": "sec",
       "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Popup image"
+    },
+    {
+      "type": "image_picker",
+      "id": "popup_image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_on_mobile",
+      "label": "Show image on mobile",
+      "default": true
     },
     {
       "type": "header",
@@ -231,7 +278,7 @@
       "type": "text",
       "id": "heading_text",
       "label": "Text",
-      "default": "Still thinking about this lamp?"
+      "default": "Enjoy 10% off your first order"
     },
     {
       "type": "range",
@@ -257,7 +304,7 @@
       "type": "text",
       "id": "intro_text",
       "label": "Text",
-      "default": "Here's a first-order perk for this visit."
+      "default": "Join our email list and we’ll send your code straight to your inbox."
     },
     {
       "type": "range",
@@ -277,7 +324,7 @@
       "type": "checkbox",
       "id": "show_code",
       "label": "Show promo code",
-      "default": true
+      "default": false
     },
     {
       "type": "text",
@@ -300,7 +347,7 @@
       "type": "checkbox",
       "id": "show_copy",
       "label": "Show copy button",
-      "default": true
+      "default": false
     },
     {
       "type": "text",
@@ -338,7 +385,7 @@
       "type": "textarea",
       "id": "prompt_text",
       "label": "Text",
-      "default": "Want to keep it for later?\nSend this code to your email."
+      "default": "A little welcome treat, plus occasional Retro Chroma updates."
     },
     {
       "type": "range",
@@ -390,7 +437,7 @@
       "type": "text",
       "id": "submit_text",
       "label": "Button text",
-      "default": "Send me the code"
+      "default": "Unlock my 10% off"
     },
     {
       "type": "text",
@@ -474,7 +521,7 @@
       "type": "text",
       "id": "success_heading_text",
       "label": "Text",
-      "default": "Saved for later"
+      "default": "Check your inbox"
     },
     {
       "type": "range",
@@ -500,7 +547,7 @@
       "type": "text",
       "id": "success_message_text",
       "label": "Text",
-      "default": "WELCOME10 has been sent to your email."
+      "default": "Your welcome code is on its way."
     },
     {
       "type": "range",
@@ -555,7 +602,7 @@
   ],
   "presets": [
     {
-      "name": "PDP Promo Popup"
+      "name": "Welcome Email Popup"
     }
   ]
 }

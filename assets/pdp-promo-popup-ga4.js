@@ -108,6 +108,7 @@
     const hasSuccess = popup.dataset.formSuccess === 'true';
     const hasError = popup.dataset.formError === 'true';
     const delay = Math.max(0, Number(popup.dataset.triggerDelay) || 10) * 1000;
+    const overlay = popup.closest('[data-pdp-promo-overlay]');
     const closeButton = popup.querySelector('[data-pdp-promo-close]');
     const copyButton = popup.querySelector('[data-pdp-promo-copy]');
     const code = popup.querySelector('[data-pdp-promo-code]')?.textContent.trim() || 'WELCOME10';
@@ -117,23 +118,37 @@
     let hasTrackedView = false;
     let timer;
 
+    const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
+    const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
+
     const show = ({ record = true, trackView = true } = {}) => {
+      if (isCartDrawerOpen()) return false;
       window.clearTimeout(timer);
-      popup.classList.add('is-visible');
+      overlay?.classList.add('is-visible');
+      overlay?.setAttribute('aria-hidden', 'false');
       popup.setAttribute('aria-hidden', 'false');
       if (trackView && !isDesignMode && !hasTrackedView) {
         trackEvent('pdp_promo_view', eventParams);
         hasTrackedView = true;
       }
       if (record && !isDesignMode) recordImpression();
+      return true;
     };
 
     const hide = () => {
-      popup.classList.remove('is-visible');
+      overlay?.classList.remove('is-visible');
+      overlay?.setAttribute('aria-hidden', 'true');
       popup.setAttribute('aria-hidden', 'true');
     };
 
     closeButton?.addEventListener('click', () => {
+      writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
+      if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
+      hide();
+    });
+
+    overlay?.addEventListener('click', (event) => {
+      if (event.target !== overlay) return;
       writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
       if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
       hide();
@@ -188,7 +203,17 @@
       return;
     }
 
-    timer = window.setTimeout(show, delay);
+    timer = window.setTimeout(() => {
+      if (show()) return;
+
+      cartDrawerDialog()?.addEventListener(
+        'close',
+        () => {
+          if (!readStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed)) show();
+        },
+        { once: true }
+      );
+    }, delay);
 
     document.addEventListener('shopify:section:select', (event) => {
       if (event.target.contains(popup)) show({ record: false });
