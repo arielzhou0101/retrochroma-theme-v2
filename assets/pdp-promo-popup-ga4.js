@@ -142,6 +142,8 @@
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
     const isSubscriptionConfirmed = () =>
       readStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed) === 'true';
+    const isCaptchaProtected = () =>
+      form?.dataset.cptcha === 'true' || form?.dataset.hcaptchaBound === 'true';
     const hasCaptchaToken = () =>
       Boolean(
         form?.querySelector('[name="h-captcha-response"]')?.value?.trim() ||
@@ -352,7 +354,7 @@
 
       if (captchaReady) {
         if (!isAwaitingCaptcha || isSubmitting) return;
-        if (form.dataset.hcaptchaBound === 'true' && !hasCaptchaToken()) return;
+        if (isCaptchaProtected() && !hasCaptchaToken()) return;
         stopCaptchaTokenPoll();
         isAwaitingCaptcha = false;
       } else {
@@ -360,7 +362,7 @@
         if (!form?.reportValidity()) return;
 
         startSubmissionState();
-        if (form.dataset.hcaptchaBound === 'true') {
+        if (isCaptchaProtected()) {
           isAwaitingCaptcha = true;
           stopCaptchaTokenPoll();
           captchaTokenPoll = window.setInterval(() => {
