@@ -68,6 +68,10 @@ html:has(.pdp-promo-popup__overlay[open]) {
   background: rgb(33 31 27 / 42%);
 }
 
+.pdp-promo-popup__overlay[open] {
+  animation: none;
+}
+
 .pdp-promo-popup {
   position: relative;
   width: min(680px, 100%);
