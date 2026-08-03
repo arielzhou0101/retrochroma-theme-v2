@@ -52,12 +52,13 @@ html:has(.pdp-promo-popup__overlay[open]) {
   inset: 0;
   width: min(680px, calc(100vw - 48px));
   max-width: none;
-  height: auto;
+  height: fit-content;
   max-height: calc(100dvh - 48px);
   margin: auto;
   padding: 0;
   overflow: visible;
   border: 0;
+  outline: none;
   background: transparent;
   box-shadow: none;
   color: inherit;
@@ -323,7 +324,7 @@ html:has(.pdp-promo-popup__overlay[open]) {
 
   .pdp-promo-popup__overlay {
     width: min(440px, calc(100vw - 40px));
-    height: auto;
+    height: fit-content;
     max-height: calc(100dvh - 40px);
     padding: 0;
   }
