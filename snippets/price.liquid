@@ -13,6 +13,14 @@
   assign selected_variant = product_resource.selected_or_first_available_variant
   assign price = selected_variant.price
   assign compare_at_price = selected_variant.compare_at_price
+  assign is_sale = false
+
+  if compare_at_price > price
+    assign is_sale = true
+    assign discount_amount = compare_at_price | minus: price
+    assign discount_percentage = discount_amount | times: 100 | divided_by: compare_at_price
+    assign promotion_label = product_resource.metafields.custom.promotion_label.value | default: 'SALE' | upcase
+  endif
 
   if product_resource == blank and request.design_mode
     assign price = 1999
@@ -41,10 +49,14 @@
     <s class="compare-at-price">{{ compare_at_price }}</s>
   {% endif %}
 
-  <span class="price">{{ price | default: '&nbsp;' }}</span>
+  <span class="price{% if is_sale %} price--sale{% endif %}">{{ price | default: '&nbsp;' }}</span>
 
   {% if show_sale_price_first == true and compare_at_price > price %}
     <s class="compare-at-price">{{ compare_at_price }}</s>
+  {% endif %}
+
+  {% if is_sale and request.page_type == 'product' and product_resource.id == product.id %}
+    <span class="sale-price-label">{{ promotion_label }} · {{ discount_percentage }}% OFF</span>
   {% endif %}
 
   {%- if selected_variant.unit_price and show_unit_price %}
