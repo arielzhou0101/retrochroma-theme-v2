@@ -1970,6 +1970,7 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
 
 .sale-price-label {
   display: inline-block;
+  vertical-align: top;
   margin-inline-start: 0.35em;
   padding: 0.2rem 0.4rem;
   border-radius: 0.2rem;
