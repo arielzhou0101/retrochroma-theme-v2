@@ -16,8 +16,15 @@
 %}
 
 {% if is_eligible %}
-  <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
-    <span class="pillow-multi-buy-promo__line">Buy 2, save 15% automatically.</span>
-    <span class="pillow-multi-buy-promo__line">Mix &amp; match eligible items.</span>
-  </div>
+  {% if tag == 'span' %}
+    <span class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
+      <span class="pillow-multi-buy-promo__line">Buy 2, save 15% automatically.</span>
+      <span class="pillow-multi-buy-promo__line">Mix &amp; match eligible items.</span>
+    </span>
+  {% else %}
+    <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
+      <span class="pillow-multi-buy-promo__line">Buy 2, save 15% automatically.</span>
+      <span class="pillow-multi-buy-promo__line">Mix &amp; match eligible items.</span>
+    </div>
+  {% endif %}
 {% endif %}
