@@ -140,7 +140,7 @@
         "copy_text": "Copy",
         "copied_text": "Copied",
         "copy_size": 13,
-        "show_prompt": true,
+        "show_prompt": false,
         "prompt_text": "A little welcome treat.",
         "prompt_size": 14,
         "show_email": true,
