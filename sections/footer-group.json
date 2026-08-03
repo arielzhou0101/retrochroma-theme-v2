@@ -204,6 +204,7 @@
           "settings": {
             "link": "",
             "open_in_new_tab": false,
+            "hero_alignment": "left",
             "content_direction": "row",
             "vertical_on_mobile": true,
             "horizontal_alignment": "space-between",
@@ -242,6 +243,7 @@
               "settings": {
                 "link": "",
                 "open_in_new_tab": false,
+                "hero_alignment": "left",
                 "content_direction": "column",
                 "vertical_on_mobile": false,
                 "horizontal_alignment": "flex-start",
@@ -355,6 +357,7 @@
                   "settings": {
                     "link": "",
                     "open_in_new_tab": false,
+                    "hero_alignment": "left",
                     "content_direction": "row",
                     "vertical_on_mobile": false,
                     "horizontal_alignment": "flex-start",
@@ -441,6 +444,7 @@
               "settings": {
                 "link": "",
                 "open_in_new_tab": false,
+                "hero_alignment": "left",
                 "content_direction": "row",
                 "vertical_on_mobile": true,
                 "horizontal_alignment": "flex-start",
@@ -669,7 +673,7 @@
         "background_media": "none",
         "video_position": "cover",
         "background_image_position": "cover",
-        "padding-block-start": 36,
+        "padding-block-start": 48,
         "padding-block-end": 18
       }
     }

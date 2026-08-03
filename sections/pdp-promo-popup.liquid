@@ -179,7 +179,7 @@
     </aside>
   {%- endform -%}
 
-  <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url | split: '?' | first }}?rcv=20260716_gtm1" defer="defer"></script>
 {%- endif -%}
 
 {% schema %}
