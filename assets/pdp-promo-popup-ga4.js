@@ -117,6 +117,7 @@
     const eventParams = buildEventParams(popup, code);
     let hasTrackedView = false;
     let timer;
+    let isSubmitting = false;
 
     const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
@@ -141,7 +142,42 @@
       popup.setAttribute('aria-hidden', 'true');
     };
 
+    const showSubmitError = () => {
+      let error = popup.querySelector('[data-pdp-promo-submit-error]');
+      if (!error) {
+        error = document.createElement('p');
+        error.className = 'pdp-promo-popup__error';
+        error.dataset.pdpPromoSubmitError = '';
+        error.setAttribute('role', 'alert');
+        submitButton?.insertAdjacentElement('beforebegin', error);
+      }
+      error.textContent = popup.dataset.submitError || 'We couldn’t send that right now. Please try again.';
+    };
+
+    const showSubmitSuccess = () => {
+      const content = popup.querySelector('.pdp-promo-popup__content');
+      if (!content) return;
+
+      const success = document.createElement('div');
+      success.className = 'pdp-promo-popup__success';
+      success.dataset.pdpPromoSuccess = '';
+      success.tabIndex = -1;
+
+      const heading = document.createElement('h2');
+      heading.className = 'pdp-promo-popup__success-heading';
+      heading.textContent = popup.dataset.successHeading || 'Check your inbox';
+
+      const message = document.createElement('p');
+      message.className = 'pdp-promo-popup__success-copy';
+      message.textContent = popup.dataset.successMessage || 'Your welcome code is on its way.';
+
+      success.append(heading, message);
+      content.replaceWith(success);
+      success.focus();
+    };
+
     closeButton?.addEventListener('click', () => {
+      if (isSubmitting) return;
       writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
       if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
       hide();
@@ -149,6 +185,7 @@
 
     overlay?.addEventListener('click', (event) => {
       if (event.target !== overlay) return;
+      if (isSubmitting) return;
       writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
       if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
       hide();
@@ -171,11 +208,56 @@
       }
     });
 
-    form?.addEventListener('submit', () => {
+    form?.addEventListener('submit', async (event) => {
+      if (isDesignMode || isSubmitting) return;
+      event.preventDefault();
+
+      isSubmitting = true;
       if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
-      if (!submitButton) return;
-      submitButton.disabled = true;
-      submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
+      popup.setAttribute('aria-busy', 'true');
+      closeButton?.setAttribute('disabled', '');
+      const submitLabel = submitButton?.textContent;
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
+      }
+
+      const abortController = new AbortController();
+      const requestTimeout = window.setTimeout(() => abortController.abort(), 15000);
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method || 'post',
+          body: new FormData(form),
+          credentials: 'same-origin',
+          redirect: 'follow',
+          signal: abortController.signal,
+        });
+        const responseHtml = await response.text();
+        const responsePopup = new DOMParser()
+          .parseFromString(responseHtml, 'text/html')
+          .querySelector('[data-pdp-promo-popup]');
+
+        if (!response.ok || responsePopup?.dataset.formSuccess !== 'true') {
+          throw new Error('Customer form submission was not confirmed.');
+        }
+
+        writeStorage(window.localStorage, STORAGE_KEYS.subscribed, 'true');
+        if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
+        showSubmitSuccess();
+        window.setTimeout(hide, 2200);
+      } catch {
+        showSubmitError();
+        closeButton?.removeAttribute('disabled');
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = submitLabel || 'Unlock my 10% off';
+        }
+      } finally {
+        window.clearTimeout(requestTimeout);
+        isSubmitting = false;
+        popup.removeAttribute('aria-busy');
+      }
     });
 
     if (hasSuccess) {
