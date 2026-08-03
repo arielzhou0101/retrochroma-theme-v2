@@ -2,7 +2,7 @@
   const EVENT_SOURCE = 'pdp_promo_popup';
 
   const STORAGE_KEYS = {
-    subscribed: 'rcPdpPromoEmailSubmitted',
+    subscriptionConfirmed: 'rcPdpPromoEmailSubmitted',
     impressions: 'rcPdpPromoImpressions',
     sessionShown: 'rcPdpPromoShown',
     sessionDismissed: 'rcPdpPromoDismissed',
@@ -12,7 +12,6 @@
   const DAY = 24 * 60 * 60 * 1000;
   const WEEK = 7 * DAY;
   const MIN_SENDING_DURATION = 700;
-  const REQUEST_TIMEOUT = 5000;
 
   const readStorage = (storage, key) => {
     try {
@@ -28,6 +27,15 @@
     } catch {
       // Storage may be unavailable in privacy mode; the popup should still work.
     }
+  };
+
+  const runWhenIdle = (callback) => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(callback, { timeout: 2000 });
+      return;
+    }
+
+    window.setTimeout(callback, 200);
   };
 
   const removeBlankParams = (params) =>
@@ -112,29 +120,91 @@
     const isPreviewForced = new URLSearchParams(window.location.search).get('welcome_popup_preview') === '1';
     const delay = Math.max(0, Number(popup.dataset.triggerDelay) || 10) * 1000;
     const overlay = popup.closest('[data-pdp-promo-overlay]');
+    const dialogComponent = popup.closest('[data-pdp-promo-dialog-component]');
     const closeButton = popup.querySelector('[data-pdp-promo-close]');
     const copyButton = popup.querySelector('[data-pdp-promo-copy]');
+    const popupImage = popup.querySelector('[data-pdp-promo-image]');
     const code = popup.querySelector('[data-pdp-promo-code]')?.textContent.trim() || 'WELCOME10';
     const form = popup.closest('form');
     const reopenButton = form?.querySelector('[data-pdp-promo-reopen]');
+    const emailInput = popup.querySelector('input[type="email"]');
     const submitButton = popup.querySelector('[data-pdp-promo-submit]');
     const eventParams = buildEventParams(popup, code);
     let hasTrackedView = false;
     let timer;
     let isSubmitting = false;
-    let submissionAbortController;
-    let submissionCancelled = false;
+    let pendingCloseOptions;
+    let previouslyFocusedElement;
+    let closeWasHandled = true;
+    let openedWithDialogComponent = false;
 
     const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
+    const isSubscriptionConfirmed = () =>
+      readStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed) === 'true';
+
+    const initializeCapsule = () => {
+      if (!reopenButton) return;
+
+      const revealCapsule = () => {
+        reopenButton.classList.add('is-ready');
+        reopenButton.hidden = !isDesignMode && isSubscriptionConfirmed();
+      };
+
+      if (isDesignMode || document.readyState === 'complete') {
+        if (isDesignMode) {
+          revealCapsule();
+        } else {
+          runWhenIdle(revealCapsule);
+        }
+        return;
+      }
+
+      window.addEventListener('load', () => runWhenIdle(revealCapsule), { once: true });
+    };
+
+    const loadPopupImage = () => {
+      if (!popupImage || popupImage.dataset.loaded === 'true') return;
+
+      if (popupImage.dataset.srcset) popupImage.srcset = popupImage.dataset.srcset;
+      if (popupImage.dataset.src) popupImage.src = popupImage.dataset.src;
+      popupImage.dataset.loaded = 'true';
+    };
+
+    const applyClosedState = ({ userDismissal = false } = {}) => {
+      if (userDismissal) {
+        writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
+        if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
+      }
+
+      if (previouslyFocusedElement instanceof HTMLElement && previouslyFocusedElement.isConnected) {
+        previouslyFocusedElement.focus();
+      }
+      previouslyFocusedElement = undefined;
+    };
+
+    const handleDialogClosed = () => {
+      if (closeWasHandled) return;
+      closeWasHandled = true;
+      const closeOptions = pendingCloseOptions || { userDismissal: true };
+      pendingCloseOptions = undefined;
+      applyClosedState(closeOptions);
+    };
 
     const show = ({ record = true, trackView = true } = {}) => {
       if (isCartDrawerOpen()) return false;
       window.clearTimeout(timer);
-      if (reopenButton) reopenButton.hidden = true;
-      overlay?.classList.add('is-visible');
-      overlay?.setAttribute('aria-hidden', 'false');
-      popup.setAttribute('aria-hidden', 'false');
+      loadPopupImage();
+      if (!overlay?.open) {
+        previouslyFocusedElement = document.activeElement;
+        closeWasHandled = false;
+        openedWithDialogComponent = typeof dialogComponent?.showDialog === 'function';
+        if (openedWithDialogComponent) {
+          dialogComponent.showDialog();
+        } else {
+          overlay?.showModal();
+        }
+      }
       if (trackView && !isDesignMode && !hasTrackedView) {
         trackEvent('pdp_promo_view', eventParams);
         hasTrackedView = true;
@@ -143,11 +213,20 @@
       return true;
     };
 
-    const hide = ({ showReopenTab = false } = {}) => {
-      overlay?.classList.remove('is-visible');
-      overlay?.setAttribute('aria-hidden', 'true');
-      popup.setAttribute('aria-hidden', 'true');
-      if (reopenButton) reopenButton.hidden = !showReopenTab;
+    const hide = ({ userDismissal = false } = {}) => {
+      const closeOptions = { userDismissal };
+      if (!overlay?.open) {
+        applyClosedState(closeOptions);
+        return;
+      }
+
+      pendingCloseOptions = closeOptions;
+      if (typeof dialogComponent?.closeDialog === 'function') {
+        dialogComponent.closeDialog();
+      } else {
+        overlay.close();
+        handleDialogClosed();
+      }
     };
 
     const showSubmitError = () => {
@@ -177,29 +256,35 @@
 
       const message = document.createElement('p');
       message.className = 'pdp-promo-popup__success-copy';
-      message.textContent = popup.dataset.successMessage || 'Your welcome code is on its way.';
+      message.textContent =
+        popup.dataset.successMessage ||
+        "You're subscribed. Your welcome email should arrive shortly—please check your spam folder too.";
 
       success.append(heading, message);
       content.replaceWith(success);
-      success.focus();
+      overlay?.setAttribute('aria-label', heading.textContent);
+      if (overlay?.open) success.focus();
     };
 
     closeButton?.addEventListener('click', () => {
-      if (isSubmitting) {
-        submissionCancelled = true;
-        submissionAbortController?.abort();
-      }
-      writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
-      if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
-      hide({ showReopenTab: true });
+      hide({ userDismissal: true });
     });
 
+    dialogComponent?.addEventListener('dialog:close', handleDialogClosed);
+    overlay?.addEventListener('close', handleDialogClosed);
+    overlay?.addEventListener('cancel', (event) => {
+      if (openedWithDialogComponent) return;
+      event.preventDefault();
+      hide({ userDismissal: true });
+    });
+    overlay?.addEventListener('keydown', (event) => {
+      if (openedWithDialogComponent || event.key !== 'Escape') return;
+      event.preventDefault();
+      hide({ userDismissal: true });
+    });
     overlay?.addEventListener('click', (event) => {
-      if (event.target !== overlay) return;
-      if (isSubmitting) return;
-      writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
-      if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
-      hide({ showReopenTab: true });
+      if (openedWithDialogComponent || event.target !== overlay) return;
+      hide({ userDismissal: true });
     });
 
     reopenButton?.addEventListener('click', () => {
@@ -226,20 +311,25 @@
     const submitForm = async (event) => {
       event?.preventDefault();
       if (isDesignMode || isSubmitting) return;
+      if (!form?.reportValidity()) return;
 
       isSubmitting = true;
-      submissionCancelled = false;
       const submissionStartedAt = Date.now();
       if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
       popup.setAttribute('aria-busy', 'true');
+      popup.querySelector('[data-pdp-promo-submit-error]')?.remove();
       const submitLabel = submitButton?.textContent;
       if (submitButton) {
         submitButton.disabled = true;
         submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
       }
 
-      submissionAbortController = new AbortController();
-      const requestTimeout = window.setTimeout(() => submissionAbortController?.abort(), REQUEST_TIMEOUT);
+      const waitForMinimumSendingDuration = async () => {
+        const remainingSendingTime = MIN_SENDING_DURATION - (Date.now() - submissionStartedAt);
+        if (remainingSendingTime > 0) {
+          await new Promise((resolve) => window.setTimeout(resolve, remainingSendingTime));
+        }
+      };
 
       try {
         const response = await fetch(form.action, {
@@ -247,7 +337,6 @@
           body: new FormData(form),
           credentials: 'same-origin',
           redirect: 'follow',
-          signal: submissionAbortController.signal,
         });
         const responseHtml = await response.text();
         const responsePopup = new DOMParser()
@@ -258,39 +347,40 @@
           throw new Error('Customer form submission was not confirmed.');
         }
 
-        writeStorage(window.localStorage, STORAGE_KEYS.subscribed, 'true');
+        await waitForMinimumSendingDuration();
+        writeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed, 'true');
+        if (reopenButton) reopenButton.hidden = true;
         if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
         showSubmitSuccess();
-        window.setTimeout(hide, 2200);
       } catch {
-        const remainingSendingTime = MIN_SENDING_DURATION - (Date.now() - submissionStartedAt);
-        if (remainingSendingTime > 0) {
-          await new Promise((resolve) => window.setTimeout(resolve, remainingSendingTime));
-        }
-        if (!submissionCancelled) {
-          showSubmitError();
-          if (submitButton) {
-            submitButton.disabled = false;
-            submitButton.textContent = submitLabel || 'Unlock my 10% off';
-          }
+        await waitForMinimumSendingDuration();
+        showSubmitError();
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = submitLabel || 'Unlock my 10% off';
         }
       } finally {
-        window.clearTimeout(requestTimeout);
-        submissionAbortController = undefined;
         isSubmitting = false;
         popup.removeAttribute('aria-busy');
       }
     };
 
     form?.addEventListener('submit', submitForm);
-    submitButton?.addEventListener('click', submitForm);
+    emailInput?.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || event.isComposing) return;
+      event.preventDefault();
+      form?.requestSubmit();
+    });
+    submitButton?.addEventListener('click', () => form?.requestSubmit());
+
+    initializeCapsule();
 
     if (hasSuccess) {
-      writeStorage(window.localStorage, STORAGE_KEYS.subscribed, 'true');
+      writeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed, 'true');
+      if (reopenButton) reopenButton.hidden = true;
       if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
       show({ record: false, trackView: false });
       popup.querySelector('[data-pdp-promo-success]')?.focus();
-      window.setTimeout(hide, 2200);
       return;
     }
 
@@ -299,17 +389,13 @@
       return;
     }
 
-    const permanentlyExcluded =
-      readStorage(window.localStorage, STORAGE_KEYS.subscribed) === 'true';
+    const permanentlyExcluded = isSubscriptionConfirmed();
     const shownThisSession =
       readStorage(window.sessionStorage, STORAGE_KEYS.sessionShown) === 'true';
     const dismissedThisSession =
       readStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed) === 'true';
 
     if (permanentlyExcluded || shownThisSession || dismissedThisSession || isFrequencyCapped()) {
-      if (dismissedThisSession && !permanentlyExcluded) {
-        hide({ showReopenTab: true });
-      }
       return;
     }
 

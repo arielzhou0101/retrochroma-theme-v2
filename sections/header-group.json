@@ -162,7 +162,7 @@
         "success_heading_text": "Check your inbox",
         "success_heading_size": 22,
         "show_success_message": true,
-        "success_message_text": "Your welcome code is on its way.",
+        "success_message_text": "You're subscribed. Your welcome email should arrive shortly—please check your spam folder too.",
         "success_message_size": 15,
         "popup_background": "#f5f2ef",
         "primary_text": "#211f1b",

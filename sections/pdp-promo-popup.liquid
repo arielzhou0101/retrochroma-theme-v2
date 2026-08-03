@@ -44,7 +44,14 @@
   {%- endstyle -%}
 
   {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form', onsubmit: 'return false;' -%}
-    <div class="pdp-promo-popup__overlay" data-pdp-promo-overlay aria-hidden="true">
+    <dialog-component class="pdp-promo-popup__dialog-component" data-pdp-promo-dialog-component>
+      <dialog
+        ref="dialog"
+        class="pdp-promo-popup__overlay dialog-modal"
+        data-pdp-promo-overlay
+        scroll-lock
+        aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Check your inbox' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
+      >
       <aside
         class="pdp-promo-popup"
         data-pdp-promo-popup
@@ -59,10 +66,6 @@
         data-success-heading="{{ section.settings.success_heading_text | escape }}"
         data-success-message="{{ section.settings.success_message_text | escape }}"
         data-submit-error="{{ section.settings.error_text | escape }}"
-        role="dialog"
-        aria-modal="true"
-        aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Check your inbox' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
-        aria-hidden="true"
       >
       <button
         class="pdp-promo-popup__close"
@@ -76,16 +79,19 @@
       <div class="pdp-promo-popup__panel pdp-promo-popup__panel--image-{{ section.settings.image_position }}{% unless section.settings.popup_image %} pdp-promo-popup__panel--no-image{% endunless %}">
         {%- if section.settings.popup_image -%}
           <div class="pdp-promo-popup__media{% unless section.settings.show_image_on_mobile %} pdp-promo-popup__media--desktop-only{% endunless %}">
-            {{
-              section.settings.popup_image
-              | image_url: width: 900
-              | image_tag:
-                class: 'pdp-promo-popup__image',
-                loading: 'lazy',
-                widths: '320, 450, 640, 900',
-                sizes: '(max-width: 749px) min(100vw - 40px, 440px), 280px',
-                alt: section.settings.popup_image.alt
-            }}
+            <img
+              class="pdp-promo-popup__image"
+              data-pdp-promo-image
+              data-src="{{ section.settings.popup_image | image_url: width: 900 }}"
+              data-srcset="{{ section.settings.popup_image | image_url: width: 320 }} 320w, {{ section.settings.popup_image | image_url: width: 450 }} 450w, {{ section.settings.popup_image | image_url: width: 640 }} 640w, {{ section.settings.popup_image | image_url: width: 900 }} 900w"
+              sizes="(max-width: 749px) min(100vw - 40px, 440px), 280px"
+              width="{{ section.settings.popup_image.width }}"
+              height="{{ section.settings.popup_image.height }}"
+              alt="{{ section.settings.popup_image.alt | escape }}"
+              loading="lazy"
+              fetchpriority="low"
+              decoding="async"
+            >
           </div>
         {%- endif -%}
 
@@ -201,8 +207,9 @@
         </div>
       </div>
       </aside>
-    </div>
-    {%- if section.settings.show_reopen_tab and customer == blank -%}
+      </dialog>
+    </dialog-component>
+    {%- if section.settings.show_reopen_tab -%}
       <button
         class="pdp-promo-popup__reopen"
         type="button"
@@ -580,7 +587,7 @@
       "type": "text",
       "id": "success_message_text",
       "label": "Text",
-      "default": "Your welcome code is on its way."
+      "default": "You're subscribed. Your welcome email should arrive shortly—please check your spam folder too."
     },
     {
       "type": "range",
