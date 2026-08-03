@@ -1971,6 +1971,7 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
 .sale-price-label {
   display: inline-block;
   vertical-align: middle;
+  white-space: nowrap;
   margin-inline-start: 0.35em;
   padding: 0.2rem 0.4rem;
   border-radius: 0.2rem;
@@ -1985,11 +1986,7 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
   text-transform: none;
 }
 
-[ref='priceContainer'] {
-  container-type: inline-size;
-}
-
-@container (width < 24rem) {
+@media screen and (width < 750px) {
   .sale-price-label__promotion,
   .sale-price-label__separator {
     display: none;
