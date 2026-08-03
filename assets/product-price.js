@@ -11,8 +11,6 @@ class ProductPrice extends HTMLElement {
   connectedCallback() {
     this.resizeObserver = new ResizeObserver(this.updateSaleLabelLayout);
     this.resizeObserver.observe(this);
-    const productCard = this.closest('product-card');
-    if (productCard) this.resizeObserver.observe(productCard);
     requestAnimationFrame(this.updateSaleLabelLayout);
 
     const closestSection = this.closest('.shopify-section, dialog');
