@@ -163,7 +163,7 @@
 
       const revealCapsule = () => {
         reopenButton.classList.add('is-ready');
-        reopenButton.hidden = !isDesignMode && isSubscriptionConfirmed();
+        reopenButton.hidden = !isDesignMode && !isPreviewForced && isSubscriptionConfirmed();
       };
 
       if (isDesignMode || document.readyState === 'complete') {
