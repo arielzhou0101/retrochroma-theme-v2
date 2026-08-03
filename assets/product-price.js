@@ -9,12 +9,20 @@ import { ThemeEvents, VariantUpdateEvent } from '@theme/events';
  */
 class ProductPrice extends HTMLElement {
   connectedCallback() {
+    this.resizeObserver = new ResizeObserver(this.updateSaleLabelLayout);
+    this.resizeObserver.observe(this);
+    const productCard = this.closest('product-card');
+    if (productCard) this.resizeObserver.observe(productCard);
+    requestAnimationFrame(this.updateSaleLabelLayout);
+
     const closestSection = this.closest('.shopify-section, dialog');
     if (!closestSection) return;
     closestSection.addEventListener(ThemeEvents.variantUpdate, this.updatePrice);
   }
 
   disconnectedCallback() {
+    this.resizeObserver?.disconnect();
+
     const closestSection = this.closest('.shopify-section, dialog');
     if (!closestSection) return;
     closestSection.removeEventListener(ThemeEvents.variantUpdate, this.updatePrice);
@@ -38,6 +46,28 @@ class ProductPrice extends HTMLElement {
 
     if (currentPrice.innerHTML !== newPrice.innerHTML) {
       currentPrice.replaceWith(newPrice);
+      requestAnimationFrame(this.updateSaleLabelLayout);
+    }
+  };
+
+  /**
+   * Keeps the price itself in its original position. The promotion name is
+   * hidden only when the label would overflow the product card.
+   */
+  updateSaleLabelLayout = () => {
+    const priceContainer = this.querySelector("[ref='priceContainer'].price-container--card");
+    const saleLabel = priceContainer?.querySelector('.sale-price-label');
+    const productCard = this.closest('product-card');
+
+    if (!priceContainer || !saleLabel || !productCard) return;
+
+    saleLabel.classList.remove('sale-price-label--compact');
+
+    const labelRect = saleLabel.getBoundingClientRect();
+    const cardRect = productCard.getBoundingClientRect();
+
+    if (labelRect.right > cardRect.right) {
+      saleLabel.classList.add('sale-price-label--compact');
     }
   };
 }
