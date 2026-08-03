@@ -1,5 +1,7 @@
 {% liquid
   assign is_eligible = false
+  assign promotion_primary_text = 'Buy 2, save 15% automatically.'
+  assign promotion_secondary_text = 'Mix & match any 2 pillows & pillowcases.'
 
   if context == 'collection'
     if collection_handle == 'soft-comforts'
@@ -18,13 +20,13 @@
 {% if is_eligible %}
   {% if tag == 'span' %}
     <span class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
-      <span class="pillow-multi-buy-promo__line">Buy 2, save 15% automatically.</span>
-      <span class="pillow-multi-buy-promo__line">Mix &amp; match eligible items.</span>
+      <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
+      <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
     </span>
   {% else %}
     <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
-      <span class="pillow-multi-buy-promo__line">Buy 2, save 15% automatically.</span>
-      <span class="pillow-multi-buy-promo__line">Mix &amp; match eligible items.</span>
+      <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
+      <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
     </div>
   {% endif %}
 {% endif %}
