@@ -133,6 +133,7 @@
     let timer;
     let isSubmitting = false;
     let isAwaitingCaptcha = false;
+    let captchaBindingPoll;
     let captchaTokenPoll;
     let submissionStartedAt = 0;
     let submitLabel;
@@ -142,8 +143,7 @@
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
     const isSubscriptionConfirmed = () =>
       readStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed) === 'true';
-    const isCaptchaProtected = () =>
-      form?.dataset.cptcha === 'true' || form?.dataset.hcaptchaBound === 'true';
+    const isCaptchaProtected = () => form?.dataset.pdpPromoCaptchaGuard === 'true';
     const hasCaptchaToken = () =>
       Boolean(
         form?.querySelector('[name="h-captcha-response"]')?.value?.trim() ||
@@ -152,6 +152,10 @@
     const stopCaptchaTokenPoll = () => {
       window.clearInterval(captchaTokenPoll);
       captchaTokenPoll = undefined;
+    };
+    const stopCaptchaBindingPoll = () => {
+      window.clearInterval(captchaBindingPoll);
+      captchaBindingPoll = undefined;
     };
 
     const initializeCapsule = () => {
@@ -308,6 +312,7 @@
 
     reopenButton?.addEventListener('click', () => {
       if (isAwaitingCaptcha) {
+        stopCaptchaBindingPoll();
         stopCaptchaTokenPoll();
         isAwaitingCaptcha = false;
         popup.removeAttribute('aria-busy');
@@ -348,30 +353,8 @@
       }
     };
 
-    const submitForm = async (event, { captchaReady = false } = {}) => {
-      event?.preventDefault();
-      if (isDesignMode) return;
-
-      if (captchaReady) {
-        if (!isAwaitingCaptcha || isSubmitting) return;
-        if (isCaptchaProtected() && !hasCaptchaToken()) return;
-        stopCaptchaTokenPoll();
-        isAwaitingCaptcha = false;
-      } else {
-        if (isSubmitting || isAwaitingCaptcha) return;
-        if (!form?.reportValidity()) return;
-
-        startSubmissionState();
-        if (isCaptchaProtected()) {
-          isAwaitingCaptcha = true;
-          stopCaptchaTokenPoll();
-          captchaTokenPoll = window.setInterval(() => {
-            if (hasCaptchaToken()) submitForm(undefined, { captchaReady: true });
-          }, 200);
-          return;
-        }
-      }
-
+    const performSubmission = async () => {
+      if (isSubmitting) return;
       isSubmitting = true;
 
       const waitForMinimumSendingDuration = async () => {
@@ -415,17 +398,54 @@
       }
     };
 
-    form?.addEventListener('submit', submitForm);
-    form?.addEventListener('pdpPromoPopup:captchaReady', () => {
-      submitForm(undefined, { captchaReady: true });
+    const completeCaptchaSubmission = () => {
+      if (!isAwaitingCaptcha || isSubmitting || !hasCaptchaToken()) return;
+
+      stopCaptchaBindingPoll();
+      stopCaptchaTokenPoll();
+      isAwaitingCaptcha = false;
+      performSubmission();
+    };
+
+    const executeCaptchaWhenReady = () => {
+      if (!isAwaitingCaptcha || form?.dataset.hcaptchaBound !== 'true') return false;
+
+      stopCaptchaBindingPoll();
+      form.submit();
+      return true;
+    };
+
+    const requestSubmission = () => {
+      if (isDesignMode || isSubmitting || isAwaitingCaptcha) return;
+      if (!form?.reportValidity()) return;
+
+      startSubmissionState();
+      if (!isCaptchaProtected()) {
+        performSubmission();
+        return;
+      }
+
+      isAwaitingCaptcha = true;
+      stopCaptchaBindingPoll();
+      stopCaptchaTokenPoll();
+      captchaTokenPoll = window.setInterval(completeCaptchaSubmission, 200);
+
+      if (executeCaptchaWhenReady()) return;
+      captchaBindingPoll = window.setInterval(executeCaptchaWhenReady, 100);
+    };
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      requestSubmission();
     });
+    form?.addEventListener('pdpPromoPopup:captchaReady', completeCaptchaSubmission);
     emailInput?.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' || event.isComposing) return;
       event.preventDefault();
       if (isSubmitting || isAwaitingCaptcha) return;
-      form?.requestSubmit();
+      requestSubmission();
     });
-    submitButton?.addEventListener('click', () => form?.requestSubmit());
+    submitButton?.addEventListener('click', requestSubmission);
 
     initializeCapsule();
 
