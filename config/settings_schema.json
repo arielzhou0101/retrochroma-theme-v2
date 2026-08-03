@@ -8,6 +8,25 @@
     "theme_support_url": "https://support.shopify.com/"
   },
   {
+    "name": "Promotions",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Pillow multi-buy promotion"
+      },
+      {
+        "type": "checkbox",
+        "id": "pillow_multi_buy_promo_enabled",
+        "label": "Show Soft Comforts multi-buy messaging",
+        "default": false
+      },
+      {
+        "type": "paragraph",
+        "content": "Frontend messaging only. Manage the automatic discount separately in Shopify Discounts."
+      }
+    ]
+  },
+  {
     "name": "t:names.logo_and_favicon",
     "settings": [
       {

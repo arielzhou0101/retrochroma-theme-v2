@@ -4,17 +4,19 @@
   assign promotion_primary_text = 'Buy 2, save 15% automatically.'
   assign promotion_secondary_text = 'Mix & match any 2 pillows & pillowcases.'
 
-  if context == 'collection'
-    if collection_handle == 'soft-comforts'
-      assign is_eligible = true
-    endif
-  elsif context == 'pdp' and product != blank
-    for product_collection in product.collections
-      if product_collection.handle == 'soft-comforts'
+  if settings.pillow_multi_buy_promo_enabled
+    if context == 'collection'
+      if collection_handle == 'soft-comforts'
         assign is_eligible = true
-        break
       endif
-    endfor
+    elsif context == 'pdp' and product != blank
+      for product_collection in product.collections
+        if product_collection.handle == 'soft-comforts'
+          assign is_eligible = true
+          break
+        endif
+      endfor
+    endif
   endif
 %}
 
