@@ -107,6 +107,7 @@
     const isDesignMode = popup.dataset.designMode === 'true' || window.Shopify?.designMode;
     const hasSuccess = popup.dataset.formSuccess === 'true';
     const hasError = popup.dataset.formError === 'true';
+    const isPreviewForced = new URLSearchParams(window.location.search).get('welcome_popup_preview') === '1';
     const delay = Math.max(0, Number(popup.dataset.triggerDelay) || 10) * 1000;
     const overlay = popup.closest('[data-pdp-promo-overlay]');
     const closeButton = popup.querySelector('[data-pdp-promo-close]');
@@ -276,7 +277,7 @@
       return;
     }
 
-    if (hasError || isDesignMode) {
+    if (hasError || isDesignMode || isPreviewForced) {
       show({ record: false, trackView: false });
       return;
     }
