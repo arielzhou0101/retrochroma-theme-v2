@@ -31,6 +31,7 @@
     "type_line_height_h6": "display-loose",
     "type_letter_spacing_h6": "heading-loose",
     "type_case_h6": "none",
+    "badge_sale_color_scheme": "scheme-4",
     "badge_new_arrival_color_scheme": "scheme-05243a14-aaba-4e60-bc3a-240d2b1b97ff",
     "badge_bestseller_color_scheme": "scheme-40bd6419-8451-4e96-a61f-a2444aad2f94",
     "badge_limited_offer_color_scheme": "scheme-352e3e76-9c1c-4a46-aecf-0c80b8b4660d",
@@ -199,9 +200,9 @@
       },
       "scheme-4": {
         "settings": {
-          "background": "#9daf96",
+          "background": "#7D3E82AD",
           "foreground_heading": "#000000",
-          "foreground": "#000000",
+          "foreground": "#FFFFFF",
           "primary": "#000000",
           "primary_hover": "#000000",
           "border": "#000000",
