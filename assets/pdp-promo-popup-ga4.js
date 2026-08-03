@@ -133,10 +133,15 @@
     let hasTrackedView = false;
     let timer;
     let isSubmitting = false;
+    let isAwaitingCaptcha = false;
+    let submissionStartedAt = 0;
+    let submitLabel;
     let pendingCloseOptions;
     let previouslyFocusedElement;
     let closeWasHandled = true;
     let openedWithDialogComponent = false;
+    let dialogWasYieldedForCaptcha = false;
+    let focusBeforeCaptcha;
 
     const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
@@ -171,13 +176,17 @@
       popupImage.dataset.loaded = 'true';
     };
 
-    const applyClosedState = ({ userDismissal = false } = {}) => {
+    const applyClosedState = ({ userDismissal = false, restoreFocus = true } = {}) => {
       if (userDismissal) {
         writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
         if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
       }
 
-      if (previouslyFocusedElement instanceof HTMLElement && previouslyFocusedElement.isConnected) {
+      if (
+        restoreFocus &&
+        previouslyFocusedElement instanceof HTMLElement &&
+        previouslyFocusedElement.isConnected
+      ) {
         previouslyFocusedElement.focus();
       }
       previouslyFocusedElement = undefined;
@@ -213,8 +222,8 @@
       return true;
     };
 
-    const hide = ({ userDismissal = false } = {}) => {
-      const closeOptions = { userDismissal };
+    const hide = ({ userDismissal = false, restoreFocus = true } = {}) => {
+      const closeOptions = { userDismissal, restoreFocus };
       if (!overlay?.open) {
         applyClosedState(closeOptions);
         return;
@@ -288,6 +297,16 @@
     });
 
     reopenButton?.addEventListener('click', () => {
+      if (isAwaitingCaptcha && dialogWasYieldedForCaptcha) {
+        dialogWasYieldedForCaptcha = false;
+        focusBeforeCaptcha = undefined;
+        isAwaitingCaptcha = false;
+        popup.removeAttribute('aria-busy');
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = submitLabel || 'Unlock my 10% off';
+        }
+      }
       show({ record: false });
     });
 
@@ -308,21 +327,56 @@
       }
     });
 
-    const submitForm = async (event) => {
-      event?.preventDefault();
-      if (isDesignMode || isSubmitting) return;
-      if (!form?.reportValidity()) return;
-
-      isSubmitting = true;
-      const submissionStartedAt = Date.now();
+    const startSubmissionState = () => {
+      submissionStartedAt = Date.now();
       if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
       popup.setAttribute('aria-busy', 'true');
       popup.querySelector('[data-pdp-promo-submit-error]')?.remove();
-      const submitLabel = submitButton?.textContent;
+      submitLabel = submitButton?.textContent;
       if (submitButton) {
         submitButton.disabled = true;
         submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
       }
+    };
+
+    const yieldDialogForCaptcha = () => {
+      dialogWasYieldedForCaptcha = Boolean(overlay?.open);
+      if (!dialogWasYieldedForCaptcha) return;
+
+      focusBeforeCaptcha = previouslyFocusedElement;
+      hide({ restoreFocus: false });
+    };
+
+    const restoreDialogAfterCaptcha = () => {
+      if (!dialogWasYieldedForCaptcha) return;
+
+      show({ record: false, trackView: false });
+      previouslyFocusedElement = focusBeforeCaptcha;
+      focusBeforeCaptcha = undefined;
+      dialogWasYieldedForCaptcha = false;
+    };
+
+    const submitForm = async (event, { captchaReady = false } = {}) => {
+      event?.preventDefault();
+      if (isDesignMode) return;
+
+      if (captchaReady) {
+        if (!isAwaitingCaptcha || isSubmitting) return;
+        isAwaitingCaptcha = false;
+        restoreDialogAfterCaptcha();
+      } else {
+        if (isSubmitting || isAwaitingCaptcha) return;
+        if (!form?.reportValidity()) return;
+
+        startSubmissionState();
+        if (form.dataset.hcaptchaBound === 'true') {
+          isAwaitingCaptcha = true;
+          yieldDialogForCaptcha();
+          return;
+        }
+      }
+
+      isSubmitting = true;
 
       const waitForMinimumSendingDuration = async () => {
         const remainingSendingTime = MIN_SENDING_DURATION - (Date.now() - submissionStartedAt);
@@ -366,9 +420,13 @@
     };
 
     form?.addEventListener('submit', submitForm);
+    form?.addEventListener('pdpPromoPopup:captchaReady', () => {
+      submitForm(undefined, { captchaReady: true });
+    });
     emailInput?.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' || event.isComposing) return;
       event.preventDefault();
+      if (isSubmitting || isAwaitingCaptcha) return;
       form?.requestSubmit();
     });
     submitButton?.addEventListener('click', () => form?.requestSubmit());
