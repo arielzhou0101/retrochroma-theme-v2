@@ -335,7 +335,7 @@
                     "type_preset": "custom",
                     "width": "100%",
                     "alignment": "left",
-                    "font": "var(--font-subheading--family)",
+                    "font": "var(--font-body--family)",
                     "font_size": "1rem",
                     "line_height": "loose",
                     "letter_spacing": "loose",
