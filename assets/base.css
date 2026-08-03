@@ -1985,6 +1985,17 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
   text-transform: none;
 }
 
+[ref='priceContainer'] {
+  container-type: inline-size;
+}
+
+@container (width < 24rem) {
+  .sale-price-label__promotion,
+  .sale-price-label__separator {
+    display: none;
+  }
+}
+
 .unit-price {
   display: block;
   font-size: 0.85em;

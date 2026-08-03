@@ -14,12 +14,42 @@
   assign price = selected_variant.price
   assign compare_at_price = selected_variant.compare_at_price
   assign is_sale = false
+  assign show_sale_label = false
+  assign sale_label_discount_percentage = 0
+  assign sale_label_is_up_to = false
 
   if compare_at_price > price
     assign is_sale = true
     assign discount_amount = compare_at_price | minus: price
     assign discount_percentage = discount_amount | times: 100 | divided_by: compare_at_price
     assign promotion_label = product_resource.metafields.custom.promotion_label.value | default: 'SALE' | upcase
+    assign show_sale_label = true
+    assign sale_label_discount_percentage = discount_percentage
+  endif
+
+  if request.page_type != 'product' or product_resource.id != product.id
+    assign maximum_discount_percentage = 0
+
+    for variant in product_resource.variants
+      if variant.available and variant.compare_at_price > variant.price
+        assign variant_discount_amount = variant.compare_at_price | minus: variant.price
+        assign variant_discount_percentage = variant_discount_amount | times: 100 | divided_by: variant.compare_at_price
+
+        if variant_discount_percentage > maximum_discount_percentage
+          assign maximum_discount_percentage = variant_discount_percentage
+        endif
+      endif
+    endfor
+
+    if maximum_discount_percentage > 0 and product_resource.available
+      assign show_sale_label = true
+      assign sale_label_discount_percentage = maximum_discount_percentage
+      assign promotion_label = product_resource.metafields.custom.promotion_label.value | default: 'SALE' | upcase
+
+      if product_resource.price_varies
+        assign sale_label_is_up_to = true
+      endif
+    endif
   endif
 
   if product_resource == blank and request.design_mode
@@ -55,8 +85,10 @@
     <s class="compare-at-price">{{ compare_at_price }}</s>
   {% endif %}
 
-  {% if is_sale and request.page_type == 'product' and product_resource.id == product.id %}
-    <span class="sale-price-label">{{ promotion_label }} · {{ discount_percentage }}% OFF</span>
+  {% if show_sale_label %}
+    <span class="sale-price-label">
+      <span class="sale-price-label__promotion">{{ promotion_label }}</span><span class="sale-price-label__separator"> · </span><span class="sale-price-label__discount">{% if sale_label_is_up_to %}UP TO {% endif %}{{ sale_label_discount_percentage }}% OFF</span>
+    </span>
   {% endif %}
 
   {%- if selected_variant.unit_price and show_unit_price %}
