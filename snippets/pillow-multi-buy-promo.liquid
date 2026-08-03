@@ -1,45 +1,20 @@
 {% liquid
   assign is_eligible = false
-  assign promotion_badge_text = 'BUY 2 · 15% OFF'
-  assign promotion_primary_text = 'Buy 2, save 15% automatically.'
-  assign promotion_secondary_text = 'Mix & match any 2 pillows & pillowcases.'
+  assign promotion_badge_text = '2ND SILK PILLOWCASE · 15% OFF'
+  assign promotion_text = 'Get 15% off your second silk pillowcase automatically.'
 
   if settings.pillow_multi_buy_promo_enabled
-    if context == 'collection'
-      if collection_handle == 'soft-comforts'
-        assign is_eligible = true
-      endif
-    elsif context == 'pdp' and product != blank
-      for product_collection in product.collections
-        if product_collection.handle == 'soft-comforts'
-          assign is_eligible = true
-          break
-        endif
-      endfor
+    if context == 'pdp' and product.handle == 'leopard-print-22-momme-silk-front-pillowcase'
+      assign is_eligible = true
     endif
   endif
 %}
 
 {% if is_eligible %}
-  {% if tag == 'span' %}
-    <span class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
-      <span class="pillow-multi-buy-promo__badge">{{ promotion_badge_text | escape }}</span>
-      <span class="pillow-multi-buy-promo__copy">
-        {% unless copy_style == 'short' %}
-          <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
-        {% endunless %}
-        <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
-      </span>
+  <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
+    <span class="pillow-multi-buy-promo__badge">{{ promotion_badge_text | escape }}</span>
+    <span class="pillow-multi-buy-promo__copy">
+      <span class="pillow-multi-buy-promo__line">{{ promotion_text | escape }}</span>
     </span>
-  {% else %}
-    <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
-      <span class="pillow-multi-buy-promo__badge">{{ promotion_badge_text | escape }}</span>
-      <span class="pillow-multi-buy-promo__copy">
-        {% unless copy_style == 'short' %}
-          <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
-        {% endunless %}
-        <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
-      </span>
-    </div>
-  {% endif %}
+  </div>
 {% endif %}

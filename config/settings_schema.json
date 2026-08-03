@@ -12,12 +12,12 @@
     "settings": [
       {
         "type": "header",
-        "content": "Pillow multi-buy promotion"
+        "content": "Silk pillowcase second-item promotion"
       },
       {
         "type": "checkbox",
         "id": "pillow_multi_buy_promo_enabled",
-        "label": "Show Soft Comforts multi-buy messaging",
+        "label": "Show silk pillowcase promotion messaging",
         "default": false
       },
       {

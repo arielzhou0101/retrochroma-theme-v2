@@ -11,20 +11,14 @@ For each feature, record:
 - Primary implementation files
 - Enable, disable, and verification procedure
 
-## Soft Comforts pillow multi-buy messaging
+## Silk pillowcase second-item promotion
 
 - Status: Staging; not released to live
 - Feature branch: `feature/pillow-multi-buy-ui`
-- Eligibility: The collection handle is exactly `soft-comforts`; PDP messaging is limited to products that belong to that collection.
-- Storefront locations:
-  - Eligible PDPs, below the tax note
-  - The upper Series recommendations component when its collection is Soft Comforts
-  - The lower Product list recommendations component does not show this promotion
-- Badge: `BUY 2 · 15% OFF`
-- PDP copy:
-  - `Buy 2, save 15% automatically.`
-  - `Mix & match any 2 pillows & pillowcases.`
-- Series recommendations copy: `Mix & match any 2 pillows & pillowcases.`
+- Eligibility: Only the PDP with handle `leopard-print-22-momme-silk-front-pillowcase`.
+- Storefront location: The eligible PDP, below the tax note. No collection or recommendations component displays this promotion.
+- Badge: `2ND SILK PILLOWCASE · 15% OFF`
+- PDP copy: `Get 15% off your second silk pillowcase automatically.`
 
 ### Configuration
 
@@ -32,7 +26,7 @@ Theme Editor path:
 
 1. Open the target theme in **Online Store > Themes > Customize**.
 2. Open **Theme settings > Promotions**.
-3. Toggle **Show Soft Comforts multi-buy messaging**.
+3. Toggle **Show silk pillowcase promotion messaging**.
 4. Save the theme.
 
 The setting ID is `settings.pillow_multi_buy_promo_enabled`. Its default is `false`, so a newly installed or newly released copy of the feature stays hidden until explicitly enabled.
@@ -44,16 +38,13 @@ This switch controls storefront messaging only. The real promotion must be confi
 - `config/settings_schema.json`: Global Theme Editor switch
 - `snippets/pillow-multi-buy-promo.liquid`: Shared eligibility, switch, badge, and copy output
 - `blocks/price.liquid`: PDP placement and styling
-- `snippets/product-series-recommendations.liquid`: Upper recommendations placement
-- `blocks/series-recommendations.liquid`: Desktop and mobile recommendations styling
 
 ### Verification
 
 - Switch off: No Pillow promotion messaging appears anywhere.
-- Switch on, eligible PDP: Badge and both PDP copy lines appear below the tax note.
+- Switch on, eligible PDP: Badge and the single PDP sentence appear below the tax note.
 - Switch on, non-eligible PDP: No promotion messaging appears.
-- Switch on, Soft Comforts Series recommendations: Badge and short copy appear in the header.
-- Lower Product list recommendations: No promotion messaging appears.
+- Collection and recommendations components: No promotion messaging appears.
 - Confirm the Shopify automatic discount independently with an eligible two-item cart before live release.
 
 ## Accordion and FAQ schema repair

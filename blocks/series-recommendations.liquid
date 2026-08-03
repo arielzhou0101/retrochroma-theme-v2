@@ -52,55 +52,6 @@
     line-height: 1.25;
   }
 
-  .product-series-recs__summary-content {
-    display: flex;
-    align-items: baseline;
-    gap: 0.875rem;
-    min-width: 0;
-  }
-
-  .product-series-recs .pillow-multi-buy-promo--collection {
-    display: inline-flex;
-    align-items: baseline;
-    min-width: 0;
-    color: var(--color-foreground);
-    font-family: var(--font-subheading--family);
-    font-size: 0.875rem;
-    line-height: 1.35;
-    letter-spacing: 0.02em;
-  }
-
-  .product-series-recs .pillow-multi-buy-promo--collection::before {
-    width: 1px;
-    height: 1.1em;
-    margin-right: 0.875rem;
-    background: color-mix(in srgb, var(--color-foreground) 32%, transparent);
-    content: '';
-  }
-
-  .product-series-recs .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__badge {
-    display: inline-flex;
-    align-items: center;
-    margin-right: 0.5rem;
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.2rem;
-    background: #000;
-    color: #fff;
-    font-family: var(--font-subheading--family);
-    font-size: 0.6875rem;
-    font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: 0.08em;
-  }
-
-  .product-series-recs .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__copy {
-    display: inline;
-  }
-
-  .product-series-recs .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__line + .pillow-multi-buy-promo__line::before {
-    content: ' ';
-  }
-
   .product-series-recs__chevron {
     width: 9px;
     height: 9px;
@@ -200,44 +151,6 @@
   }
 
   @media screen and (width < 750px) {
-    .product-series-recs__summary {
-      align-items: flex-start;
-    }
-
-    .product-series-recs__summary-content {
-      display: block;
-    }
-
-    .product-series-recs .pillow-multi-buy-promo--collection {
-      display: block;
-      margin-top: 0.5rem;
-      font-family: var(--font-body--family);
-      font-size: 0.875rem;
-      letter-spacing: normal;
-    }
-
-    .product-series-recs .pillow-multi-buy-promo--collection::before {
-      display: none;
-    }
-
-    .product-series-recs .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__badge {
-      display: inline-flex;
-      width: fit-content;
-      margin: 0 0 0.5rem;
-    }
-
-    .product-series-recs .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__copy {
-      display: block;
-    }
-
-    .product-series-recs .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__line {
-      display: block;
-    }
-
-    .product-series-recs .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__line + .pillow-multi-buy-promo__line::before {
-      content: none;
-    }
-
     .product-series-recs__card {
       width: 42%;
       min-width: 42%;

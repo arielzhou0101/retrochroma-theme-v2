@@ -6,10 +6,7 @@
 {% if rec_title != blank and rec_collection != blank %}
   <details class="product-series-recs" open>
     <summary class="product-series-recs__summary">
-      <span class="product-series-recs__summary-content">
-        <span class="product-series-recs__title">{{ rec_title }}</span>
-        {% render 'pillow-multi-buy-promo', context: 'collection', collection_handle: rec_collection.handle, tag: 'span', copy_style: 'short' %}
-      </span>
+      <span class="product-series-recs__title">{{ rec_title }}</span>
       <span class="product-series-recs__chevron" aria-hidden="true"></span>
     </summary>
 
