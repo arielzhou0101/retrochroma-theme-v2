@@ -12,6 +12,7 @@
   const DAY = 24 * 60 * 60 * 1000;
   const WEEK = 7 * DAY;
   const MIN_SENDING_DURATION = 700;
+  const REQUEST_TIMEOUT = 5000;
 
   const readStorage = (storage, key) => {
     try {
@@ -238,7 +239,7 @@
       }
 
       submissionAbortController = new AbortController();
-      const requestTimeout = window.setTimeout(() => submissionAbortController?.abort(), 15000);
+      const requestTimeout = window.setTimeout(() => submissionAbortController?.abort(), REQUEST_TIMEOUT);
 
       try {
         const response = await fetch(form.action, {
