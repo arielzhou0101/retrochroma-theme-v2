@@ -1964,6 +1964,26 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
   white-space: nowrap;
 }
 
+.price--sale {
+  color: #8f3041;
+}
+
+.sale-price-label {
+  display: inline-block;
+  margin-inline-start: 0.35em;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.2rem;
+  color: #fff;
+  background: #000;
+  font-family: var(--font-subheading--family);
+  font-style: var(--font-subheading--style);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
 .unit-price {
   display: block;
   font-size: 0.85em;
