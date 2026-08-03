@@ -1965,12 +1965,13 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
 }
 
 .price--sale {
-  color: #8f3041;
+  color: #5c315f;
 }
 
 .sale-price-label {
   display: inline-block;
   vertical-align: middle;
+  white-space: nowrap;
   margin-inline-start: 0.35em;
   padding: 0.2rem 0.4rem;
   border-radius: 0.2rem;
@@ -1983,6 +1984,27 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
   line-height: 1.2;
   letter-spacing: 0.08em;
   text-transform: none;
+}
+
+.price-container__content {
+  display: inline-block;
+}
+
+.price-container--card .price-container__content {
+  position: relative;
+}
+
+.price-container--card .sale-price-label {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: calc(100% + 0.35em);
+  margin-inline-start: 0;
+  transform: translateY(-50%);
+}
+
+.sale-price-label--compact .sale-price-label__promotion,
+.sale-price-label--compact .sale-price-label__separator {
+  display: none;
 }
 
 .unit-price {
