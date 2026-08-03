@@ -92,13 +92,26 @@
   如果既没有自定义标签也没sold out，再判断sale
   {%- endcomment -%}
   {% if show_badge == false %}
-    {% if product.compare_at_price > product.price and product.available %}
+    {% assign maximum_discount_percentage = 0 %}
+    {% assign promotion_label = product.metafields.custom.promotion_label.value | default: 'SALE' | upcase %}
+
+    {% for variant in product.variants %}
+      {% if variant.available and variant.compare_at_price > variant.price %}
+        {% assign discount_amount = variant.compare_at_price | minus: variant.price %}
+        {% assign discount_percentage = discount_amount | times: 100 | divided_by: variant.compare_at_price %}
+
+        {% if discount_percentage > maximum_discount_percentage %}
+          {% assign maximum_discount_percentage = discount_percentage %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% if maximum_discount_percentage > 0 and product.available %}
       <div
         class="product-badges__badge product-badges__badge--rectangle color-{{ settings.badge_sale_color_scheme }}"
       >
-        {{ 'content.product_badge_sale' | t }}
+        {{ promotion_label }} · {% if product.price_varies %}UP TO {% endif %}{{ maximum_discount_percentage }}% OFF
       </div>
     {% endif %}
   {% endif %}
 </div>
-
