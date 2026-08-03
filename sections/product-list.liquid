@@ -86,6 +86,25 @@
     content: '';
   }
 
+  .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__badge {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 0.5rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.2rem;
+    background: #000;
+    color: #fff;
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+  }
+
+  .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__copy {
+    display: inline;
+  }
+
   .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__line + .pillow-multi-buy-promo__line::before {
     content: ' ';
   }
@@ -105,6 +124,16 @@
 
     .pillow-multi-buy-promo--collection::before {
       display: none;
+    }
+
+    .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__badge {
+      display: inline-flex;
+      width: fit-content;
+      margin: 0 0 0.5rem;
+    }
+
+    .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__copy {
+      display: block;
     }
 
     .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__line {

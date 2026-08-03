@@ -1,5 +1,6 @@
 {% liquid
   assign is_eligible = false
+  assign promotion_badge_text = 'BUY 2 · 15% OFF'
   assign promotion_primary_text = 'Buy 2, save 15% automatically.'
   assign promotion_secondary_text = 'Mix & match any 2 pillows & pillowcases.'
 
@@ -20,13 +21,19 @@
 {% if is_eligible %}
   {% if tag == 'span' %}
     <span class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
-      <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
-      <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
+      <span class="pillow-multi-buy-promo__badge">{{ promotion_badge_text | escape }}</span>
+      <span class="pillow-multi-buy-promo__copy">
+        <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
+        <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
+      </span>
     </span>
   {% else %}
     <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
-      <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
-      <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
+      <span class="pillow-multi-buy-promo__badge">{{ promotion_badge_text | escape }}</span>
+      <span class="pillow-multi-buy-promo__copy">
+        <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
+        <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
+      </span>
     </div>
   {% endif %}
 {% endif %}
