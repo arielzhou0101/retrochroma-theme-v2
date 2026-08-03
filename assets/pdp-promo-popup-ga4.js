@@ -11,6 +11,7 @@
 
   const DAY = 24 * 60 * 60 * 1000;
   const WEEK = 7 * DAY;
+  const MIN_SENDING_DURATION = 700;
 
   const readStorage = (storage, key) => {
     try {
@@ -222,11 +223,12 @@
     });
 
     form?.addEventListener('submit', async (event) => {
-      if (isDesignMode || isSubmitting) return;
       event.preventDefault();
+      if (isDesignMode || isSubmitting) return;
 
       isSubmitting = true;
       submissionCancelled = false;
+      const submissionStartedAt = Date.now();
       if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
       popup.setAttribute('aria-busy', 'true');
       const submitLabel = submitButton?.textContent;
@@ -260,6 +262,10 @@
         showSubmitSuccess();
         window.setTimeout(hide, 2200);
       } catch {
+        const remainingSendingTime = MIN_SENDING_DURATION - (Date.now() - submissionStartedAt);
+        if (remainingSendingTime > 0) {
+          await new Promise((resolve) => window.setTimeout(resolve, remainingSendingTime));
+        }
         if (!submissionCancelled) {
           showSubmitError();
           if (submitButton) {
