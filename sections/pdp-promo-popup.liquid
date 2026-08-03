@@ -202,7 +202,7 @@
       </div>
       </aside>
     </div>
-    {%- if section.settings.show_reopen_tab -%}
+    {%- if section.settings.show_reopen_tab and customer == blank -%}
       <button
         class="pdp-promo-popup__reopen"
         type="button"
