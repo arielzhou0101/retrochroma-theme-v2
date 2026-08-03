@@ -55,95 +55,6 @@
     display: none;
   }
 
-  .pillow-promo-recommendation-header {
-    display: flex;
-    align-items: baseline;
-    gap: 0.875rem;
-    min-width: 0;
-  }
-
-  .pillow-promo-recommendation-header h3 {
-    flex: 0 0 auto;
-    margin: 0;
-  }
-
-  .pillow-multi-buy-promo--collection {
-    display: inline-flex;
-    align-items: baseline;
-    min-width: 0;
-    color: var(--color-foreground);
-    font-family: var(--font-subheading--family);
-    font-size: 0.875rem;
-    line-height: 1.35;
-    letter-spacing: 0.02em;
-  }
-
-  .pillow-multi-buy-promo--collection::before {
-    width: 1px;
-    height: 1.1em;
-    margin-right: 0.875rem;
-    background: color-mix(in srgb, var(--color-foreground) 32%, transparent);
-    content: '';
-  }
-
-  .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__badge {
-    display: inline-flex;
-    align-items: center;
-    margin-right: 0.5rem;
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.2rem;
-    background: #000;
-    color: #fff;
-    font-family: var(--font-subheading--family);
-    font-size: 0.6875rem;
-    font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: 0.08em;
-  }
-
-  .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__copy {
-    display: inline;
-  }
-
-  .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__line + .pillow-multi-buy-promo__line::before {
-    content: ' ';
-  }
-
-  @media screen and (width < 750px) {
-    .pillow-promo-recommendation-header {
-      display: block;
-    }
-
-    .pillow-multi-buy-promo--collection {
-      display: block;
-      margin-top: 0.5rem;
-      font-family: var(--font-body--family);
-      font-size: 0.875rem;
-      letter-spacing: normal;
-    }
-
-    .pillow-multi-buy-promo--collection::before {
-      display: none;
-    }
-
-    .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__badge {
-      display: inline-flex;
-      width: fit-content;
-      margin: 0 0 0.5rem;
-    }
-
-    .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__copy {
-      display: block;
-    }
-
-    .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__line {
-      display: block;
-    }
-
-    .pillow-multi-buy-promo--collection .pillow-multi-buy-promo__line + .pillow-multi-buy-promo__line::before {
-      content: none;
-    }
-  }
   /* === 手机端强制修复补丁 (Zig-Zag 错落布局 - 仅针对 Editorial 模式) === */
   @media screen and (max-width: 768px) {
     /* 1. 容器修复：只针对 editorial 专用类名 */
@@ -278,14 +189,7 @@
 >
   <div class="section-resource-list__header">
     {% if request.page_type == 'product' and rec_title != blank %}
-      {% if rec_collection.handle == 'soft-comforts' %}
-        <div class="pillow-promo-recommendation-header">
-          <h3>{{ rec_title }}</h3>
-          {% render 'pillow-multi-buy-promo', context: 'collection', collection_handle: rec_collection.handle %}
-        </div>
-      {% else %}
-        <h3>{{ rec_title }}</h3>
-      {% endif %}
+      <h3>{{ rec_title }}</h3>
     {% else %}
       {%- content_for 'block', type: '_product-list-content', id: 'static-header',
           closest.collection: rec_collection -%}

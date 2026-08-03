@@ -23,7 +23,9 @@
     <span class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
       <span class="pillow-multi-buy-promo__badge">{{ promotion_badge_text | escape }}</span>
       <span class="pillow-multi-buy-promo__copy">
-        <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
+        {% unless copy_style == 'short' %}
+          <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
+        {% endunless %}
         <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
       </span>
     </span>
@@ -31,7 +33,9 @@
     <div class="pillow-multi-buy-promo pillow-multi-buy-promo--{{ context }}" role="note">
       <span class="pillow-multi-buy-promo__badge">{{ promotion_badge_text | escape }}</span>
       <span class="pillow-multi-buy-promo__copy">
-        <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
+        {% unless copy_style == 'short' %}
+          <span class="pillow-multi-buy-promo__line">{{ promotion_primary_text | escape }}</span>
+        {% endunless %}
         <span class="pillow-multi-buy-promo__line">{{ promotion_secondary_text | escape }}</span>
       </span>
     </div>
