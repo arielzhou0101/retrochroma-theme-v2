@@ -167,16 +167,12 @@
         reopenButton.hidden = false;
       };
 
-      if (isDesignMode || document.readyState === 'complete') {
-        if (isDesignMode) {
-          revealCapsule();
-        } else {
-          runWhenIdle(revealCapsule);
-        }
+      if (isDesignMode) {
+        revealCapsule();
         return;
       }
 
-      window.addEventListener('load', () => runWhenIdle(revealCapsule), { once: true });
+      runWhenIdle(revealCapsule);
     };
 
     const loadPopupImage = () => {
