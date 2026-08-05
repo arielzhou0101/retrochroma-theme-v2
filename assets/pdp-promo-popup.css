@@ -33,7 +33,7 @@ html[data-pdp-promo-popup-open] shopify-chat {
   padding: 0 14px 0 12px;
   border: 0;
   border-radius: 999px 0 0 999px;
-  background: color-mix(in srgb, var(--pdp-popup-accent) 94%, transparent);
+  background: color-mix(in srgb, var(--pdp-popup-accent) 98%, transparent);
   color: var(--pdp-popup-accent-text);
   box-shadow: 0 4px 14px rgb(33 31 27 / 20%);
   font: 600 13px/1 var(--pdp-popup-font);
