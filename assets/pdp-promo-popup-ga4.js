@@ -276,7 +276,9 @@
         error.setAttribute('role', 'alert');
         submitButton?.insertAdjacentElement('beforebegin', error);
       }
-      error.textContent = popup.dataset.submitError || 'We couldn’t send that right now. Please try again.';
+      error.textContent =
+        popup.dataset.submitError ||
+        'Something went wrong. This email may already be subscribed. Please try again.';
     };
 
     const showSubmitSuccess = () => {
