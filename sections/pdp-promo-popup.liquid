@@ -43,7 +43,7 @@
     }
   {%- endstyle -%}
 
-  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form', onsubmit: 'return false;' -%}
+  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form' -%}
     <div
       class="pdp-promo-popup__overlay"
       data-pdp-promo-overlay
@@ -116,6 +116,15 @@
               {{ section.settings.success_note_text | escape }}
             </p>
           {%- endif -%}
+          {%- if section.settings.show_success_retry -%}
+            <button
+              class="pdp-promo-popup__success-retry"
+              type="button"
+              data-pdp-promo-success-retry
+            >
+              {{ section.settings.success_retry_text | escape }}
+            </button>
+          {%- endif -%}
         </div>
       {%- else -%}
         <div class="pdp-promo-popup__content">
@@ -162,6 +171,9 @@
             </p>
           {%- endif -%}
 
+          <input type="hidden" name="contact[tags]" value="newsletter,pdp-promo-popup">
+          <input type="hidden" name="contact[accepts_marketing]" value="true">
+
           {%- if section.settings.show_email -%}
             <label class="visually-hidden" for="PdpPromoEmail-{{ section.id }}">
               {{ section.settings.email_placeholder | escape }}
@@ -194,7 +206,7 @@
           {%- if section.settings.show_submit -%}
             <button
               class="pdp-promo-popup__submit"
-              type="button"
+              type="submit"
               data-pdp-promo-submit
               data-sending-label="{{ section.settings.sending_text | escape }}"
             >
@@ -227,17 +239,6 @@
         <span>{{ section.settings.reopen_tab_text | escape }}</span>
       </button>
     {%- endif -%}
-    <script>
-      (() => {
-        const customerForm = document.getElementById({{ form_id | json }});
-        if (!customerForm || customerForm.dataset.pdpPromoCaptchaGuard === 'true') return;
-
-        customerForm.dataset.pdpPromoCaptchaGuard = 'true';
-        customerForm.submit = () => {
-          customerForm.dispatchEvent(new CustomEvent('pdpPromoPopup:captchaReady'));
-        };
-      })();
-    </script>
   {%- endform -%}
 
   <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url }}" defer="defer"></script>
