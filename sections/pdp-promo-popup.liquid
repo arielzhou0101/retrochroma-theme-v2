@@ -43,7 +43,7 @@
     }
   {%- endstyle -%}
 
-  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form', onsubmit: 'return false;', data-shopify-captcha: 'true' -%}
+  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form', return_to: '/?pdp_promo_response=1', onsubmit: 'return false;', data-shopify-captcha: 'true' -%}
     <div
       class="pdp-promo-popup__overlay"
       data-pdp-promo-overlay
