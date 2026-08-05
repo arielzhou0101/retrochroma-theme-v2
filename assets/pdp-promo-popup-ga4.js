@@ -280,7 +280,7 @@
       }
       error.textContent =
         popup.dataset.submitError ||
-        'Something went wrong. This email may already be subscribed. Please try again.';
+        'Something went wrong. Please try again.';
     };
 
     const showSubmitSuccess = () => {
