@@ -114,6 +114,23 @@
     if (popup.dataset.initialized === 'true') return;
     popup.dataset.initialized = 'true';
 
+    if (window.parent !== window && window.name.startsWith('PdpPromoPopupResponse-')) {
+      const responseForm = popup.closest('form');
+      window.parent.postMessage(
+        {
+          source: EVENT_SOURCE,
+          type: 'submission-response',
+          formId: responseForm?.id,
+          succeeded: popup.dataset.formSuccess === 'true',
+          failed: popup.dataset.formError === 'true',
+          title: document.title,
+          path: `${window.location.pathname}${window.location.search}`,
+        },
+        '*'
+      );
+      return;
+    }
+
     const isDesignMode = popup.dataset.designMode === 'true' || window.Shopify?.designMode;
     const hasSuccess = popup.dataset.formSuccess === 'true';
     const hasError = popup.dataset.formError === 'true';
@@ -136,6 +153,7 @@
     let hasTrackedView = false;
     let timer;
     let isSubmitting = false;
+    let isCompletingSubmission = false;
     let captchaTokenPoll;
     let submissionStartedAt = 0;
     let submitLabel;
@@ -419,6 +437,21 @@
       popup.removeAttribute('aria-busy');
     };
 
+    const processResponseResult = ({ succeeded, failed, title, path, error }) => {
+      if (!isSubmitting || isCompletingSubmission) return;
+      isCompletingSubmission = true;
+      if (timingMarks.fetchStarted === undefined) markTiming('fetchStarted', 'Waiting for Shopify');
+      markTiming('responseReceived', 'Reading Shopify response');
+      responseDiagnostics = [
+        `Final URL: ${path || '(unavailable)'}`,
+        `Response title: ${title || '(none)'}`,
+        `Popup result: success=${succeeded}, error=${failed}`,
+        `Form error: ${error || '(none)'}`,
+      ];
+      markTiming('responseParsed', 'Processing result');
+      completeSubmission(Boolean(succeeded));
+    };
+
     const recordCaptchaReady = () => {
       if (!isSubmitting || !hasCaptchaToken() || timingMarks.captchaReady !== undefined) return;
       markTiming('captchaReady', 'Captcha ready');
@@ -436,6 +469,7 @@
 
       startSubmissionState();
       isSubmitting = true;
+      isCompletingSubmission = false;
       form.target = responseFrame.name;
       form
         ?.querySelectorAll('[name="h-captcha-response"], [name="g-recaptcha-response"]')
@@ -457,8 +491,6 @@
         if (!responseDocument || responseUrl.href === 'about:blank') return;
 
         if (timingMarks.captchaReady === undefined && hasCaptchaToken()) recordCaptchaReady();
-        if (timingMarks.fetchStarted === undefined) markTiming('fetchStarted', 'Waiting for Shopify');
-        markTiming('responseReceived', 'Reading Shopify response');
 
         const responsePopup = responseDocument.querySelector('[data-pdp-promo-popup]');
         const responseError =
@@ -466,20 +498,33 @@
             ?.textContent?.trim() ||
           responseDocument.querySelector('.errors, [class*="captcha"] [class*="error"]')
             ?.textContent?.trim();
-        const succeeded = responsePopup?.dataset.formSuccess === 'true';
-        responseDiagnostics = [
-          `Final URL: ${responseUrl.pathname}${responseUrl.search}`,
-          `Response title: ${responseDocument.title || '(none)'}`,
-          `Popup result: success=${responsePopup?.dataset.formSuccess || 'missing'}, error=${responsePopup?.dataset.formError || 'missing'}`,
-          `Form error: ${responseError || '(none)'}`,
-        ];
-        markTiming('responseParsed', 'Processing result');
-        completeSubmission(succeeded);
+        processResponseResult({
+          succeeded: responsePopup?.dataset.formSuccess === 'true',
+          failed: responsePopup?.dataset.formError === 'true',
+          title: responseDocument.title,
+          path: `${responseUrl.pathname}${responseUrl.search}`,
+          error: responseError,
+        });
       } catch (error) {
-        responseDiagnostics = [`Response error: ${error?.message || 'Unknown error'}`];
-        markTiming('responseParsed', 'Processing result');
-        completeSubmission(false);
+        responseDiagnostics = [
+          'Frame response: cross-origin; waiting for response bridge',
+          `Frame access: ${error?.message || 'Unavailable'}`,
+        ];
+        renderTimingDebug('Waiting for framed response');
       }
+    });
+
+    window.addEventListener('message', (event) => {
+      if (
+        event.source !== responseFrame?.contentWindow ||
+        event.data?.source !== EVENT_SOURCE ||
+        event.data?.type !== 'submission-response' ||
+        event.data?.formId !== form?.id
+      ) {
+        return;
+      }
+
+      processResponseResult(event.data);
     });
 
     form?.addEventListener('submit', (event) => {
