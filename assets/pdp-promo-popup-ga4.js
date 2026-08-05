@@ -114,23 +114,6 @@
     if (popup.dataset.initialized === 'true') return;
     popup.dataset.initialized = 'true';
 
-    if (window.parent !== window && window.name.startsWith('PdpPromoPopupResponse-')) {
-      const responseForm = popup.closest('form');
-      window.parent.postMessage(
-        {
-          source: EVENT_SOURCE,
-          type: 'submission-response',
-          formId: responseForm?.id,
-          succeeded: popup.dataset.formSuccess === 'true',
-          failed: popup.dataset.formError === 'true',
-          title: document.title,
-          path: `${window.location.pathname}${window.location.search}`,
-        },
-        '*'
-      );
-      return;
-    }
-
     const isDesignMode = popup.dataset.designMode === 'true' || window.Shopify?.designMode;
     const hasSuccess = popup.dataset.formSuccess === 'true';
     const hasError = popup.dataset.formError === 'true';
@@ -148,12 +131,12 @@
     const originalContent = popup.querySelector('.pdp-promo-popup__content');
     const emailInput = popup.querySelector('input[type="email"]');
     const submitButton = popup.querySelector('[data-pdp-promo-submit]');
-    const responseFrame = form?.querySelector('[data-pdp-promo-response]');
     const eventParams = buildEventParams(popup, code);
     let hasTrackedView = false;
     let timer;
     let isSubmitting = false;
-    let isCompletingSubmission = false;
+    let isAwaitingCaptcha = false;
+    let captchaBindingPoll;
     let captchaTokenPoll;
     let submissionStartedAt = 0;
     let submitLabel;
@@ -195,6 +178,7 @@
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
     const isSubscriptionConfirmed = () =>
       readStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed) === 'true';
+    const isCaptchaProtected = () => form?.dataset.pdpPromoCaptchaGuard === 'true';
     const hasCaptchaToken = () =>
       Boolean(
         form?.querySelector('[name="h-captcha-response"]')?.value?.trim() ||
@@ -203,6 +187,10 @@
     const stopCaptchaTokenPoll = () => {
       window.clearInterval(captchaTokenPoll);
       captchaTokenPoll = undefined;
+    };
+    const stopCaptchaBindingPoll = () => {
+      window.clearInterval(captchaBindingPoll);
+      captchaBindingPoll = undefined;
     };
 
     const initializeCapsule = () => {
@@ -408,133 +396,125 @@
       }
     };
 
-    const waitForMinimumSendingDuration = async () => {
-      const remainingSendingTime = MIN_SENDING_DURATION - (Date.now() - submissionStartedAt);
-      if (remainingSendingTime > 0) {
-        await new Promise((resolve) => window.setTimeout(resolve, remainingSendingTime));
-      }
-    };
-
-    const completeSubmission = async (succeeded) => {
-      await waitForMinimumSendingDuration();
-      stopCaptchaTokenPoll();
-
-      if (succeeded) {
-        writeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed, 'true');
-        if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
-        showSubmitSuccess();
-        markTiming('completed', 'Success');
-      } else {
-        showSubmitError();
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.textContent = submitLabel || 'Unlock my 10% off';
-        }
-        markTiming('completed', 'Error');
-      }
-
-      isSubmitting = false;
-      popup.removeAttribute('aria-busy');
-    };
-
-    const processResponseResult = ({ succeeded, failed, title, path, error }) => {
-      if (!isSubmitting || isCompletingSubmission) return;
-      isCompletingSubmission = true;
-      if (timingMarks.fetchStarted === undefined) markTiming('fetchStarted', 'Waiting for Shopify');
-      markTiming('responseReceived', 'Reading Shopify response');
-      responseDiagnostics = [
-        `Final URL: ${path || '(unavailable)'}`,
-        `Response title: ${title || '(none)'}`,
-        `Popup result: success=${succeeded}, error=${failed}`,
-        `Form error: ${error || '(none)'}`,
-      ];
-      markTiming('responseParsed', 'Processing result');
-      completeSubmission(Boolean(succeeded));
-    };
-
-    const recordCaptchaReady = () => {
-      if (!isSubmitting || !hasCaptchaToken() || timingMarks.captchaReady !== undefined) return;
-      markTiming('captchaReady', 'Captcha ready');
-      stopCaptchaTokenPoll();
-      markTiming('fetchStarted', 'Waiting for Shopify');
-    };
-
-    const requestSubmission = () => {
-      if (isDesignMode || isSubmitting) return;
-      if (!form?.reportValidity()) return;
-      if (!responseFrame?.name) {
-        showSubmitError();
-        return;
-      }
-
-      startSubmissionState();
+    const performSubmission = async () => {
+      if (isSubmitting) return;
       isSubmitting = true;
-      isCompletingSubmission = false;
-      form.target = responseFrame.name;
-      form
-        ?.querySelectorAll('[name="h-captcha-response"], [name="g-recaptcha-response"]')
-        .forEach((input) => {
-          input.value = '';
-        });
-      stopCaptchaTokenPoll();
-      captchaTokenPoll = window.setInterval(recordCaptchaReady, 100);
-      markTiming('captchaInvoked', 'Waiting for captcha token');
-      form.submit();
-    };
+      markTiming('fetchStarted', 'Waiting for Shopify');
 
-    responseFrame?.addEventListener('load', () => {
-      if (!isSubmitting) return;
+      const waitForMinimumSendingDuration = async () => {
+        const remainingSendingTime = MIN_SENDING_DURATION - (Date.now() - submissionStartedAt);
+        if (remainingSendingTime > 0) {
+          await new Promise((resolve) => window.setTimeout(resolve, remainingSendingTime));
+        }
+      };
 
       try {
-        const responseDocument = responseFrame.contentDocument;
-        const responseUrl = new URL(responseFrame.contentWindow.location.href);
-        if (!responseDocument || responseUrl.href === 'about:blank') return;
-
-        if (timingMarks.captchaReady === undefined && hasCaptchaToken()) recordCaptchaReady();
-
+        const response = await fetch(form.action, {
+          method: form.method || 'post',
+          body: new FormData(form),
+          credentials: 'same-origin',
+          redirect: 'follow',
+        });
+        markTiming('responseReceived', 'Reading Shopify response');
+        const responseHtml = await response.text();
+        const responseDocument = new DOMParser().parseFromString(responseHtml, 'text/html');
         const responsePopup = responseDocument.querySelector('[data-pdp-promo-popup]');
         const responseError =
           responseDocument.querySelector('[data-pdp-promo-submit-error], .pdp-promo-popup__error')
             ?.textContent?.trim() ||
           responseDocument.querySelector('.errors, [class*="captcha"] [class*="error"]')
             ?.textContent?.trim();
-        processResponseResult({
-          succeeded: responsePopup?.dataset.formSuccess === 'true',
-          failed: responsePopup?.dataset.formError === 'true',
-          title: responseDocument.title,
-          path: `${responseUrl.pathname}${responseUrl.search}`,
-          error: responseError,
-        });
-      } catch (error) {
         responseDiagnostics = [
-          'Frame response: cross-origin; waiting for response bridge',
-          `Frame access: ${error?.message || 'Unavailable'}`,
+          `HTTP: ${response.status} ${response.statusText || ''}`.trim(),
+          `Final URL: ${new URL(response.url).pathname}${new URL(response.url).search}`,
+          `Redirected: ${response.redirected}`,
+          `Content-Type: ${response.headers.get('content-type') || 'unknown'}`,
+          `Response title: ${responseDocument.title || '(none)'}`,
+          `Popup result: success=${responsePopup?.dataset.formSuccess || 'missing'}, error=${responsePopup?.dataset.formError || 'missing'}`,
+          `Form error: ${responseError || '(none)'}`,
         ];
-        renderTimingDebug('Waiting for framed response');
-      }
-    });
+        markTiming('responseParsed', 'Processing result');
 
-    window.addEventListener('message', (event) => {
-      if (
-        event.source !== responseFrame?.contentWindow ||
-        event.data?.source !== EVENT_SOURCE ||
-        event.data?.type !== 'submission-response' ||
-        event.data?.formId !== form?.id
-      ) {
+        if (!response.ok || responsePopup?.dataset.formSuccess !== 'true') {
+          throw new Error('Customer form submission was not confirmed.');
+        }
+
+        await waitForMinimumSendingDuration();
+        writeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed, 'true');
+        if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
+        showSubmitSuccess();
+        markTiming('completed', 'Success');
+      } catch (error) {
+        if (!responseDiagnostics.length) {
+          responseDiagnostics = [`Request error: ${error?.message || 'Unknown error'}`];
+        }
+        await waitForMinimumSendingDuration();
+        showSubmitError();
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = submitLabel || 'Unlock my 10% off';
+        }
+        markTiming('completed', 'Error');
+      } finally {
+        isSubmitting = false;
+        popup.removeAttribute('aria-busy');
+      }
+    };
+
+    const completeCaptchaSubmission = () => {
+      if (!isAwaitingCaptcha || isSubmitting || !hasCaptchaToken()) return;
+
+      markTiming('captchaReady', 'Captcha ready');
+      stopCaptchaBindingPoll();
+      stopCaptchaTokenPoll();
+      isAwaitingCaptcha = false;
+      performSubmission();
+    };
+
+    const executeCaptchaWhenReady = () => {
+      if (!isAwaitingCaptcha || form?.dataset.hcaptchaBound !== 'true') return false;
+
+      stopCaptchaBindingPoll();
+      markTiming('captchaInvoked', 'Waiting for captcha token');
+      form.submit();
+      return true;
+    };
+
+    const requestSubmission = () => {
+      if (isDesignMode || isSubmitting || isAwaitingCaptcha) return;
+      if (!form?.reportValidity()) return;
+
+      startSubmissionState();
+      if (!isCaptchaProtected()) {
+        markTiming('captchaInvoked', 'Captcha not required');
+        markTiming('captchaReady', 'Captcha not required');
+        performSubmission();
         return;
       }
 
-      processResponseResult(event.data);
-    });
+      isAwaitingCaptcha = true;
+      form
+        ?.querySelectorAll('[name="h-captcha-response"], [name="g-recaptcha-response"]')
+        .forEach((input) => {
+          input.value = '';
+        });
+      stopCaptchaBindingPoll();
+      stopCaptchaTokenPoll();
+      captchaTokenPoll = window.setInterval(completeCaptchaSubmission, 200);
+
+      if (executeCaptchaWhenReady()) return;
+      captchaBindingPoll = window.setInterval(executeCaptchaWhenReady, 100);
+    };
 
     form?.addEventListener('submit', (event) => {
       event.preventDefault();
       requestSubmission();
     });
+    form?.addEventListener('pdpPromoPopup:captchaReady', completeCaptchaSubmission);
     emailInput?.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' || event.isComposing) return;
       event.preventDefault();
-      if (isSubmitting) return;
+      if (isSubmitting || isAwaitingCaptcha) return;
       requestSubmission();
     });
     submitButton?.addEventListener('click', requestSubmission);
