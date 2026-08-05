@@ -165,6 +165,8 @@
         "success_message_text": "Thanks! Please check your inbox. Your welcome email should arrive shortly—please check your spam folder too.",
         "show_success_note": true,
         "success_note_text": "If no email arrives, this address may already be subscribed.",
+        "show_success_retry": true,
+        "success_retry_text": "Try again",
         "success_message_size": 15,
         "popup_background": "#f5f2ef",
         "primary_text": "#211f1b",

@@ -329,6 +329,24 @@ html[data-pdp-promo-popup-open] shopify-chat {
   margin-top: 16px;
 }
 
+.pdp-promo-popup__success-retry {
+  display: block;
+  margin: 16px auto 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pdp-popup-secondary-text);
+  font: inherit;
+  font-size: var(--pdp-popup-success-message-size);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.pdp-promo-popup__success-retry:hover {
+  color: var(--pdp-popup-primary-text);
+}
+
 @media screen and (width < 750px) {
   .pdp-promo-popup__reopen {
     min-height: 38px;

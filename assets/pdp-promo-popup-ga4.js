@@ -126,6 +126,7 @@
     const code = popup.querySelector('[data-pdp-promo-code]')?.textContent.trim() || 'WELCOME10';
     const form = popup.closest('form');
     const reopenButton = form?.querySelector('[data-pdp-promo-reopen]');
+    const originalContent = popup.querySelector('.pdp-promo-popup__content');
     const emailInput = popup.querySelector('input[type="email"]');
     const submitButton = popup.querySelector('[data-pdp-promo-submit]');
     const eventParams = buildEventParams(popup, code);
@@ -163,7 +164,7 @@
 
       const revealCapsule = () => {
         reopenButton.classList.add('is-ready');
-        reopenButton.hidden = !isDesignMode && !isPreviewForced && isSubscriptionConfirmed();
+        reopenButton.hidden = false;
       };
 
       if (isDesignMode || document.readyState === 'complete') {
@@ -202,7 +203,11 @@
         popup.setAttribute('aria-hidden', 'false');
         document.documentElement.setAttribute('data-pdp-promo-popup-open', '');
         window.requestAnimationFrame(() => {
-          (popup.querySelector('[autofocus]') || emailInput || closeButton)?.focus();
+          const success = popup.querySelector('[data-pdp-promo-success]');
+          const focusTarget =
+            popup.querySelector('[autofocus]') || success ||
+            (emailInput?.isConnected ? emailInput : closeButton);
+          focusTarget?.focus();
         });
       }
       if (trackView && !isDesignMode && !hasTrackedView) {
@@ -272,6 +277,21 @@
         note.textContent = popup.dataset.successNote;
         success.append(note);
       }
+      if (originalContent && popup.dataset.successRetry) {
+        const retry = document.createElement('button');
+        retry.className = 'pdp-promo-popup__success-retry';
+        retry.type = 'button';
+        retry.textContent = popup.dataset.successRetry;
+        retry.addEventListener('click', () => {
+          success.replaceWith(originalContent);
+          overlay?.setAttribute(
+            'aria-label',
+            popup.dataset.signupHeading || 'Special offer'
+          );
+          if (overlay?.classList.contains('is-visible')) emailInput?.focus();
+        });
+        success.append(retry);
+      }
       content.replaceWith(success);
       overlay?.setAttribute('aria-label', heading.textContent);
       if (overlay?.classList.contains('is-visible')) success.focus();
@@ -310,19 +330,7 @@
       hide({ userDismissal: true });
     });
 
-    reopenButton?.addEventListener('click', () => {
-      if (isAwaitingCaptcha) {
-        stopCaptchaBindingPoll();
-        stopCaptchaTokenPoll();
-        isAwaitingCaptcha = false;
-        popup.removeAttribute('aria-busy');
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.textContent = submitLabel || 'Unlock my 10% off';
-        }
-      }
-      show({ record: false });
-    });
+    reopenButton?.addEventListener('click', () => show({ record: false }));
 
     copyButton?.addEventListener('click', async () => {
       const copyLabel = copyButton.dataset.copyLabel || 'Copy';
@@ -382,7 +390,6 @@
 
         await waitForMinimumSendingDuration();
         writeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed, 'true');
-        if (reopenButton) reopenButton.hidden = true;
         if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
         showSubmitSuccess();
       } catch {
@@ -426,6 +433,11 @@
       }
 
       isAwaitingCaptcha = true;
+      form
+        ?.querySelectorAll('[name="h-captcha-response"], [name="g-recaptcha-response"]')
+        .forEach((input) => {
+          input.value = '';
+        });
       stopCaptchaBindingPoll();
       stopCaptchaTokenPoll();
       captchaTokenPoll = window.setInterval(completeCaptchaSubmission, 200);
@@ -451,19 +463,20 @@
 
     if (hasSuccess) {
       writeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed, 'true');
-      if (reopenButton) reopenButton.hidden = true;
       if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
       show({ record: false, trackView: false });
       popup.querySelector('[data-pdp-promo-success]')?.focus();
       return;
     }
 
+    const permanentlyExcluded = !isDesignMode && isSubscriptionConfirmed();
+    if (permanentlyExcluded) showSubmitSuccess();
+
     if (hasError || isDesignMode || isPreviewForced) {
       show({ record: false, trackView: false });
       return;
     }
 
-    const permanentlyExcluded = isSubscriptionConfirmed();
     const shownThisSession =
       readStorage(window.sessionStorage, STORAGE_KEYS.sessionShown) === 'true';
     const dismissedThisSession =

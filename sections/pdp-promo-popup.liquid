@@ -66,6 +66,8 @@
         data-success-heading="{{ section.settings.success_heading_text | escape }}"
         data-success-message="{{ section.settings.success_message_text | escape }}"
         data-success-note="{% if section.settings.show_success_note %}{{ section.settings.success_note_text | escape }}{% endif %}"
+        data-success-retry="{% if section.settings.show_success_retry %}{{ section.settings.success_retry_text | escape }}{% endif %}"
+        data-signup-heading="{{ section.settings.heading_text | default: 'Special offer' | escape }}"
         data-submit-error="{{ section.settings.error_text | escape }}"
       >
       <button
@@ -613,6 +615,18 @@
       "id": "success_note_text",
       "label": "Subscription note",
       "default": "If no email arrives, this address may already be subscribed."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_success_retry",
+      "label": "Show retry link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "success_retry_text",
+      "label": "Retry link",
+      "default": "Try again"
     },
     {
       "type": "range",
