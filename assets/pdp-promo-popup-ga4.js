@@ -143,6 +143,7 @@
     let previouslyFocusedElement;
     const timingMarks = {};
     let timingDebugPanel;
+    let responseDiagnostics = [];
 
     const formatDuration = (start, end) =>
       start === undefined || end === undefined ? '—' : `${((end - start) / 1000).toFixed(2)}s`;
@@ -163,6 +164,7 @@
         `Shopify request: ${formatDuration(timingMarks.fetchStarted, timingMarks.responseReceived)}`,
         `Response processing: ${formatDuration(timingMarks.responseReceived, timingMarks.responseParsed)}`,
         `Total to UI result: ${formatDuration(timingMarks.started, timingMarks.completed)}`,
+        ...responseDiagnostics,
       ].join('\n');
     };
 
@@ -382,6 +384,7 @@
     const startSubmissionState = () => {
       submissionStartedAt = Date.now();
       Object.keys(timingMarks).forEach((key) => delete timingMarks[key]);
+      responseDiagnostics = [];
       markTiming('started', 'Waiting for captcha');
       if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
       popup.setAttribute('aria-busy', 'true');
@@ -414,9 +417,22 @@
         });
         markTiming('responseReceived', 'Reading Shopify response');
         const responseHtml = await response.text();
-        const responsePopup = new DOMParser()
-          .parseFromString(responseHtml, 'text/html')
-          .querySelector('[data-pdp-promo-popup]');
+        const responseDocument = new DOMParser().parseFromString(responseHtml, 'text/html');
+        const responsePopup = responseDocument.querySelector('[data-pdp-promo-popup]');
+        const responseError =
+          responseDocument.querySelector('[data-pdp-promo-submit-error], .pdp-promo-popup__error')
+            ?.textContent?.trim() ||
+          responseDocument.querySelector('.errors, [class*="captcha"] [class*="error"]')
+            ?.textContent?.trim();
+        responseDiagnostics = [
+          `HTTP: ${response.status} ${response.statusText || ''}`.trim(),
+          `Final URL: ${new URL(response.url).pathname}${new URL(response.url).search}`,
+          `Redirected: ${response.redirected}`,
+          `Content-Type: ${response.headers.get('content-type') || 'unknown'}`,
+          `Response title: ${responseDocument.title || '(none)'}`,
+          `Popup result: success=${responsePopup?.dataset.formSuccess || 'missing'}, error=${responsePopup?.dataset.formError || 'missing'}`,
+          `Form error: ${responseError || '(none)'}`,
+        ];
         markTiming('responseParsed', 'Processing result');
 
         if (!response.ok || responsePopup?.dataset.formSuccess !== 'true') {
@@ -428,7 +444,10 @@
         if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
         showSubmitSuccess();
         markTiming('completed', 'Success');
-      } catch {
+      } catch (error) {
+        if (!responseDiagnostics.length) {
+          responseDiagnostics = [`Request error: ${error?.message || 'Unknown error'}`];
+        }
         await waitForMinimumSendingDuration();
         showSubmitError();
         if (submitButton) {
