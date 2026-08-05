@@ -31,11 +31,13 @@ html[data-pdp-promo-popup-open] shopify-chat {
   align-items: center;
   gap: 7px;
   padding: 0 14px 0 12px;
-  border: 0;
+  border: 1px solid color-mix(in srgb, var(--pdp-popup-accent) 45%, transparent);
   border-radius: 999px 0 0 999px;
-  background: var(--pdp-popup-accent);
-  color: var(--pdp-popup-accent-text);
+  background: color-mix(in srgb, var(--pdp-popup-accent) 30%, transparent);
+  color: var(--pdp-popup-primary-text);
   box-shadow: 0 4px 14px rgb(33 31 27 / 20%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   font: 600 13px/1 var(--pdp-popup-font);
   letter-spacing: 0.04em;
   cursor: pointer;
