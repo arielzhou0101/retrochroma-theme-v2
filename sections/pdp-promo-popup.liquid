@@ -43,7 +43,7 @@
     }
   {%- endstyle -%}
 
-  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form', onsubmit: 'return false;' -%}
+  {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form', onsubmit: 'return false;', data-shopify-captcha: 'true' -%}
     <div
       class="pdp-promo-popup__overlay"
       data-pdp-promo-overlay
@@ -213,6 +213,15 @@
       </div>
       </aside>
     </div>
+    <iframe
+      name="PdpPromoPopupResponse-{{ section.id }}"
+      data-pdp-promo-response
+      title="Newsletter submission response"
+      tabindex="-1"
+      aria-hidden="true"
+      sandbox="allow-forms allow-same-origin"
+      hidden
+    ></iframe>
     {%- if section.settings.show_reopen_tab -%}
       <button
         class="pdp-promo-popup__reopen"
@@ -227,17 +236,6 @@
         <span>{{ section.settings.reopen_tab_text | escape }}</span>
       </button>
     {%- endif -%}
-    <script>
-      (() => {
-        const customerForm = document.getElementById({{ form_id | json }});
-        if (!customerForm || customerForm.dataset.pdpPromoCaptchaGuard === 'true') return;
-
-        customerForm.dataset.pdpPromoCaptchaGuard = 'true';
-        customerForm.submit = () => {
-          customerForm.dispatchEvent(new CustomEvent('pdpPromoPopup:captchaReady'));
-        };
-      })();
-    </script>
   {%- endform -%}
 
   <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url }}" defer="defer"></script>
