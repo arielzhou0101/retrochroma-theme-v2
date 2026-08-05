@@ -143,6 +143,7 @@
     let hasTrackedView = false;
     let timer;
     let previouslyFocusedElement;
+    let lockedScrollPosition;
 
     const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
@@ -178,6 +179,31 @@
         'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
       ) || [])].filter((element) => element instanceof HTMLElement && element.offsetParent !== null);
 
+    const lockPageScroll = () => {
+      if (lockedScrollPosition !== undefined) return;
+
+      lockedScrollPosition = window.scrollY;
+      document.documentElement.style.setProperty(
+        '--pdp-promo-scroll-top',
+        `-${lockedScrollPosition}px`
+      );
+      document.documentElement.setAttribute('data-pdp-promo-popup-open', '');
+    };
+
+    const unlockPageScroll = () => {
+      if (lockedScrollPosition === undefined) {
+        document.documentElement.removeAttribute('data-pdp-promo-popup-open');
+        document.documentElement.style.removeProperty('--pdp-promo-scroll-top');
+        return;
+      }
+
+      const scrollPosition = lockedScrollPosition;
+      lockedScrollPosition = undefined;
+      document.documentElement.removeAttribute('data-pdp-promo-popup-open');
+      document.documentElement.style.removeProperty('--pdp-promo-scroll-top');
+      window.scrollTo(0, scrollPosition);
+    };
+
     const show = ({ record = true, trackView = true } = {}) => {
       if (isCartDrawerOpen()) return false;
       window.clearTimeout(timer);
@@ -187,7 +213,7 @@
         overlay.classList.add('is-visible');
         overlay.setAttribute('aria-hidden', 'false');
         popup.setAttribute('aria-hidden', 'false');
-        document.documentElement.setAttribute('data-pdp-promo-popup-open', '');
+        lockPageScroll();
         window.requestAnimationFrame(() => {
           const success = popup.querySelector('[data-pdp-promo-success]');
           const focusTarget =
@@ -213,7 +239,7 @@
       overlay?.classList.remove('is-visible');
       overlay?.setAttribute('aria-hidden', 'true');
       popup.setAttribute('aria-hidden', 'true');
-      document.documentElement.removeAttribute('data-pdp-promo-popup-open');
+      unlockPageScroll();
 
       if (
         restoreFocus &&
