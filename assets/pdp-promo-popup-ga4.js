@@ -117,7 +117,9 @@
     const isDesignMode = popup.dataset.designMode === 'true' || window.Shopify?.designMode;
     const hasSuccess = popup.dataset.formSuccess === 'true';
     const hasError = popup.dataset.formError === 'true';
-    const isPreviewForced = new URLSearchParams(window.location.search).get('welcome_popup_preview') === '1';
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPreviewForced = urlParams.get('welcome_popup_preview') === '1';
+    const isTimingDebug = urlParams.get('popup_timing_debug') === '1';
     const delay = Math.max(0, Number(popup.dataset.triggerDelay) || 10) * 1000;
     const overlay = popup.closest('[data-pdp-promo-overlay]');
     const closeButton = popup.querySelector('[data-pdp-promo-close]');
@@ -139,6 +141,36 @@
     let submissionStartedAt = 0;
     let submitLabel;
     let previouslyFocusedElement;
+    const timingMarks = {};
+    let timingDebugPanel;
+
+    const formatDuration = (start, end) =>
+      start === undefined || end === undefined ? '—' : `${((end - start) / 1000).toFixed(2)}s`;
+
+    const renderTimingDebug = (status) => {
+      if (!isTimingDebug) return;
+      if (!timingDebugPanel) {
+        timingDebugPanel = document.createElement('pre');
+        timingDebugPanel.className = 'pdp-promo-popup__timing-debug';
+        timingDebugPanel.setAttribute('aria-live', 'polite');
+        overlay?.append(timingDebugPanel);
+      }
+
+      timingDebugPanel.textContent = [
+        `Status: ${status}`,
+        `Click → captcha invoked: ${formatDuration(timingMarks.started, timingMarks.captchaInvoked)}`,
+        `Captcha invoked → token: ${formatDuration(timingMarks.captchaInvoked, timingMarks.captchaReady)}`,
+        `Shopify request: ${formatDuration(timingMarks.fetchStarted, timingMarks.responseReceived)}`,
+        `Response processing: ${formatDuration(timingMarks.responseReceived, timingMarks.responseParsed)}`,
+        `Total to UI result: ${formatDuration(timingMarks.started, timingMarks.completed)}`,
+      ].join('\n');
+    };
+
+    const markTiming = (name, status) => {
+      if (!isTimingDebug) return;
+      timingMarks[name] = performance.now();
+      renderTimingDebug(status);
+    };
 
     const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
     const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
@@ -347,6 +379,8 @@
 
     const startSubmissionState = () => {
       submissionStartedAt = Date.now();
+      Object.keys(timingMarks).forEach((key) => delete timingMarks[key]);
+      markTiming('started', 'Waiting for captcha');
       if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
       popup.setAttribute('aria-busy', 'true');
       popup.querySelector('[data-pdp-promo-submit-error]')?.remove();
@@ -360,6 +394,7 @@
     const performSubmission = async () => {
       if (isSubmitting) return;
       isSubmitting = true;
+      markTiming('fetchStarted', 'Waiting for Shopify');
 
       const waitForMinimumSendingDuration = async () => {
         const remainingSendingTime = MIN_SENDING_DURATION - (Date.now() - submissionStartedAt);
@@ -375,10 +410,12 @@
           credentials: 'same-origin',
           redirect: 'follow',
         });
+        markTiming('responseReceived', 'Reading Shopify response');
         const responseHtml = await response.text();
         const responsePopup = new DOMParser()
           .parseFromString(responseHtml, 'text/html')
           .querySelector('[data-pdp-promo-popup]');
+        markTiming('responseParsed', 'Processing result');
 
         if (!response.ok || responsePopup?.dataset.formSuccess !== 'true') {
           throw new Error('Customer form submission was not confirmed.');
@@ -388,6 +425,7 @@
         writeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed, 'true');
         if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
         showSubmitSuccess();
+        markTiming('completed', 'Success');
       } catch {
         await waitForMinimumSendingDuration();
         showSubmitError();
@@ -395,6 +433,7 @@
           submitButton.disabled = false;
           submitButton.textContent = submitLabel || 'Unlock my 10% off';
         }
+        markTiming('completed', 'Error');
       } finally {
         isSubmitting = false;
         popup.removeAttribute('aria-busy');
@@ -404,6 +443,7 @@
     const completeCaptchaSubmission = () => {
       if (!isAwaitingCaptcha || isSubmitting || !hasCaptchaToken()) return;
 
+      markTiming('captchaReady', 'Captcha ready');
       stopCaptchaBindingPoll();
       stopCaptchaTokenPoll();
       isAwaitingCaptcha = false;
@@ -414,6 +454,7 @@
       if (!isAwaitingCaptcha || form?.dataset.hcaptchaBound !== 'true') return false;
 
       stopCaptchaBindingPoll();
+      markTiming('captchaInvoked', 'Waiting for captcha token');
       form.submit();
       return true;
     };
@@ -424,6 +465,8 @@
 
       startSubmissionState();
       if (!isCaptchaProtected()) {
+        markTiming('captchaInvoked', 'Captcha not required');
+        markTiming('captchaReady', 'Captcha not required');
         performSubmission();
         return;
       }
