@@ -8,6 +8,8 @@
     sessionDismissed: 'rcPdpPromoDismissed',
     sessionCopied: 'rcPdpPromoCopied',
     retryRequested: 'rcPdpPromoRetryRequested',
+    capsuleDismissedSession: 'rcPdpPromoCapsuleDismissed',
+    capsuleDismissedUntil: 'rcPdpPromoCapsuleDismissedUntil',
   };
 
   const DAY = 24 * 60 * 60 * 1000;
@@ -134,7 +136,9 @@
     const popupImage = popup.querySelector('[data-pdp-promo-image]');
     const code = popup.querySelector('[data-pdp-promo-code]')?.textContent.trim() || 'WELCOME10';
     const form = popup.closest('form');
+    const reopenCapsule = form?.querySelector('[data-pdp-promo-reopen-capsule]');
     const reopenButton = form?.querySelector('[data-pdp-promo-reopen]');
+    const reopenCloseButton = form?.querySelector('[data-pdp-promo-reopen-close]');
     const originalContent = popup.querySelector('.pdp-promo-popup__content');
     const emailInput = popup.querySelector('input[type="email"]');
     const submitButton = popup.querySelector('[data-pdp-promo-submit]');
@@ -150,12 +154,28 @@
     const isSubscriptionConfirmed = () =>
       readStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed) === 'true';
 
+    const isCapsuleSuppressed = () => {
+      if (
+        readStorage(window.sessionStorage, STORAGE_KEYS.capsuleDismissedSession) === 'true'
+      ) {
+        return true;
+      }
+
+      const dismissedUntil = Number(
+        readStorage(window.localStorage, STORAGE_KEYS.capsuleDismissedUntil)
+      );
+      if (Number.isFinite(dismissedUntil) && dismissedUntil > Date.now()) return true;
+
+      removeStorage(window.localStorage, STORAGE_KEYS.capsuleDismissedUntil);
+      return false;
+    };
+
     const initializeCapsule = () => {
-      if (!reopenButton) return;
+      if (!reopenCapsule || (!isDesignMode && isCapsuleSuppressed())) return;
 
       const revealCapsule = () => {
-        reopenButton.classList.add('is-ready');
-        reopenButton.hidden = false;
+        reopenCapsule.classList.add('is-ready');
+        reopenCapsule.hidden = false;
       };
 
       if (isDesignMode) {
@@ -332,6 +352,19 @@
     });
 
     reopenButton?.addEventListener('click', () => show({ record: false }));
+
+    reopenCloseButton?.addEventListener('click', () => {
+      reopenCapsule?.classList.remove('is-ready');
+      if (reopenCapsule) reopenCapsule.hidden = true;
+      if (isDesignMode) return;
+
+      writeStorage(window.sessionStorage, STORAGE_KEYS.capsuleDismissedSession, 'true');
+      writeStorage(
+        window.localStorage,
+        STORAGE_KEYS.capsuleDismissedUntil,
+        String(Date.now() + WEEK)
+      );
+    });
 
     copyButton?.addEventListener('click', async () => {
       const copyLabel = copyButton.dataset.copyLabel || 'Copy';

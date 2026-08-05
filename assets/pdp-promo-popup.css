@@ -29,18 +29,15 @@ html[data-pdp-promo-popup-open] shopify-chat {
   display: inline-flex;
   min-height: 42px;
   align-items: center;
-  gap: 7px;
-  padding: 0 14px 0 12px;
+  padding: 0;
   border: 1px solid color-mix(in srgb, var(--pdp-popup-accent) 45%, transparent);
   border-radius: 999px 0 0 999px;
   background: color-mix(in srgb, var(--pdp-popup-accent) 30%, transparent);
   color: var(--pdp-popup-primary-text);
   box-shadow: 0 4px 14px rgb(33 31 27 / 20%);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
   font: 600 13px/1 var(--pdp-popup-font);
   letter-spacing: 0.04em;
-  cursor: pointer;
+  overflow: hidden;
   transform: translateY(-50%);
 }
 
@@ -55,13 +52,43 @@ html[data-pdp-promo-popup-open] shopify-chat {
   flex: none;
 }
 
-.pdp-promo-popup__reopen:hover {
-  filter: brightness(0.92);
+.pdp-promo-popup__reopen-trigger,
+.pdp-promo-popup__reopen-close {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
 }
 
-.pdp-promo-popup__reopen:focus-visible {
+.pdp-promo-popup__reopen-trigger {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px 0 12px;
+}
+
+.pdp-promo-popup__reopen-close {
+  display: grid;
+  width: 30px;
+  min-height: 40px;
+  padding: 0;
+  border-left: 1px solid color-mix(in srgb, var(--pdp-popup-accent) 35%, transparent);
+  font-size: 18px;
+  line-height: 1;
+  place-items: center;
+}
+
+.pdp-promo-popup__reopen-trigger:hover,
+.pdp-promo-popup__reopen-close:hover {
+  background: color-mix(in srgb, var(--pdp-popup-accent) 14%, transparent);
+}
+
+.pdp-promo-popup__reopen-trigger:focus-visible,
+.pdp-promo-popup__reopen-close:focus-visible {
   outline: 2px solid var(--pdp-popup-accent);
-  outline-offset: 3px;
+  outline-offset: -3px;
 }
 
 .pdp-promo-popup__overlay {
@@ -366,9 +393,18 @@ html[data-pdp-promo-popup-open] shopify-chat {
 @media screen and (width < 750px) {
   .pdp-promo-popup__reopen {
     min-height: 38px;
-    gap: 6px;
-    padding: 0 11px 0 10px;
     font-size: 12px;
+  }
+
+  .pdp-promo-popup__reopen-trigger {
+    min-height: 36px;
+    gap: 6px;
+    padding: 0 8px 0 10px;
+  }
+
+  .pdp-promo-popup__reopen-close {
+    width: 28px;
+    min-height: 36px;
   }
 
   .pdp-promo-popup__overlay {
