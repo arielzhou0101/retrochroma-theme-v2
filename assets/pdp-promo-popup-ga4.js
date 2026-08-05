@@ -2,11 +2,14 @@
   const EVENT_SOURCE = 'pdp_promo_popup';
 
   const STORAGE_KEYS = {
-    subscribed: 'rcPdpPromoEmailSubmitted',
+    subscriptionConfirmed: 'rcPdpPromoEmailSubmitted',
     impressions: 'rcPdpPromoImpressions',
     sessionShown: 'rcPdpPromoShown',
     sessionDismissed: 'rcPdpPromoDismissed',
     sessionCopied: 'rcPdpPromoCopied',
+    retryRequested: 'rcPdpPromoRetryRequested',
+    capsuleDismissedSession: 'rcPdpPromoCapsuleDismissed',
+    capsuleDismissedUntil: 'rcPdpPromoCapsuleDismissedUntil',
   };
 
   const DAY = 24 * 60 * 60 * 1000;
@@ -26,6 +29,23 @@
     } catch {
       // Storage may be unavailable in privacy mode; the popup should still work.
     }
+  };
+
+  const removeStorage = (storage, key) => {
+    try {
+      storage.removeItem(key);
+    } catch {
+      // Storage may be unavailable in privacy mode; the popup should still work.
+    }
+  };
+
+  const runWhenIdle = (callback) => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(callback, { timeout: 2000 });
+      return;
+    }
+
+    window.setTimeout(callback, 200);
   };
 
   const removeBlankParams = (params) =>
@@ -107,36 +127,243 @@
     const isDesignMode = popup.dataset.designMode === 'true' || window.Shopify?.designMode;
     const hasSuccess = popup.dataset.formSuccess === 'true';
     const hasError = popup.dataset.formError === 'true';
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPreviewForced = urlParams.get('welcome_popup_preview') === '1';
     const delay = Math.max(0, Number(popup.dataset.triggerDelay) || 10) * 1000;
+    const overlay = popup.closest('[data-pdp-promo-overlay]');
     const closeButton = popup.querySelector('[data-pdp-promo-close]');
     const copyButton = popup.querySelector('[data-pdp-promo-copy]');
+    const popupImage = popup.querySelector('[data-pdp-promo-image]');
     const code = popup.querySelector('[data-pdp-promo-code]')?.textContent.trim() || 'WELCOME10';
     const form = popup.closest('form');
+    const reopenCapsule = form?.querySelector('[data-pdp-promo-reopen-capsule]');
+    const reopenButton = form?.querySelector('[data-pdp-promo-reopen]');
+    const reopenCloseButton = form?.querySelector('[data-pdp-promo-reopen-close]');
+    const originalContent = popup.querySelector('.pdp-promo-popup__content');
+    const emailInput = popup.querySelector('input[type="email"]');
     const submitButton = popup.querySelector('[data-pdp-promo-submit]');
+    const serverSuccessRetryButton = popup.querySelector('[data-pdp-promo-success-retry]');
     const eventParams = buildEventParams(popup, code);
     let hasTrackedView = false;
     let timer;
+    let previouslyFocusedElement;
+    let lockedScrollPosition;
+
+    const cartDrawerDialog = () => document.querySelector('.cart-drawer__dialog');
+    const isCartDrawerOpen = () => Boolean(cartDrawerDialog()?.open);
+    const isSubscriptionConfirmed = () =>
+      readStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed) === 'true';
+
+    const isCapsuleSuppressed = () => {
+      if (
+        readStorage(window.sessionStorage, STORAGE_KEYS.capsuleDismissedSession) === 'true'
+      ) {
+        return true;
+      }
+
+      const dismissedUntil = Number(
+        readStorage(window.localStorage, STORAGE_KEYS.capsuleDismissedUntil)
+      );
+      if (Number.isFinite(dismissedUntil) && dismissedUntil > Date.now()) return true;
+
+      removeStorage(window.localStorage, STORAGE_KEYS.capsuleDismissedUntil);
+      return false;
+    };
+
+    const initializeCapsule = () => {
+      if (!reopenCapsule || (!isDesignMode && isCapsuleSuppressed())) return;
+
+      const revealCapsule = () => {
+        reopenCapsule.classList.add('is-ready');
+        reopenCapsule.hidden = false;
+      };
+
+      if (isDesignMode) {
+        revealCapsule();
+        return;
+      }
+
+      runWhenIdle(revealCapsule);
+    };
+
+    const loadPopupImage = () => {
+      if (!popupImage || popupImage.dataset.loaded === 'true') return;
+
+      if (popupImage.dataset.srcset) popupImage.srcset = popupImage.dataset.srcset;
+      if (popupImage.dataset.src) popupImage.src = popupImage.dataset.src;
+      popupImage.dataset.loaded = 'true';
+    };
+
+    const getFocusableElements = () =>
+      [...(overlay?.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ) || [])].filter((element) => element instanceof HTMLElement && element.offsetParent !== null);
+
+    const lockPageScroll = () => {
+      if (lockedScrollPosition !== undefined) return;
+
+      lockedScrollPosition = window.scrollY;
+      document.documentElement.style.setProperty(
+        '--pdp-promo-scroll-top',
+        `-${lockedScrollPosition}px`
+      );
+      document.documentElement.setAttribute('data-pdp-promo-popup-open', '');
+    };
+
+    const unlockPageScroll = () => {
+      if (lockedScrollPosition === undefined) {
+        document.documentElement.removeAttribute('data-pdp-promo-popup-open');
+        document.documentElement.style.removeProperty('--pdp-promo-scroll-top');
+        return;
+      }
+
+      const scrollPosition = lockedScrollPosition;
+      lockedScrollPosition = undefined;
+      document.documentElement.removeAttribute('data-pdp-promo-popup-open');
+      document.documentElement.style.removeProperty('--pdp-promo-scroll-top');
+      window.scrollTo(0, scrollPosition);
+    };
 
     const show = ({ record = true, trackView = true } = {}) => {
+      if (isCartDrawerOpen()) return false;
       window.clearTimeout(timer);
-      popup.classList.add('is-visible');
-      popup.setAttribute('aria-hidden', 'false');
+      loadPopupImage();
+      if (overlay && !overlay.classList.contains('is-visible')) {
+        previouslyFocusedElement = document.activeElement;
+        overlay.classList.add('is-visible');
+        overlay.setAttribute('aria-hidden', 'false');
+        popup.setAttribute('aria-hidden', 'false');
+        lockPageScroll();
+        window.requestAnimationFrame(() => {
+          const success = popup.querySelector('[data-pdp-promo-success]');
+          const focusTarget =
+            popup.querySelector('[autofocus]') || success ||
+            (emailInput?.isConnected ? emailInput : closeButton);
+          focusTarget?.focus();
+        });
+      }
       if (trackView && !isDesignMode && !hasTrackedView) {
         trackEvent('pdp_promo_view', eventParams);
         hasTrackedView = true;
       }
       if (record && !isDesignMode) recordImpression();
+      return true;
     };
 
-    const hide = () => {
-      popup.classList.remove('is-visible');
+    const hide = ({ userDismissal = false, restoreFocus = true } = {}) => {
+      if (userDismissal) {
+        writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
+        if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
+      }
+
+      overlay?.classList.remove('is-visible');
+      overlay?.setAttribute('aria-hidden', 'true');
       popup.setAttribute('aria-hidden', 'true');
+      unlockPageScroll();
+
+      if (
+        restoreFocus &&
+        previouslyFocusedElement instanceof HTMLElement &&
+        previouslyFocusedElement.isConnected
+      ) {
+        previouslyFocusedElement.focus();
+      }
+      previouslyFocusedElement = undefined;
+    };
+
+    const showSubmitSuccess = () => {
+      const content = popup.querySelector('.pdp-promo-popup__content');
+      if (!content) return;
+
+      const success = document.createElement('div');
+      success.className = 'pdp-promo-popup__success';
+      success.dataset.pdpPromoSuccess = '';
+      success.tabIndex = -1;
+
+      const heading = document.createElement('h2');
+      heading.className = 'pdp-promo-popup__success-heading';
+      heading.textContent = popup.dataset.successHeading || 'Check your inbox';
+
+      const message = document.createElement('p');
+      message.className = 'pdp-promo-popup__success-copy';
+      message.textContent =
+        popup.dataset.successMessage ||
+        'Thanks! Please check your inbox. Your welcome email should arrive shortly—please check your spam folder too.';
+
+      success.append(heading, message);
+      if (popup.dataset.successNote) {
+        const note = document.createElement('p');
+        note.className = 'pdp-promo-popup__success-copy pdp-promo-popup__success-note';
+        note.textContent = popup.dataset.successNote;
+        success.append(note);
+      }
+      if (originalContent && popup.dataset.successRetry) {
+        const retry = document.createElement('button');
+        retry.className = 'pdp-promo-popup__success-retry';
+        retry.type = 'button';
+        retry.textContent = popup.dataset.successRetry;
+        retry.addEventListener('click', () => {
+          removeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed);
+          success.replaceWith(originalContent);
+          overlay?.setAttribute(
+            'aria-label',
+            popup.dataset.signupHeading || 'Special offer'
+          );
+          if (overlay?.classList.contains('is-visible')) emailInput?.focus();
+        });
+        success.append(retry);
+      }
+      content.replaceWith(success);
+      overlay?.setAttribute('aria-label', heading.textContent);
+      if (overlay?.classList.contains('is-visible')) success.focus();
     };
 
     closeButton?.addEventListener('click', () => {
-      writeStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed, 'true');
-      if (!isDesignMode) trackEvent('pdp_promo_close', eventParams);
-      hide();
+      hide({ userDismissal: true });
+    });
+
+    overlay?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        hide({ userDismissal: true });
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusableElements = getFocusableElements();
+      if (!focusableElements.length) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    });
+    overlay?.addEventListener('click', (event) => {
+      if (event.target !== overlay) return;
+      hide({ userDismissal: true });
+    });
+
+    reopenButton?.addEventListener('click', () => show({ record: false }));
+
+    reopenCloseButton?.addEventListener('click', () => {
+      reopenCapsule?.classList.remove('is-ready');
+      if (reopenCapsule) reopenCapsule.hidden = true;
+      if (isDesignMode) return;
+
+      writeStorage(window.sessionStorage, STORAGE_KEYS.capsuleDismissedSession, 'true');
+      writeStorage(
+        window.localStorage,
+        STORAGE_KEYS.capsuleDismissedUntil,
+        String(Date.now() + WEEK)
+      );
     });
 
     copyButton?.addEventListener('click', async () => {
@@ -156,29 +383,54 @@
       }
     });
 
-    form?.addEventListener('submit', () => {
-      if (!isDesignMode) trackEvent('pdp_promo_email_submit', eventParams);
-      if (!submitButton) return;
-      submitButton.disabled = true;
-      submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
+    serverSuccessRetryButton?.addEventListener('click', () => {
+      removeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed);
+      writeStorage(window.sessionStorage, STORAGE_KEYS.retryRequested, 'true');
+
+      const retryUrl = new URL(window.location.href);
+      retryUrl.searchParams.delete('customer_posted');
+      retryUrl.hash = '';
+      window.location.replace(retryUrl);
     });
 
+    form?.addEventListener('submit', (event) => {
+      if (isDesignMode) {
+        event.preventDefault();
+        return;
+      }
+
+      trackEvent('pdp_promo_email_submit', eventParams);
+      popup.setAttribute('aria-busy', 'true');
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = submitButton.dataset.sendingLabel || 'Sending...';
+      }
+    });
+
+    initializeCapsule();
+
     if (hasSuccess) {
-      writeStorage(window.localStorage, STORAGE_KEYS.subscribed, 'true');
+      writeStorage(window.localStorage, STORAGE_KEYS.subscriptionConfirmed, 'true');
       if (!isDesignMode) trackEvent('pdp_promo_email_success', eventParams);
       show({ record: false, trackView: false });
       popup.querySelector('[data-pdp-promo-success]')?.focus();
-      window.setTimeout(hide, 2200);
       return;
     }
 
-    if (hasError || isDesignMode) {
+    const permanentlyExcluded = !isDesignMode && isSubscriptionConfirmed();
+    if (permanentlyExcluded) showSubmitSuccess();
+
+    const retryRequested =
+      readStorage(window.sessionStorage, STORAGE_KEYS.retryRequested) === 'true';
+    if (retryRequested) {
+      removeStorage(window.sessionStorage, STORAGE_KEYS.retryRequested);
+    }
+
+    if (hasError || isDesignMode || isPreviewForced || retryRequested) {
       show({ record: false, trackView: false });
       return;
     }
 
-    const permanentlyExcluded =
-      readStorage(window.localStorage, STORAGE_KEYS.subscribed) === 'true';
     const shownThisSession =
       readStorage(window.sessionStorage, STORAGE_KEYS.sessionShown) === 'true';
     const dismissedThisSession =
@@ -188,7 +440,17 @@
       return;
     }
 
-    timer = window.setTimeout(show, delay);
+    timer = window.setTimeout(() => {
+      if (show()) return;
+
+      cartDrawerDialog()?.addEventListener(
+        'close',
+        () => {
+          if (!readStorage(window.sessionStorage, STORAGE_KEYS.sessionDismissed)) show();
+        },
+        { once: true }
+      );
+    }, delay);
 
     document.addEventListener('shopify:section:select', (event) => {
       if (event.target.contains(popup)) show({ record: false });

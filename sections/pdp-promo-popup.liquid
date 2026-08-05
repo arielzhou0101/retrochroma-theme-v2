@@ -1,7 +1,7 @@
 {%- liquid
   assign should_render = section.settings.enable_popup
 
-  unless request.page_type == 'product'
+  unless request.page_type == 'index' or request.page_type == 'collection' or request.page_type == 'product' or request.page_type == 'page' or request.page_type == 'blog' or request.page_type == 'article' or request.page_type == 'search'
     assign should_render = false
   endunless
 
@@ -44,22 +44,32 @@
   {%- endstyle -%}
 
   {%- form 'customer', id: form_id, class: 'pdp-promo-popup__customer-form' -%}
-    <aside
-      class="pdp-promo-popup"
-      data-pdp-promo-popup
-      data-nosnippet
-      data-trigger-delay="{{ section.settings.trigger_delay }}"
-      data-design-mode="{{ request.design_mode }}"
-      data-form-success="{{ form.posted_successfully? }}"
-      data-form-error="{% if form.errors %}true{% else %}false{% endif %}"
-      data-product-id="{{ product.id }}"
-      data-product-handle="{{ product.handle | escape }}"
-      data-promo-code="{{ section.settings.code_text | escape }}"
+    <div
+      class="pdp-promo-popup__overlay"
+      data-pdp-promo-overlay
       role="dialog"
-      aria-modal="false"
-      aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Saved for later' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
+      aria-modal="true"
       aria-hidden="true"
+      aria-label="{% if form.posted_successfully? %}{{ section.settings.success_heading_text | default: 'Check your inbox' | escape }}{% else %}{{ section.settings.heading_text | default: 'Special offer' | escape }}{% endif %}"
     >
+      <aside
+        class="pdp-promo-popup"
+        data-pdp-promo-popup
+        data-nosnippet
+        data-trigger-delay="{{ section.settings.trigger_delay }}"
+        data-design-mode="{{ request.design_mode }}"
+        data-form-success="{{ form.posted_successfully? }}"
+        data-form-error="{% if form.errors %}true{% else %}false{% endif %}"
+        data-product-id="{{ product.id }}"
+        data-product-handle="{{ product.handle | escape }}"
+        data-promo-code="{{ section.settings.code_text | escape }}"
+        data-success-heading="{{ section.settings.success_heading_text | escape }}"
+        data-success-message="{{ section.settings.success_message_text | escape }}"
+        data-success-note="{% if section.settings.show_success_note %}{{ section.settings.success_note_text | escape }}{% endif %}"
+        data-success-retry="{% if section.settings.show_success_retry %}{{ section.settings.success_retry_text | escape }}{% endif %}"
+        data-signup-heading="{{ section.settings.heading_text | default: 'Special offer' | escape }}"
+        data-submit-error="{{ section.settings.error_text | escape }}"
+      >
       <button
         class="pdp-promo-popup__close"
         type="button"
@@ -69,6 +79,26 @@
         <span aria-hidden="true">&times;</span>
       </button>
 
+      <div class="pdp-promo-popup__panel pdp-promo-popup__panel--image-{{ section.settings.image_position }}{% unless section.settings.popup_image %} pdp-promo-popup__panel--no-image{% endunless %}">
+        {%- if section.settings.popup_image -%}
+          <div class="pdp-promo-popup__media{% unless section.settings.show_image_on_mobile %} pdp-promo-popup__media--desktop-only{% endunless %}">
+            <img
+              class="pdp-promo-popup__image"
+              data-pdp-promo-image
+              data-src="{{ section.settings.popup_image | image_url: width: 900 }}"
+              data-srcset="{{ section.settings.popup_image | image_url: width: 320 }} 320w, {{ section.settings.popup_image | image_url: width: 450 }} 450w, {{ section.settings.popup_image | image_url: width: 640 }} 640w, {{ section.settings.popup_image | image_url: width: 900 }} 900w"
+              sizes="(max-width: 749px) min(100vw - 40px, 440px), 280px"
+              width="{{ section.settings.popup_image.width }}"
+              height="{{ section.settings.popup_image.height }}"
+              alt="{{ section.settings.popup_image.alt | escape }}"
+              loading="lazy"
+              fetchpriority="low"
+              decoding="async"
+            >
+          </div>
+        {%- endif -%}
+
+        <div class="pdp-promo-popup__body">
       {%- if form.posted_successfully? -%}
         <div class="pdp-promo-popup__success" data-pdp-promo-success tabindex="-1">
           {%- if section.settings.show_success_heading -%}
@@ -80,6 +110,20 @@
             <p class="pdp-promo-popup__success-copy">
               {{ section.settings.success_message_text | escape }}
             </p>
+          {%- endif -%}
+          {%- if section.settings.show_success_note -%}
+            <p class="pdp-promo-popup__success-copy pdp-promo-popup__success-note">
+              {{ section.settings.success_note_text | escape }}
+            </p>
+          {%- endif -%}
+          {%- if section.settings.show_success_retry -%}
+            <button
+              class="pdp-promo-popup__success-retry"
+              type="button"
+              data-pdp-promo-success-retry
+            >
+              {{ section.settings.success_retry_text | escape }}
+            </button>
           {%- endif -%}
         </div>
       {%- else -%}
@@ -128,6 +172,7 @@
           {%- endif -%}
 
           <input type="hidden" name="contact[tags]" value="newsletter,pdp-promo-popup">
+          <input type="hidden" name="contact[accepts_marketing]" value="true">
 
           {%- if section.settings.show_email -%}
             <label class="visually-hidden" for="PdpPromoEmail-{{ section.id }}">
@@ -176,19 +221,49 @@
           {%- endif -%}
         </div>
       {%- endif -%}
-    </aside>
+        </div>
+      </div>
+      </aside>
+    </div>
+    {%- if section.settings.show_reopen_tab -%}
+      <div
+        class="pdp-promo-popup__reopen"
+        data-pdp-promo-reopen-capsule
+        hidden
+      >
+        <button
+          class="pdp-promo-popup__reopen-trigger"
+          type="button"
+          data-pdp-promo-reopen
+          aria-label="Reopen welcome offer"
+        >
+          <svg class="pdp-promo-popup__reopen-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="M3.5 10.25h17v10.25h-17zM2.5 6.5h19v3.75h-19zM12 6.5v14M12 6.5H8.75a2.25 2.25 0 1 1 2.25-2.25V6.5Zm0 0h3.25A2.25 2.25 0 1 0 13 4.25V6.5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"/>
+          </svg>
+          <span>{{ section.settings.reopen_tab_text | escape }}</span>
+        </button>
+        <button
+          class="pdp-promo-popup__reopen-close"
+          type="button"
+          data-pdp-promo-reopen-close
+          aria-label="Hide welcome offer for 7 days"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {%- endif -%}
   {%- endform -%}
 
-  <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url | split: '?' | first }}?rcv=20260716_gtm1" defer="defer"></script>
+  <script src="{{ 'pdp-promo-popup-ga4.js' | asset_url }}" defer="defer"></script>
 {%- endif -%}
 
 {% schema %}
 {
-  "name": "PDP Promo Popup",
+  "name": "Welcome Email Popup",
   "tag": "section",
   "class": "pdp-promo-popup-section",
   "enabled_on": {
-    "templates": ["product"]
+    "groups": ["header"]
   },
   "settings": [
     {
@@ -206,6 +281,47 @@
       "step": 1,
       "unit": "sec",
       "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Collapsed tab"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reopen_tab",
+      "label": "Show tab after closing popup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "reopen_tab_text",
+      "label": "Tab text",
+      "default": "10% OFF"
+    },
+    {
+      "type": "header",
+      "content": "Popup image"
+    },
+    {
+      "type": "image_picker",
+      "id": "popup_image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Desktop position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_on_mobile",
+      "label": "Show image on mobile",
+      "default": true
     },
     {
       "type": "header",
@@ -231,7 +347,7 @@
       "type": "text",
       "id": "heading_text",
       "label": "Text",
-      "default": "Still thinking about this lamp?"
+      "default": "Enjoy 10% off your first order"
     },
     {
       "type": "range",
@@ -257,7 +373,7 @@
       "type": "text",
       "id": "intro_text",
       "label": "Text",
-      "default": "Here's a first-order perk for this visit."
+      "default": "Join our email list and we’ll send your code straight to your inbox."
     },
     {
       "type": "range",
@@ -277,7 +393,7 @@
       "type": "checkbox",
       "id": "show_code",
       "label": "Show promo code",
-      "default": true
+      "default": false
     },
     {
       "type": "text",
@@ -300,7 +416,7 @@
       "type": "checkbox",
       "id": "show_copy",
       "label": "Show copy button",
-      "default": true
+      "default": false
     },
     {
       "type": "text",
@@ -338,7 +454,7 @@
       "type": "textarea",
       "id": "prompt_text",
       "label": "Text",
-      "default": "Want to keep it for later?\nSend this code to your email."
+      "default": "A little welcome treat, plus occasional Retro Chroma updates."
     },
     {
       "type": "range",
@@ -390,7 +506,7 @@
       "type": "text",
       "id": "submit_text",
       "label": "Button text",
-      "default": "Send me the code"
+      "default": "Unlock my 10% off"
     },
     {
       "type": "text",
@@ -448,7 +564,7 @@
       "type": "text",
       "id": "error_text",
       "label": "Text",
-      "default": "Please enter a valid email address."
+      "default": "Something went wrong. Please try again."
     },
     {
       "type": "range",
@@ -474,7 +590,7 @@
       "type": "text",
       "id": "success_heading_text",
       "label": "Text",
-      "default": "Saved for later"
+      "default": "Check your inbox"
     },
     {
       "type": "range",
@@ -500,7 +616,31 @@
       "type": "text",
       "id": "success_message_text",
       "label": "Text",
-      "default": "WELCOME10 has been sent to your email."
+      "default": "Thanks! Please check your inbox. Your welcome email should arrive shortly—please check your spam folder too."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_success_note",
+      "label": "Show subscription note",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "success_note_text",
+      "label": "Subscription note",
+      "default": "If no email arrives, please try again."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_success_retry",
+      "label": "Show retry link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "success_retry_text",
+      "label": "Retry link",
+      "default": "Try again"
     },
     {
       "type": "range",
@@ -555,7 +695,7 @@
   ],
   "presets": [
     {
-      "name": "PDP Promo Popup"
+      "name": "Welcome Email Popup"
     }
   ]
 }
