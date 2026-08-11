@@ -54,7 +54,6 @@
   .section-resource-list__content:empty {
     display: none;
   }
-
   /* === 手机端强制修复补丁 (Zig-Zag 错落布局 - 仅针对 Editorial 模式) === */
   @media screen and (max-width: 768px) {
     /* 1. 容器修复：只针对 editorial 专用类名 */
@@ -188,13 +187,13 @@
   "
 >
   <div class="section-resource-list__header">
-    {% if request.page_type == 'product' and rec_title != blank %}
-      <h3>{{ rec_title }}</h3>
-    {% else %}
-      {%- content_for 'block', type: '_product-list-content', id: 'static-header',
-          closest.collection: rec_collection -%}
-    {% endif %}
-  </div>
+  {% if request.page_type == 'product' and rec_title != blank %}
+    <h3>{{ rec_title }}</h3>
+  {% else %}
+    {%- content_for 'block', type: '_product-list-content', id: 'static-header',
+        closest.collection: rec_collection -%}
+  {% endif %}
+</div>
 
 
   {% capture list_items %}

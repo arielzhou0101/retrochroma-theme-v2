@@ -47,20 +47,12 @@
     })(window,document,'script','dataLayer','GTM-N7S44Z3N');</script>
     <!-- End Google Tag Manager -->
 
-    {%- if settings.favicon != blank -%}
-      <link
-        rel="icon"
-        type="image/png"
-        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
-      >
-    {%- else -%}
-      <link
-        rel="icon"
-        type="image/png"
-        sizes="512x512"
-        href="{{ 'favicon-google-filled.png' | asset_url }}"
-      >
-    {%- endif -%}
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="{{ 'favicon-google-filled.png' | asset_url }}"
+    >
 
     {% comment %} This a way to wait for main content to load when navigating to a new page so that the view transitions can work consistently {% endcomment %}
     <link
