@@ -18,7 +18,7 @@ For each feature, record:
 - Eligibility: Managed by the **Eligible products** picker on the Product promotion block. The current selection contains only `leopard-print-22-momme-silk-front-pillowcase`.
 - Storefront location: A standalone Product promotion block placed after the Price block and before the Variant picker. It is not rendered by, or dependent on, the Price or tax-information block.
 - Badge: `SPECIAL OFFER`, with the theme's inline discount-tag icon and `#5C315F` background
-- PDP copy: `Get 15% off your second silk pillowcase automatically.`
+- PDP copy: `Get 20% off your second silk pillowcase automatically.`
 
 ### Configuration
 
