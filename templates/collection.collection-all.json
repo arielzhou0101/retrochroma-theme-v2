@@ -39,6 +39,7 @@
         },
         "text_FEzLLh": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "<p>A growing edit of distinctive, tactile pieces for the home—carefully chosen and added over time.</p>",
             "width": "fit-content",
