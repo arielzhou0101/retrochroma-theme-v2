@@ -640,7 +640,6 @@
           ]
         }
       },
-      "disabled": true,
       "name": "Soft Comforts",
       "settings": {
         "collection": "soft-comforts",
@@ -900,7 +899,6 @@
           ]
         }
       },
-      "disabled": true,
       "name": "Fluffy Warm",
       "settings": {
         "collection": "fluffy-warm",
@@ -1160,7 +1158,6 @@
           ]
         }
       },
-      "disabled": true,
       "name": "Loofah Core",
       "settings": {
         "collection": "loofah-core",
@@ -1420,7 +1417,6 @@
           ]
         }
       },
-      "disabled": true,
       "name": "Midcentury modern & vintage fabric",
       "settings": {
         "collection": "midcentury-modern-vintage-fabric",
