@@ -42,10 +42,10 @@
         },
         "series_recommendations_below_media": {
           "type": "series_recommendations",
-          "name": "Series recommendations",
+          "static": true,
           "settings": {
-            "product": "{{ closest.product }}",
-            "padding-block-start": 20,
+            "product": "",
+            "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
@@ -145,8 +145,8 @@
                 "letter_spacing": "loose",
                 "case": "none",
                 "color": "var(--color-foreground)",
-                "padding-block-start": 20,
-                "padding-block-end": 20,
+                "padding-block-start": 12,
+                "padding-block-end": 16,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
@@ -159,8 +159,8 @@
                 "variant_style": "buttons",
                 "show_swatches": true,
                 "alignment": "left",
-                "padding-block-start": 20,
-                "padding-block-end": 20,
+                "padding-block-start": 16,
+                "padding-block-end": 16,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
@@ -177,7 +177,7 @@
                 "stacking": false,
                 "show_pickup_availability": false,
                 "padding-block-start": 20,
-                "padding-block-end": 0,
+                "padding-block-end": 12,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
@@ -250,8 +250,8 @@
                 "thickness": 1,
                 "corner_radius": "square",
                 "width_percent": 100,
-                "padding-block-start": 20,
-                "padding-block-end": 20
+                "padding-block-start": 16,
+                "padding-block-end": 12
               },
               "blocks": {}
             },
@@ -328,7 +328,7 @@
                 "background_color": "#00000026",
                 "corner_radius": 0,
                 "padding-block-start": 20,
-                "padding-block-end": 0,
+                "padding-block-end": 8,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
