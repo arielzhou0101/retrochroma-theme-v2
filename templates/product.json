@@ -167,6 +167,8 @@
                 ],
                 "badge_text": "SPECIAL OFFER",
                 "message": "Get 20% off your second silk pillowcase automatically.",
+                "message_font": "var(--font-subheading--family)",
+                "message_font_size": 18,
                 "show_icon": true,
                 "badge_background": "#5C315F",
                 "badge_foreground": "#FFFFFF"

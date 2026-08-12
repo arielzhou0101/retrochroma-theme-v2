@@ -31,7 +31,7 @@ Theme Editor path:
 
 The master setting ID is `settings.storefront_promotions_enabled`. Its default is `false`, so a newly installed or newly released copy of the feature stays hidden until explicitly enabled.
 
-To manage one promotion, open the Product information section and select the **Product promotion** block. The block controls its own enabled state, eligible products, badge text, message, icon, and badge colors. Shopify supports up to 50 products in this picker.
+To manage one promotion, open the Product information section and select the **Product promotion** block. The block controls its own enabled state, eligible products, badge text, message, message font and size, icon, and badge colors. Shopify supports up to 50 products in this picker.
 
 This switch controls storefront messaging only. The real promotion must be configured and activated separately in **Shopify Admin > Discounts**. Enabling this switch does not create or validate a discount, and disabling the automatic discount does not hide the storefront messaging.
 

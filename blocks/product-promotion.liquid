@@ -9,10 +9,6 @@
     border: 1px solid color-mix(in srgb, var(--color-foreground) 16%, transparent);
     background: color-mix(in srgb, var(--color-background) 92%, #f5eadc);
     color: var(--color-foreground);
-    font-family: var(--font-subheading--family);
-    font-size: 1.125rem;
-    line-height: 1.35;
-    letter-spacing: 0.02em;
   }
 
   .product-promotion__badge,
@@ -30,10 +26,18 @@
     border-radius: 0.2rem;
     background: var(--promotion-badge-background);
     color: var(--promotion-badge-foreground);
+    font-family: var(--font-subheading--family);
     font-size: 0.6875rem;
     font-weight: 400;
     line-height: 1.2;
     letter-spacing: 0.08em;
+  }
+
+  .product-promotion__copy {
+    font-family: var(--promotion-message-font);
+    font-size: var(--promotion-message-font-size);
+    line-height: 1.35;
+    letter-spacing: 0.02em;
   }
 
   .product-promotion__badge-icon,
@@ -50,6 +54,8 @@
   enabled: block.settings.enabled,
   badge_text: block.settings.badge_text,
   message: block.settings.message,
+  message_font: block.settings.message_font,
+  message_font_size: block.settings.message_font_size,
   show_icon: block.settings.show_icon,
   badge_background: block.settings.badge_background,
   badge_foreground: block.settings.badge_foreground,
@@ -89,6 +95,40 @@
       "id": "message",
       "label": "Message",
       "default": "Get 20% off your second silk pillowcase automatically."
+    },
+    {
+      "type": "select",
+      "id": "message_font",
+      "label": "Message font",
+      "options": [
+        {
+          "value": "var(--font-body--family)",
+          "label": "Body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "Subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "Heading"
+        },
+        {
+          "value": "var(--font-accent--family)",
+          "label": "Accent"
+        }
+      ],
+      "default": "var(--font-subheading--family)"
+    },
+    {
+      "type": "range",
+      "id": "message_font_size",
+      "label": "Message size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
     },
     {
       "type": "checkbox",
