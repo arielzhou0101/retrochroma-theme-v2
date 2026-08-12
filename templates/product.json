@@ -93,14 +93,15 @@
             "text_FqENNL": {
               "type": "text",
               "name": "t:names.text",
+              "disabled": true,
               "settings": {
-                "text": "<p>{{ closest.product.metafields.custom.product_sub_title | metafield_tag }}</p>",
+                "text": "{{ closest.product.metafields.custom.product_sub_title | metafield_tag }}",
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "h5",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
+                "type_preset": "custom",
+                "font": "var(--font-heading--family)",
+                "font_size": "0.875rem",
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
@@ -123,25 +124,21 @@
                 "show_sale_price_first": true,
                 "show_installments": true,
                 "show_tax_info": true,
-                "type_preset": "h4",
+                "type_preset": "custom",
                 "width": "100%",
                 "alignment": "left",
                 "font": "var(--font-body--family)",
                 "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
+                "line_height": "loose",
+                "letter_spacing": "loose",
                 "case": "none",
                 "color": "var(--color-foreground)",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
+                "padding-block-start": 10,
+                "padding-block-end": 10,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
               "blocks": {}
-            },
-            "judge_me_reviews_preview_badge_Qtq8fK": {
-              "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-              "settings": {}
             },
             "variant_picker_R3rGDr": {
               "type": "variant-picker",
@@ -156,6 +153,10 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
+            },
+            "judge_me_reviews_preview_badge_Qtq8fK": {
+              "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+              "settings": {}
             },
             "buy_buttons_eYQEYi": {
               "type": "buy-buttons",
@@ -198,19 +199,6 @@
               },
               "block_order": []
             },
-            "payment_icons_tUEBdY": {
-              "type": "payment-icons",
-              "name": "t:names.payment_icons",
-              "settings": {
-                "horizontal_alignment": "flex-start",
-                "gap": 10,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
             "ai_gen_block_bdf77c4_a4c6Fa": {
               "type": "ai_gen_block_bdf77c4",
               "settings": {
@@ -220,13 +208,26 @@
                 "row_2_enabled": true,
                 "row_2_icon": "shopify://shop_images/box_7b731e62-12da-44dd-a13d-39f45f817730.svg",
                 "row_2_text": "No hassle returns within 30 days",
-                "row_3_enabled": false,
-                "row_3_text": "Mohair shade adds softness, warmth, and depth",
-                "spacing_top": 12,
+                "row_3_enabled": true,
+                "row_3_text": "In stock. Etimated Delivery Date: {date}",
+                "spacing_top": 0,
                 "spacing_bottom": 0,
                 "row_gap": 8,
-                "icon_size": 28,
+                "icon_size": 20,
                 "show_dividers": false
+              },
+              "blocks": {}
+            },
+            "payment_icons_tUEBdY": {
+              "type": "payment-icons",
+              "name": "t:names.payment_icons",
+              "settings": {
+                "horizontal_alignment": "flex-start",
+                "gap": 10,
+                "padding-block-start": 0,
+                "padding-block-end": 10,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
               },
               "blocks": {}
             },
@@ -274,13 +275,65 @@
               "name": "t:names.text",
               "settings": {
                 "text": "{{ closest.product.description }}",
-                "width": "100%",
-                "max_width": "none",
+                "width": "fit-content",
+                "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "rte",
+                "type_preset": "custom",
                 "font": "var(--font-body--family)",
-                "font_size": "1rem",
+                "font_size": "0.875rem",
+                "line_height": "loose",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 10,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "text_HdiLen": {
+              "type": "text",
+              "name": "t:names.text",
+              "settings": {
+                "text": "<p>PRODUCT DETAILS</p>",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "custom",
+                "font": "var(--font-body--family)",
+                "font_size": "1.125rem",
                 "line_height": "normal",
+                "letter_spacing": "loose",
+                "case": "uppercase",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 20,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "text_MQjAGL": {
+              "type": "text",
+              "name": "t:names.text",
+              "settings": {
+                "text": "{{ closest.product.metafields.custom.product_details_text | metafield_tag }}",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "custom",
+                "font": "var(--font-body--family)",
+                "font_size": "0.875rem",
+                "line_height": "loose",
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
@@ -313,7 +366,7 @@
               "settings": {
                 "icon": "plus",
                 "dividers": true,
-                "type_preset": "h4",
+                "type_preset": "paragraph",
                 "inherit_color_scheme": true,
                 "color_scheme": "",
                 "border": "none",
@@ -328,6 +381,7 @@
               "blocks": {
                 "accordion_row_VyFryh": {
                   "type": "_accordion-row",
+                  "disabled": true,
                   "settings": {
                     "heading": "Specifications",
                     "open_by_default_desktop": true,
@@ -339,7 +393,7 @@
                       "settings": {
                         "text": "{{ closest.product.metafields.custom.product_details_text | metafield_tag }}",
                         "width": "100%",
-                        "max_width": "none",
+                        "max_width": "normal",
                         "alignment": "left",
                         "type_preset": "rte",
                         "font": "var(--font-primary--family)",
@@ -413,14 +467,16 @@
             "heading_m7KmQQ",
             "text_FqENNL",
             "price_a7krng",
-            "judge_me_reviews_preview_badge_Qtq8fK",
             "variant_picker_R3rGDr",
+            "judge_me_reviews_preview_badge_Qtq8fK",
             "buy_buttons_eYQEYi",
-            "payment_icons_tUEBdY",
             "ai_gen_block_bdf77c4_a4c6Fa",
+            "payment_icons_tUEBdY",
             "divider_BtHjh9",
             "product_description_LfDYCg",
             "text_AVg9L8",
+            "text_HdiLen",
+            "text_MQjAGL",
             "series_recommendations",
             "accordion_CWUgfK"
           ]
