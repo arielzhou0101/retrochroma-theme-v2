@@ -224,7 +224,7 @@
                 "row_2_enabled": true,
                 "row_2_icon": "shopify://shop_images/box_7b731e62-12da-44dd-a13d-39f45f817730.svg",
                 "row_2_text": "No hassle returns within 30 days",
-                "row_3_enabled": true,
+                "row_3_enabled": false,
                 "row_3_text": "In stock. Etimated Delivery Date: {date}",
                 "spacing_top": 0,
                 "spacing_bottom": 0,
