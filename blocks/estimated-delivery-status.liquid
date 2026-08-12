@@ -1,5 +1,6 @@
 {% liquid
   assign delivery_product = block.settings.product | default: closest.product | default: product
+  assign delivery_variant = delivery_product.selected_or_first_available_variant
 %}
 
 {% stylesheet %}
@@ -44,8 +45,12 @@
   <div
     class="estimated-delivery-status"
     data-estimated-delivery-status
+    data-product-id="{{ delivery_product.id }}"
     data-min-business-days="{{ block.settings.minimum_business_days }}"
     data-max-business-days="{{ block.settings.maximum_business_days }}"
+    {% unless delivery_variant.available %}
+      hidden
+    {% endunless %}
     {{ block.shopify_attributes }}
   >
     <span class="estimated-delivery-status__dot" aria-hidden="true"></span>
@@ -64,6 +69,7 @@
 
       const minBusinessDays = Number(status.dataset.minBusinessDays);
       const maxBusinessDays = Number(status.dataset.maxBusinessDays);
+      const productId = status.dataset.productId;
       const dateTarget = status.querySelector('[data-estimated-delivery-date]');
 
       if (!dateTarget || !Number.isFinite(minBusinessDays) || !Number.isFinite(maxBusinessDays)) return;
@@ -156,6 +162,30 @@
       const earliest = addBusinessDays(processingStart, minBusinessDays);
       const latest = addBusinessDays(processingStart, maxBusinessDays);
       dateTarget.textContent = formatRange(earliest, latest);
+
+      const productSection = status.closest('.shopify-section');
+      const setVisibility = (variant) => {
+        status.hidden = variant?.available !== true;
+      };
+
+      const variantPicker = [...(productSection?.querySelectorAll('variant-picker') ?? [])].find(
+        (picker) => picker.dataset.productId === productId
+      );
+      const initialVariantJson = variantPicker?.querySelector('script[type="application/json"]')?.textContent;
+
+      if (initialVariantJson) {
+        try {
+          setVisibility(JSON.parse(initialVariantJson));
+        } catch (error) {
+          console.warn('Estimated delivery status could not read the selected variant.', error);
+        }
+      }
+
+      productSection?.addEventListener('variant:update', (event) => {
+        const updatedProductId = event.detail?.data?.newProduct?.id ?? event.detail?.data?.productId;
+        if (String(updatedProductId) !== String(productId)) return;
+        setVisibility(event.detail?.resource);
+      });
     })();
   </script>
 {% endif %}
