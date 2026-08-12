@@ -1,0 +1,35 @@
+{% liquid
+  assign is_eligible = false
+
+  if settings.storefront_promotions_enabled and enabled and product != blank
+    for eligible_product in eligible_products
+      if eligible_product.id == product.id
+        assign is_eligible = true
+        break
+      endif
+    endfor
+  endif
+%}
+
+{% if is_eligible %}
+  <div
+    class="product-promotion"
+    role="note"
+    style="--promotion-badge-background: {{ badge_background }}; --promotion-badge-foreground: {{ badge_foreground }};"
+    {{ shopify_attributes }}
+  >
+    {% if badge_text != blank %}
+      <span class="product-promotion__badge">
+        {% if show_icon %}
+          <span class="product-promotion__badge-icon" aria-hidden="true">
+            {{ 'icon-discount.svg' | inline_asset_content }}
+          </span>
+        {% endif %}
+        {{ badge_text | escape }}
+      </span>
+    {% endif %}
+    {% if message != blank %}
+      <span class="product-promotion__copy">{{ message | escape | newline_to_br }}</span>
+    {% endif %}
+  </div>
+{% endif %}

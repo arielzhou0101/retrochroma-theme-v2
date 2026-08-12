@@ -15,8 +15,8 @@ For each feature, record:
 
 - Status: Staging; not released to live
 - Feature branch: `feature/pillow-multi-buy-ui`
-- Eligibility: Only the PDP with handle `leopard-print-22-momme-silk-front-pillowcase`.
-- Storefront location: The eligible PDP, below the tax note. No collection or recommendations component displays this promotion.
+- Eligibility: Managed by the **Eligible products** picker on the Product promotion block. The current selection contains only `leopard-print-22-momme-silk-front-pillowcase`.
+- Storefront location: A standalone Product promotion block placed after the Price block and before the Variant picker. It is not rendered by, or dependent on, the Price or tax-information block.
 - Badge: `SPECIAL OFFER`, with the theme's inline discount-tag icon and `#5C315F` background
 - PDP copy: `Get 15% off your second silk pillowcase automatically.`
 
@@ -26,24 +26,29 @@ Theme Editor path:
 
 1. Open the target theme in **Online Store > Themes > Customize**.
 2. Open **Theme settings > Promotions**.
-3. Toggle **Show silk pillowcase promotion messaging**.
+3. Toggle **Show storefront promotion messaging**.
 4. Save the theme.
 
-The setting ID is `settings.pillow_multi_buy_promo_enabled`. Its default is `false`, so a newly installed or newly released copy of the feature stays hidden until explicitly enabled.
+The master setting ID is `settings.storefront_promotions_enabled`. Its default is `false`, so a newly installed or newly released copy of the feature stays hidden until explicitly enabled.
+
+To manage one promotion, open the Product information section and select the **Product promotion** block. The block controls its own enabled state, eligible products, badge text, message, icon, and badge colors. Shopify supports up to 50 products in this picker.
 
 This switch controls storefront messaging only. The real promotion must be configured and activated separately in **Shopify Admin > Discounts**. Enabling this switch does not create or validate a discount, and disabling the automatic discount does not hide the storefront messaging.
 
 ### Implementation
 
-- `config/settings_schema.json`: Global Theme Editor switch
-- `snippets/pillow-multi-buy-promo.liquid`: Shared eligibility, switch, badge, and copy output
-- `blocks/price.liquid`: PDP placement and styling
+- `config/settings_schema.json`: Global Theme Editor master switch
+- `blocks/product-promotion.liquid`: Standalone Theme Editor block and presentation settings
+- `snippets/product-promotion.liquid`: Shared product eligibility and accessible output
+- `templates/product.json`: Block placement and current eligible-product selection
 
 ### Verification
 
 - Switch off: No Pillow promotion messaging appears anywhere.
-- Switch on, eligible PDP: Badge and the single PDP sentence appear below the tax note.
+- Block off: This promotion remains hidden while other promotion blocks can stay active.
+- Switch and block on, eligible PDP: Badge and the single PDP sentence appear between the Price and Variant picker blocks.
 - Switch on, non-eligible PDP: No promotion messaging appears.
+- Turning off tax information: The promotion remains independently controlled and does not disappear with the tax note.
 - Collection and recommendations components: No promotion messaging appears.
 - Confirm the Shopify automatic discount independently with an eligible two-item cart before live release.
 

@@ -12,12 +12,12 @@
     "settings": [
       {
         "type": "header",
-        "content": "Silk pillowcase second-item promotion"
+        "content": "Storefront promotions"
       },
       {
         "type": "checkbox",
-        "id": "pillow_multi_buy_promo_enabled",
-        "label": "Show silk pillowcase promotion messaging",
+        "id": "storefront_promotions_enabled",
+        "label": "Show storefront promotion messaging",
         "default": false
       },
       {

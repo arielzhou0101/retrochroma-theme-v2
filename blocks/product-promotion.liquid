@@ -1,0 +1,118 @@
+{% liquid
+  assign promotion_product = block.settings.product | default: closest.product | default: product
+%}
+
+{% stylesheet %}
+  .product-promotion {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--color-foreground) 16%, transparent);
+    background: color-mix(in srgb, var(--color-background) 92%, #f5eadc);
+    color: var(--color-foreground);
+    font-family: var(--font-subheading--family);
+    font-size: 1.125rem;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+  }
+
+  .product-promotion__badge,
+  .product-promotion__copy {
+    display: block;
+  }
+
+  .product-promotion__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: fit-content;
+    margin-bottom: 0.4rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.2rem;
+    background: var(--promotion-badge-background);
+    color: var(--promotion-badge-foreground);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+  }
+
+  .product-promotion__badge-icon,
+  .product-promotion__badge-icon svg {
+    display: block;
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+{% endstylesheet %}
+
+{% render 'product-promotion',
+  product: promotion_product,
+  eligible_products: block.settings.eligible_products,
+  enabled: block.settings.enabled,
+  badge_text: block.settings.badge_text,
+  message: block.settings.message,
+  show_icon: block.settings.show_icon,
+  badge_background: block.settings.badge_background,
+  badge_foreground: block.settings.badge_foreground,
+  shopify_attributes: block.shopify_attributes
+%}
+
+{% schema %}
+{
+  "name": "Product promotion",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Show this promotion",
+      "default": true
+    },
+    {
+      "type": "product_list",
+      "id": "eligible_products",
+      "label": "Eligible products",
+      "limit": 50
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge",
+      "default": "SPECIAL OFFER"
+    },
+    {
+      "type": "textarea",
+      "id": "message",
+      "label": "Message",
+      "default": "Get 15% off your second silk pillowcase automatically."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Show discount icon",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Badge background",
+      "default": "#5C315F"
+    },
+    {
+      "type": "color",
+      "id": "badge_foreground",
+      "label": "Badge text and icon",
+      "default": "#FFFFFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product promotion"
+    }
+  ]
+}
+{% endschema %}

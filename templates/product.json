@@ -156,6 +156,23 @@
               },
               "blocks": {}
             },
+            "product_promotion_silk_pillowcase": {
+              "type": "product-promotion",
+              "name": "Silk pillowcase promotion",
+              "settings": {
+                "product": "{{ closest.product }}",
+                "enabled": true,
+                "eligible_products": [
+                  "leopard-print-22-momme-silk-front-pillowcase"
+                ],
+                "badge_text": "SPECIAL OFFER",
+                "message": "Get 15% off your second silk pillowcase automatically.",
+                "show_icon": true,
+                "badge_background": "#5C315F",
+                "badge_foreground": "#FFFFFF"
+              },
+              "blocks": {}
+            },
             "variant_picker_R3rGDr": {
               "type": "variant-picker",
               "settings": {
@@ -494,6 +511,7 @@
             "heading_m7KmQQ",
             "text_FqENNL",
             "price_a7krng",
+            "product_promotion_silk_pillowcase",
             "variant_picker_R3rGDr",
             "judge_me_reviews_preview_badge_Qtq8fK",
             "buy_buttons_eYQEYi",
