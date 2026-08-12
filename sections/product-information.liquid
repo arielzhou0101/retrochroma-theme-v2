@@ -25,6 +25,13 @@
 
   .product-information__media-series-recommendations {
     width: 100%;
+    margin-block-start: 24px;
+  }
+
+  @media screen and (width >= 750px) {
+    .product-information__media:has(.product-information__media-series-recommendations) > media-gallery {
+      position: static;
+    }
   }
 
   /* Mobile styles */
@@ -42,6 +49,7 @@
     .product-information__media-series-recommendations {
       grid-column: 2 / 3;
       order: 2;
+      margin-block-start: 0;
     }
     .product-details {
       grid-column: 2 / 3;
