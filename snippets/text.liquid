@@ -98,6 +98,18 @@
     margin-block: var(--font-paragraph--spacing);
   }
 
+  .text-block--custom-paragraph-spacing p {
+    margin-block: 0;
+  }
+
+  .text-block--custom-paragraph-spacing p + p {
+    margin-block-start: var(--paragraph-spacing);
+  }
+
+  .text-block--custom-paragraph-line-height p {
+    line-height: var(--paragraph-line-height);
+  }
+
   .text-block > *:first-child {
     margin-block-start: 0;
   }
@@ -164,6 +176,12 @@
         echo ' custom-color '
       endif
     endif
+    if block.settings.paragraph_spacing > 0
+      echo ' text-block--custom-paragraph-spacing '
+    endif
+    if block.settings.paragraph_line_height > 0
+      echo ' text-block--custom-paragraph-line-height '
+    endif
     if block.settings.background
       echo ' text-block--background '
     endif
@@ -183,6 +201,12 @@
     {% render 'typography-style', settings: block.settings %}
     --width: {{ text_width }};
     --max-width: var(--max-width--{{ type }}-{{ block.settings.max_width }});
+    {% if block.settings.paragraph_spacing > 0 %}
+      --paragraph-spacing: {{ block.settings.paragraph_spacing }}px;
+    {% endif %}
+    {% if block.settings.paragraph_line_height > 0 %}
+      --paragraph-line-height: {{ block.settings.paragraph_line_height | divided_by: 100.0 }};
+    {% endif %}
     {% if text_width == "100%" %}
       --text-align: {{ block.settings.alignment }};
     {% endif %}

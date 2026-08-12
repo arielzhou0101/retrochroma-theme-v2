@@ -254,6 +254,32 @@
       "visible_if": "{{ block.settings.type_preset == 'custom' }}"
     },
     {
+      "type": "header",
+      "content": "Paragraph spacing"
+    },
+    {
+      "type": "range",
+      "id": "paragraph_line_height",
+      "label": "Paragraph line height",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 0,
+      "info": "0 uses the text block line-height setting."
+    },
+    {
+      "type": "range",
+      "id": "paragraph_spacing",
+      "label": "Space between paragraphs",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "0 uses the theme default paragraph spacing."
+    },
+    {
       "type": "select",
       "id": "case",
       "label": "t:settings.case",

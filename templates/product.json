@@ -295,6 +295,8 @@
                 "font_size": "0.875rem",
                 "line_height": "loose",
                 "letter_spacing": "normal",
+                "paragraph_line_height": 150,
+                "paragraph_spacing": 20,
                 "case": "none",
                 "wrap": "pretty",
                 "color": "var(--color-foreground)",
