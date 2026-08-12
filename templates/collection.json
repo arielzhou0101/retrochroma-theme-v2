@@ -15,7 +15,7 @@
         "text_tqQTNE": {
           "type": "text",
           "settings": {
-            "text": "<h1>All Retro Chroma Picks</h1>",
+            "text": "<h1>{{ closest.collection.title }}</h1>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -221,7 +221,6 @@
         },
         "product-card": {
           "type": "product-card",
-          "disabled": true,
           "static": true,
           "settings": {
             "product": "{{ closest.product }}",
@@ -385,7 +384,6 @@
           ]
         }
       },
-      "disabled": true,
       "settings": {
         "layout_type": "grid",
         "product_card_size": "medium",
