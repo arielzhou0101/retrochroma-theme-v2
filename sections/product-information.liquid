@@ -23,6 +23,10 @@
     min-width: 100%;
   }
 
+  .product-information__media-series-recommendations {
+    width: 100%;
+  }
+
   /* Mobile styles */
   @media screen and (width < 750px) {
     .product-information__media {
@@ -232,6 +236,13 @@
           id: 'media-gallery',
           closest.product: section.settings.product
         -%}
+        <div class="product-information__media-series-recommendations">
+          {%- content_for 'block',
+            type: 'series_recommendations',
+            id: 'series_recommendations_below_media',
+            closest.product: section.settings.product
+          -%}
+        </div>
       </div>
     {% endcapture %}
 
@@ -261,6 +272,9 @@
 {
   "name": "t:names.product_information",
   "blocks": [
+    {
+      "type": "series_recommendations"
+    },
     {
       "type": "@app"
     }

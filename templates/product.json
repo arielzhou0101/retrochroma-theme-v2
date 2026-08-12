@@ -40,6 +40,18 @@
           },
           "blocks": {}
         },
+        "series_recommendations_below_media": {
+          "type": "series_recommendations",
+          "name": "Series recommendations",
+          "settings": {
+            "product": "{{ closest.product }}",
+            "padding-block-start": 20,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
         "product-details": {
           "type": "_product-details",
           "static": true,
@@ -348,18 +360,6 @@
               },
               "blocks": {}
             },
-            "series_recommendations": {
-              "type": "series_recommendations",
-              "name": "Series recommendations",
-              "settings": {
-                "product": "{{ closest.product }}",
-                "padding-block-start": 20,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
             "accordion_CWUgfK": {
               "type": "accordion",
               "name": "Accordion",
@@ -477,7 +477,6 @@
             "text_AVg9L8",
             "text_HdiLen",
             "text_MQjAGL",
-            "series_recommendations",
             "accordion_CWUgfK"
           ]
         }
