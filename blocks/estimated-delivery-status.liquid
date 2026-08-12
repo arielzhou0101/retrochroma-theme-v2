@@ -164,24 +164,38 @@
       dateTarget.textContent = formatRange(earliest, latest);
 
       const productRoot = status.closest('.product-information') ?? document;
-      const productForm = [...productRoot.querySelectorAll('product-form-component')].find(
-        (form) => form.dataset.productId === productId
+      const variantPicker = [...productRoot.querySelectorAll('variant-picker')].find(
+        (picker) => picker.dataset.productId === productId
       );
 
-      const syncAvailability = () => {
-        const addToCartButton = productForm?.querySelector('[ref="addToCartButton"]');
-        if (!addToCartButton) return;
-        status.hidden = addToCartButton.hasAttribute('disabled');
+      const setAvailability = (variant) => {
+        if (!variant || typeof variant.available !== 'boolean') return;
+        status.hidden = !variant.available;
       };
 
-      syncAvailability();
+      const syncFromVariantJson = () => {
+        const variantJson = variantPicker?.querySelector('script[type="application/json"]')?.textContent;
+        if (!variantJson) return;
+        try {
+          setAvailability(JSON.parse(variantJson));
+        } catch (error) {
+          console.warn('Estimated delivery status could not read the selected variant.', error);
+        }
+      };
 
-      if (productForm) {
-        new MutationObserver(syncAvailability).observe(productForm, {
-          attributes: true,
+      const syncFromVariantUpdate = (event) => {
+        if (!productRoot.contains(event.target)) return;
+        setAvailability(event.detail?.resource);
+      };
+
+      syncFromVariantJson();
+      document.addEventListener('variant:update', syncFromVariantUpdate, true);
+
+      if (variantPicker) {
+        new MutationObserver(syncFromVariantJson).observe(variantPicker, {
           childList: true,
           subtree: true,
-          attributeFilter: ['disabled'],
+          characterData: true,
         });
       }
     })();
