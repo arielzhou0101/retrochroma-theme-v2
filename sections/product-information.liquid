@@ -30,7 +30,18 @@
   /* Mobile styles */
   @media screen and (width < 750px) {
     .product-information__media {
+      display: contents;
       grid-column: 1 / -1;
+    }
+
+    .product-information__media > media-gallery {
+      grid-column: 1 / -1;
+      order: 0;
+    }
+
+    .product-information__media-series-recommendations {
+      grid-column: 2 / 3;
+      order: 2;
     }
     .product-details {
       grid-column: 2 / 3;
