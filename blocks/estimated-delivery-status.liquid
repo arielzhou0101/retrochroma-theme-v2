@@ -163,29 +163,42 @@
       const latest = addBusinessDays(processingStart, maxBusinessDays);
       dateTarget.textContent = formatRange(earliest, latest);
 
-      const productSection = status.closest('.shopify-section');
       const setVisibility = (variant) => {
         status.hidden = variant?.available !== true;
       };
 
-      const variantPicker = [...(productSection?.querySelectorAll('variant-picker') ?? [])].find(
+      const productRoot = status.closest('.product-information') ?? document;
+      const variantPicker = [...productRoot.querySelectorAll('variant-picker')].find(
         (picker) => picker.dataset.productId === productId
       );
-      const initialVariantJson = variantPicker?.querySelector('script[type="application/json"]')?.textContent;
 
-      if (initialVariantJson) {
+      const syncFromVariantPicker = () => {
+        const variantJson = variantPicker?.querySelector('script[type="application/json"]')?.textContent;
+        if (!variantJson) return;
         try {
-          setVisibility(JSON.parse(initialVariantJson));
+          setVisibility(JSON.parse(variantJson));
         } catch (error) {
           console.warn('Estimated delivery status could not read the selected variant.', error);
         }
-      }
+      };
 
-      productSection?.addEventListener('variant:update', (event) => {
+      const syncFromVariantUpdate = (event) => {
         const updatedProductId = event.detail?.data?.newProduct?.id ?? event.detail?.data?.productId;
         if (String(updatedProductId) !== String(productId)) return;
         setVisibility(event.detail?.resource);
-      });
+      };
+
+      syncFromVariantPicker();
+      variantPicker?.addEventListener('variant:update', syncFromVariantUpdate);
+      document.addEventListener('variant:update', syncFromVariantUpdate);
+
+      if (variantPicker) {
+        new MutationObserver(syncFromVariantPicker).observe(variantPicker, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+      }
     })();
   </script>
 {% endif %}
