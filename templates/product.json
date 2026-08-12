@@ -211,6 +211,19 @@
               },
               "block_order": []
             },
+            "estimated_delivery_status": {
+              "type": "estimated-delivery-status",
+              "name": "Estimated delivery status",
+              "settings": {
+                "product": "{{ closest.product }}",
+                "in_stock_label": "In stock",
+                "delivery_label": "Estimated delivery:",
+                "loading_label": "Calculating…",
+                "minimum_business_days": 8,
+                "maximum_business_days": 10
+              },
+              "blocks": {}
+            },
             "ai_gen_block_bdf77c4_a4c6Fa": {
               "type": "ai_gen_block_bdf77c4",
               "settings": {
@@ -220,7 +233,7 @@
                 "row_2_enabled": true,
                 "row_2_icon": "shopify://shop_images/box_7b731e62-12da-44dd-a13d-39f45f817730.svg",
                 "row_2_text": "No hassle returns within 30 days",
-                "row_3_enabled": true,
+                "row_3_enabled": false,
                 "row_3_text": "In stock. Etimated Delivery Date: {date}",
                 "spacing_top": 0,
                 "spacing_bottom": 0,
@@ -472,6 +485,7 @@
             "variant_picker_R3rGDr",
             "judge_me_reviews_preview_badge_Qtq8fK",
             "buy_buttons_eYQEYi",
+            "estimated_delivery_status",
             "ai_gen_block_bdf77c4_a4c6Fa",
             "payment_icons_tUEBdY",
             "divider_BtHjh9",

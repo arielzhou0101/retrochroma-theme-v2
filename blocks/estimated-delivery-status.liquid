@@ -1,0 +1,217 @@
+{% liquid
+  assign delivery_product = block.settings.product | default: closest.product | default: product
+%}
+
+{% stylesheet %}
+  .estimated-delivery-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-block: 14px;
+    color: var(--color-foreground);
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .estimated-delivery-status__dot {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: #668457;
+  }
+
+  .estimated-delivery-status__availability,
+  .estimated-delivery-status__date {
+    color: #668457;
+    font-weight: 600;
+  }
+
+  .estimated-delivery-status__separator {
+    color: color-mix(in srgb, var(--color-foreground) 45%, transparent);
+  }
+
+  @media screen and (width < 750px) {
+    .estimated-delivery-status {
+      font-size: 0.8125rem;
+    }
+  }
+{% endstylesheet %}
+
+{% if delivery_product != blank and delivery_product.available %}
+  <div
+    class="estimated-delivery-status"
+    data-estimated-delivery-status
+    data-min-business-days="{{ block.settings.minimum_business_days }}"
+    data-max-business-days="{{ block.settings.maximum_business_days }}"
+    {{ block.shopify_attributes }}
+  >
+    <span class="estimated-delivery-status__dot" aria-hidden="true"></span>
+    <span class="estimated-delivery-status__availability">{{ block.settings.in_stock_label }}</span>
+    <span class="estimated-delivery-status__separator" aria-hidden="true">·</span>
+    <span>{{ block.settings.delivery_label }}</span>
+    <span class="estimated-delivery-status__date" data-estimated-delivery-date>{{ block.settings.loading_label }}</span>
+  </div>
+
+  <script>
+    (() => {
+      const status = document.currentScript.previousElementSibling;
+      if (!status || status.dataset.estimatedDeliveryReady === 'true') return;
+
+      status.dataset.estimatedDeliveryReady = 'true';
+
+      const minBusinessDays = Number(status.dataset.minBusinessDays);
+      const maxBusinessDays = Number(status.dataset.maxBusinessDays);
+      const dateTarget = status.querySelector('[data-estimated-delivery-date]');
+
+      if (!dateTarget || !Number.isFinite(minBusinessDays) || !Number.isFinite(maxBusinessDays)) return;
+
+      const dateInEasternTime = () => {
+        const parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/New_York',
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23',
+        }).formatToParts(new Date()).reduce((values, part) => {
+          if (part.type !== 'literal') values[part.type] = Number(part.value);
+          return values;
+        }, {});
+
+        return {
+          date: new Date(Date.UTC(parts.year, parts.month - 1, parts.day)),
+          hour: parts.hour,
+          minute: parts.minute,
+        };
+      };
+
+      const observed = (date) => {
+        const day = date.getUTCDay();
+        if (day === 6) date.setUTCDate(date.getUTCDate() - 1);
+        if (day === 0) date.setUTCDate(date.getUTCDate() + 1);
+        return date;
+      };
+
+      const nthWeekday = (year, month, weekday, occurrence) => {
+        const date = new Date(Date.UTC(year, month, 1));
+        const offset = (weekday - date.getUTCDay() + 7) % 7;
+        date.setUTCDate(1 + offset + (occurrence - 1) * 7);
+        return date;
+      };
+
+      const lastWeekday = (year, month, weekday) => {
+        const date = new Date(Date.UTC(year, month + 1, 0));
+        date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() - weekday + 7) % 7));
+        return date;
+      };
+
+      const key = (date) => date.toISOString().slice(0, 10);
+      const holidayKeys = (year) => {
+        const holidays = [
+          observed(new Date(Date.UTC(year, 0, 1))),
+          nthWeekday(year, 0, 1, 3),
+          nthWeekday(year, 1, 1, 3),
+          lastWeekday(year, 4, 1),
+          observed(new Date(Date.UTC(year, 5, 19))),
+          observed(new Date(Date.UTC(year, 6, 4))),
+          nthWeekday(year, 8, 1, 1),
+          nthWeekday(year, 9, 1, 2),
+          observed(new Date(Date.UTC(year, 10, 11))),
+          nthWeekday(year, 10, 4, 4),
+          observed(new Date(Date.UTC(year, 11, 25))),
+        ];
+        return holidays.map(key);
+      };
+
+      const holidays = new Set([-1, 0, 1].flatMap((offset) => holidayKeys(dateInEasternTime().date.getUTCFullYear() + offset)));
+      const isBusinessDay = (date) => date.getUTCDay() !== 0 && date.getUTCDay() !== 6 && !holidays.has(key(date));
+      const nextBusinessDay = (date) => {
+        const next = new Date(date);
+        do next.setUTCDate(next.getUTCDate() + 1); while (!isBusinessDay(next));
+        return next;
+      };
+      const addBusinessDays = (date, count) => {
+        let result = new Date(date);
+        for (let day = 0; day < count; day += 1) result = nextBusinessDay(result);
+        return result;
+      };
+      const formatRange = (start, end) => {
+        const formatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+        const startMonth = start.getUTCMonth();
+        const endMonth = end.getUTCMonth();
+        const startYear = start.getUTCFullYear();
+        const endYear = end.getUTCFullYear();
+        if (startYear === endYear && startMonth === endMonth) return `${formatter.format(start)}–${end.getUTCDate()}`;
+        if (startYear === endYear) return `${formatter.format(start)}–${formatter.format(end)}`;
+        return `${formatter.format(start)}, ${startYear}–${formatter.format(end)}, ${endYear}`;
+      };
+
+      const eastern = dateInEasternTime();
+      const afterCutoff = eastern.hour > 17 || (eastern.hour === 17 && eastern.minute >= 0);
+      const processingStart = afterCutoff || !isBusinessDay(eastern.date) ? nextBusinessDay(eastern.date) : eastern.date;
+      const earliest = addBusinessDays(processingStart, minBusinessDays);
+      const latest = addBusinessDays(processingStart, maxBusinessDays);
+      dateTarget.textContent = formatRange(earliest, latest);
+    })();
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Estimated delivery status",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    },
+    {
+      "type": "text",
+      "id": "in_stock_label",
+      "label": "In-stock label",
+      "default": "In stock"
+    },
+    {
+      "type": "text",
+      "id": "delivery_label",
+      "label": "Delivery label",
+      "default": "Estimated delivery:"
+    },
+    {
+      "type": "text",
+      "id": "loading_label",
+      "label": "Loading label",
+      "default": "Calculating…"
+    },
+    {
+      "type": "range",
+      "id": "minimum_business_days",
+      "label": "Earliest delivery",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "unit": "business days",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "maximum_business_days",
+      "label": "Latest delivery",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "unit": "business days",
+      "default": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "Estimated delivery status"
+    }
+  ]
+}
+{% endschema %}
