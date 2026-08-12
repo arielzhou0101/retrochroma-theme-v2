@@ -15,7 +15,7 @@
         "text_tqQTNE": {
           "type": "text",
           "settings": {
-            "text": "<h1>All Retro Chroma Picks</h1>",
+            "text": "<h1>{{ closest.collection.title }}</h1>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -39,6 +39,7 @@
         },
         "text_FEzLLh": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "<p>A growing edit of distinctive, tactile pieces for the home—carefully chosen and added over time.</p>",
             "width": "fit-content",
@@ -220,7 +221,6 @@
         },
         "product-card": {
           "type": "product-card",
-          "disabled": true,
           "static": true,
           "settings": {
             "product": "{{ closest.product }}",
@@ -384,7 +384,6 @@
           ]
         }
       },
-      "disabled": true,
       "settings": {
         "layout_type": "grid",
         "product_card_size": "medium",
@@ -639,6 +638,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "Soft Comforts",
       "settings": {
         "collection": "soft-comforts",
@@ -898,6 +898,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "Fluffy Warm",
       "settings": {
         "collection": "fluffy-warm",
@@ -1157,6 +1158,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "Loofah Core",
       "settings": {
         "collection": "loofah-core",
@@ -1416,6 +1418,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "Midcentury modern & vintage fabric",
       "settings": {
         "collection": "midcentury-modern-vintage-fabric",
