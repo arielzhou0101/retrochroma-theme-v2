@@ -107,6 +107,7 @@
             "text_FqENNL": {
               "type": "text",
               "name": "product sub title",
+              "disabled": true,
               "settings": {
                 "text": "{{ closest.product.metafields.custom.product_sub_title | metafield_tag }}",
                 "width": "fit-content",
