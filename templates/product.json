@@ -193,13 +193,26 @@
               "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
               "settings": {}
             },
+            "estimated_delivery_status": {
+              "type": "estimated-delivery-status",
+              "name": "Estimated delivery status",
+              "settings": {
+                "product": "{{ closest.product }}",
+                "in_stock_label": "In stock",
+                "delivery_label": "Estimated delivery:",
+                "loading_label": "Calculating…",
+                "minimum_business_days": 8,
+                "maximum_business_days": 10
+              },
+              "blocks": {}
+            },
             "buy_buttons_eYQEYi": {
               "type": "buy-buttons",
               "settings": {
                 "product": "{{ closest.product }}",
                 "stacking": false,
                 "show_pickup_availability": false,
-                "padding-block-start": 20,
+                "padding-block-start": 12,
                 "padding-block-end": 12,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
@@ -234,16 +247,16 @@
               },
               "block_order": []
             },
-            "estimated_delivery_status": {
-              "type": "estimated-delivery-status",
-              "name": "Estimated delivery status",
+            "payment_icons_tUEBdY": {
+              "type": "payment-icons",
+              "name": "t:names.payment_icons",
               "settings": {
-                "product": "{{ closest.product }}",
-                "in_stock_label": "In stock",
-                "delivery_label": "Estimated delivery:",
-                "loading_label": "Calculating…",
-                "minimum_business_days": 8,
-                "maximum_business_days": 10
+                "horizontal_alignment": "flex-start",
+                "gap": 10,
+                "padding-block-start": 10,
+                "padding-block-end": 10,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
               },
               "blocks": {}
             },
@@ -258,24 +271,11 @@
                 "row_2_text": "No hassle returns within 30 days",
                 "row_3_enabled": false,
                 "row_3_text": "In stock. Etimated Delivery Date: {date}",
-                "spacing_top": 0,
+                "spacing_top": 8,
                 "spacing_bottom": 0,
                 "row_gap": 8,
                 "icon_size": 20,
                 "show_dividers": false
-              },
-              "blocks": {}
-            },
-            "payment_icons_tUEBdY": {
-              "type": "payment-icons",
-              "name": "t:names.payment_icons",
-              "settings": {
-                "horizontal_alignment": "flex-start",
-                "gap": 10,
-                "padding-block-start": 10,
-                "padding-block-end": 10,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
               },
               "blocks": {}
             },
@@ -516,10 +516,10 @@
             "product_promotion_silk_pillowcase",
             "variant_picker_R3rGDr",
             "judge_me_reviews_preview_badge_Qtq8fK",
-            "buy_buttons_eYQEYi",
             "estimated_delivery_status",
-            "ai_gen_block_bdf77c4_a4c6Fa",
+            "buy_buttons_eYQEYi",
             "payment_icons_tUEBdY",
+            "ai_gen_block_bdf77c4_a4c6Fa",
             "divider_BtHjh9",
             "product_description_LfDYCg",
             "text_AVg9L8",
