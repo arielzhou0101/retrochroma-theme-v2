@@ -235,6 +235,48 @@
         {% endif %}
       </li>
     {% endif %}
+
+    {% if block.settings.row_4_enabled %}
+      <li class="ai-reassurance-item-{{ ai_gen_id }}">
+        <div class="ai-reassurance-icon-{{ ai_gen_id }}">
+          {% if block.settings.row_4_icon %}
+            <img
+              src="{{ block.settings.row_4_icon | image_url: width: 100 }}"
+              alt=""
+              loading="lazy"
+              width="100"
+              height="100"
+            >
+          {% else %}
+            <div class="ai-reassurance-icon-placeholder-{{ ai_gen_id }}"></div>
+          {% endif %}
+        </div>
+        {% if block.settings.row_4_text != blank %}
+          <p class="ai-reassurance-text-{{ ai_gen_id }}">{{ block.settings.row_4_text }}</p>
+        {% endif %}
+      </li>
+    {% endif %}
+
+    {% if block.settings.row_5_enabled %}
+      <li class="ai-reassurance-item-{{ ai_gen_id }}">
+        <div class="ai-reassurance-icon-{{ ai_gen_id }}">
+          {% if block.settings.row_5_icon %}
+            <img
+              src="{{ block.settings.row_5_icon | image_url: width: 100 }}"
+              alt=""
+              loading="lazy"
+              width="100"
+              height="100"
+            >
+          {% else %}
+            <div class="ai-reassurance-icon-placeholder-{{ ai_gen_id }}"></div>
+          {% endif %}
+        </div>
+        {% if block.settings.row_5_text != blank %}
+          <p class="ai-reassurance-text-{{ ai_gen_id }}">{{ block.settings.row_5_text }}</p>
+        {% endif %}
+      </li>
+    {% endif %}
   </ul>
 </div>
 
@@ -304,6 +346,46 @@
       "id": "row_3_text",
       "label": "Text",
       "default": "Mohair shade adds softness, warmth, and depth"
+    },
+    {
+      "type": "header",
+      "content": "Row 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "row_4_enabled",
+      "label": "Show row 4",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "row_4_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "row_4_text",
+      "label": "Text"
+    },
+    {
+      "type": "header",
+      "content": "Row 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "row_5_enabled",
+      "label": "Show row 5",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "row_5_icon",
+      "label": "Icon"
+    },
+    {
+      "type": "text",
+      "id": "row_5_text",
+      "label": "Text"
     },
     {
       "type": "header",
