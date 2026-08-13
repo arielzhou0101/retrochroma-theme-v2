@@ -106,15 +106,14 @@
             },
             "text_FqENNL": {
               "type": "text",
-              "name": "t:names.text",
-              "disabled": true,
+              "name": "product sub title",
               "settings": {
                 "text": "{{ closest.product.metafields.custom.product_sub_title | metafield_tag }}",
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
                 "type_preset": "custom",
-                "font": "var(--font-heading--family)",
+                "font": "var(--font-body--family)",
                 "font_size": "0.875rem",
                 "line_height": "normal",
                 "letter_spacing": "normal",
@@ -150,7 +149,7 @@
                 "case": "none",
                 "color": "var(--color-foreground)",
                 "padding-block-start": 12,
-                "padding-block-end": 16,
+                "padding-block-end": 12,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
