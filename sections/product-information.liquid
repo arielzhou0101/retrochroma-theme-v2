@@ -29,8 +29,43 @@
   }
 
   @media screen and (width >= 750px) {
+    .product-information__media:has(.product-information__media-series-recommendations) {
+      /* Keep the gallery and its recommendations together while leaving the whole group in view. */
+      --series-recommendations-reserve: 315px;
+      --series-recommendations-gallery-height: calc(
+        100dvh - var(--sticky-header-offset, 0px) - var(--series-recommendations-reserve)
+      );
+
+      position: sticky;
+      top: var(--sticky-header-offset, 0px);
+      align-self: start;
+    }
+
     .product-information__media:has(.product-information__media-series-recommendations) > media-gallery {
       position: static;
+      --constrained-height: var(--series-recommendations-gallery-height);
+
+      :is(slideshow-component, slideshow-container, slideshow-slides) {
+        height: var(--series-recommendations-gallery-height);
+      }
+
+      .product-media-container,
+      .product-media {
+        height: 100%;
+        max-height: none;
+        aspect-ratio: auto;
+      }
+
+      .product-media-container img {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+      }
+    }
+
+    body:has(#header-group #header-component[data-sticky-state='active'])
+      .product-information__media:has(.product-information__media-series-recommendations) {
+      --sticky-header-offset: var(--header-height);
     }
   }
 
