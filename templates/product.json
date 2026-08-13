@@ -264,18 +264,19 @@
               "type": "ai_gen_block_bdf77c4",
               "settings": {
                 "row_1_enabled": true,
-                "row_1_icon": "shopify://shop_images/truck.svg",
-                "row_1_text": "Free, trackable shipping to most U.S. regions in 8-10 working days",
+                "row_1_icon": "shopify://shop_images/worldwide-shipping-truck.svg",
+                "row_1_text": "Free, trackable shipping to most U.S. regions",
                 "row_2_enabled": true,
-                "row_2_icon": "shopify://shop_images/box_7b731e62-12da-44dd-a13d-39f45f817730.svg",
-                "row_2_text": "No hassle returns within 30 days",
-                "row_3_enabled": false,
-                "row_3_text": "In stock. Etimated Delivery Date: {date}",
+                "row_2_icon": "shopify://shop_images/secure-checkout-padlock.svg",
+                "row_2_text": "100% Secure Checkout",
+                "row_3_enabled": true,
+                "row_3_icon": "shopify://shop_images/customer-support-heart.svg",
+                "row_3_text": "No hassle returns within 30 days",
                 "spacing_top": 8,
                 "spacing_bottom": 0,
                 "row_gap": 8,
-                "icon_size": 20,
-                "show_dividers": false
+                "icon_size": 28,
+                "show_dividers": true
               },
               "blocks": {}
             },
@@ -286,7 +287,7 @@
                 "thickness": 1,
                 "corner_radius": "square",
                 "width_percent": 100,
-                "padding-block-start": 16,
+                "padding-block-start": 10,
                 "padding-block-end": 12
               },
               "blocks": {}
@@ -294,11 +295,10 @@
             "product_description_LfDYCg": {
               "type": "product-description",
               "name": "t:names.product_description",
-              "disabled": true,
               "settings": {
                 "text": "{{ closest.product.description }}",
                 "width": "fit-content",
-                "max_width": "normal",
+                "max_width": "none",
                 "alignment": "left",
                 "type_preset": "paragraph",
                 "font": "var(--font-primary--family)",
@@ -321,6 +321,7 @@
             "text_AVg9L8": {
               "type": "text",
               "name": "t:names.text",
+              "disabled": true,
               "settings": {
                 "text": "{{ closest.product.description }}",
                 "width": "fit-content",
@@ -387,8 +388,8 @@
                 "font_size": "0.875rem",
                 "line_height": "loose",
                 "letter_spacing": "normal",
-                "paragraph_line_height": 0,
-                "paragraph_spacing": 0,
+                "paragraph_line_height": 150,
+                "paragraph_spacing": 20,
                 "case": "none",
                 "wrap": "pretty",
                 "color": "var(--color-foreground)",
