@@ -497,8 +497,8 @@
           "type": "see-it-clearly",
           "settings": {
             "heading": "Beyond the First Look",
-            "show_subtitle": false,
-            "subtitle": "<p>subtitle subtitle</p>",
+            "show_subtitle": true,
+            "subtitle": "<p>Look closer: materials, styling and the stories behind each piece.</p>",
             "card_1_image": "{{ closest.product.metafields.custom.detail_product_image_1.value }}",
             "card_1_copy": "{{ closest.product.metafields.custom.description_text_1 | metafield_tag }}",
             "card_2_image": "{{ closest.product.metafields.custom.detail_product_image_2.value }}",
@@ -514,7 +514,7 @@
             "heading_font": "abel_n4",
             "heading_size": 48,
             "subtitle_font": "abel_n4",
-            "subtitle_size": 17,
+            "subtitle_size": 20,
             "copy_size": 13,
             "background_color": "#e5e6dc",
             "text_color": "#111111"
