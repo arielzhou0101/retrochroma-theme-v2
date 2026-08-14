@@ -368,39 +368,11 @@
               },
               "blocks": {}
             },
-            "text_MQjAGL": {
-              "type": "text",
-              "name": "t:names.text",
-              "settings": {
-                "text": "{{ closest.product.metafields.custom.product_details_text | metafield_tag }}",
-                "width": "fit-content",
-                "max_width": "none",
-                "alignment": "left",
-                "type_preset": "custom",
-                "font": "var(--font-body--family)",
-                "font_size": "0.875rem",
-                "line_height": "loose",
-                "letter_spacing": "normal",
-                "paragraph_line_height": 150,
-                "paragraph_spacing": 20,
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
             "product_specifications_N7qPLu": {
               "type": "product-specifications",
-              "name": "Product specifications",
+              "name": "Product details",
               "settings": {
-                "heading": "Specifications",
+                "heading": "Product Details",
                 "padding-block-start": 16,
                 "padding-block-end": 16,
                 "padding-inline-start": 0,
@@ -427,47 +399,6 @@
                 "padding-inline-end": 0
               },
               "blocks": {
-                "accordion_row_VyFryh": {
-                  "type": "_accordion-row",
-                  "disabled": true,
-                  "settings": {
-                    "heading": "Specifications",
-                    "open_by_default_desktop": true,
-                    "open_by_default_mobile": false
-                  },
-                  "blocks": {
-                    "text_McjMWz": {
-                      "type": "text",
-                      "settings": {
-                        "text": "{{ closest.product.metafields.custom.product_details_text | metafield_tag }}",
-                        "width": "100%",
-                        "max_width": "normal",
-                        "alignment": "left",
-                        "type_preset": "rte",
-                        "font": "var(--font-primary--family)",
-                        "font_size": "",
-                        "line_height": "normal",
-                        "letter_spacing": "normal",
-                        "paragraph_line_height": 0,
-                        "paragraph_spacing": 0,
-                        "case": "none",
-                        "wrap": "pretty",
-                        "color": "",
-                        "background": false,
-                        "background_color": "#00000026",
-                        "corner_radius": 0,
-                        "padding-block-start": 0,
-                        "padding-block-end": 0,
-                        "padding-inline-start": 0,
-                        "padding-inline-end": 0
-                      },
-                      "blocks": {}
-                    }
-                  },
-                  "block_order": [
-                    "text_McjMWz"
-                  ]
-                },
                 "accordion_row_aaFerA": {
                   "type": "_accordion-row",
                   "settings": {
@@ -510,7 +441,6 @@
                 }
               },
               "block_order": [
-                "accordion_row_VyFryh",
                 "accordion_row_aaFerA"
               ]
             },
@@ -541,7 +471,6 @@
             "product_description_LfDYCg",
             "text_AVg9L8",
             "text_HdiLen",
-            "text_MQjAGL",
             "product_specifications_N7qPLu",
             "accordion_CWUgfK",
             "series_recommendations_after_shipping"

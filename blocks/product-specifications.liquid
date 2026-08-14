@@ -7,8 +7,11 @@
     assign specifications_product = section.settings.product
   endif
 
-  assign specifications = specifications_product.metafields.custom.product_specifications.value
-  assign measurement_image = specifications_product.metafields.custom.product_measurement_image.value
+  assign product_details = specifications_product.metafields.custom.product_details.value
+  assign specifications = product_details.specifications
+  assign notes = product_details.notes
+  assign measurement_image = product_details.measurement_image
+  assign measurement_image_url = measurement_image.url
   assign measurement_image_alt = measurement_image.alt | default: specifications_product.title
 %}
 
@@ -51,6 +54,31 @@
     border-top: 1px solid color-mix(in srgb, var(--color-foreground) 18%, transparent);
   }
 
+  .product-specifications__notes {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .product-specifications__note {
+    margin: 0;
+  }
+
+  .product-specifications__note-heading {
+    margin: 0 0 4px;
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .product-specifications__note-text {
+    margin: 0;
+    color: color-mix(in srgb, var(--color-foreground) 76%, transparent);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
   .product-specifications__row {
     display: grid;
     grid-template-columns: minmax(92px, 0.72fr) minmax(0, 1.28fr);
@@ -84,7 +112,7 @@
   }
 {% endstylesheet %}
 
-{% if specifications_product != blank and specifications != blank %}
+{% if specifications_product != blank and product_details != blank %}
   <section
     class="product-specifications spacing-style"
     style="{% render 'spacing-style', settings: block.settings %}"
@@ -94,41 +122,57 @@
       <h2 class="product-specifications__heading">{{ block.settings.heading | escape }}</h2>
     {% endif %}
 
-    {% if measurement_image != blank %}
-      {{
-        measurement_image
-        | image_url: width: 1200
-        | image_tag:
-          class: 'product-specifications__image',
-          loading: 'lazy',
-          widths: '360, 540, 720, 900, 1200',
-          alt: measurement_image_alt
-      }}
+    {% if measurement_image_url != blank %}
+      <img
+        class="product-specifications__image"
+        src="{{ measurement_image_url | escape }}"
+        alt="{{ measurement_image_alt | escape }}"
+        loading="lazy"
+        width="1200"
+        height="1200"
+      >
     {% endif %}
 
-    <dl class="product-specifications__table">
-      {% for specification in specifications %}
-        {% if specification.label != blank and specification.value != blank %}
-          <div class="product-specifications__row">
-            <dt class="product-specifications__label">{{ specification.label | escape }}</dt>
-            <dd class="product-specifications__value">{{ specification.value | newline_to_br }}</dd>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </dl>
+    {% if specifications != blank %}
+      <dl class="product-specifications__table">
+        {% for specification in specifications %}
+          {% if specification.label != blank and specification.value != blank %}
+            <div class="product-specifications__row">
+              <dt class="product-specifications__label">{{ specification.label | escape }}</dt>
+              <dd class="product-specifications__value">{{ specification.value | escape | newline_to_br }}</dd>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </dl>
+    {% endif %}
+
+    {% if notes != blank %}
+      <div class="product-specifications__notes">
+        {% for note in notes %}
+          {% if note.text != blank %}
+            <div class="product-specifications__note">
+              {% if note.heading != blank %}
+                <h3 class="product-specifications__note-heading">{{ note.heading | escape }}</h3>
+              {% endif %}
+              <p class="product-specifications__note-text">{{ note.text | escape | newline_to_br }}</p>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
   </section>
 {% endif %}
 
 {% schema %}
 {
-  "name": "Product specifications",
+  "name": "Product details",
   "tag": null,
   "settings": [
     {
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Specifications"
+      "default": "Product Details"
     },
     {
       "type": "header",
