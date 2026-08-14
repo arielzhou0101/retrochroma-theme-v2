@@ -506,7 +506,7 @@
               "type": "series_recommendations",
               "static": true,
               "settings": {
-                "product": "",
+                "product": "{{ closest.product }}",
                 "padding-block-start": 20,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
