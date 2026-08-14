@@ -496,8 +496,8 @@
         "see_it_clearly_main": {
           "type": "see-it-clearly",
           "settings": {
-            "heading": "See it Clearly",
-            "show_subtitle": true,
+            "heading": "Beyond the First Look",
+            "show_subtitle": false,
             "subtitle": "<p>subtitle subtitle</p>",
             "card_1_image": "{{ closest.product.metafields.custom.detail_product_image_1.value }}",
             "card_1_copy": "{{ closest.product.metafields.custom.description_text_1 | metafield_tag }}",
