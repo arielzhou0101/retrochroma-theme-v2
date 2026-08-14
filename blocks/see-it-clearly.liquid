@@ -48,6 +48,8 @@
     .see-it-clearly__subtitle-{{ section_id }} {
       margin: 16px auto 0;
       max-width: 540px;
+      font-family: {{ block.settings.subtitle_font.family }}, {{ block.settings.subtitle_font.fallback_families }};
+      font-weight: {{ block.settings.subtitle_font.weight }};
       font-size: {{ block.settings.subtitle_size }}px;
       line-height: 1.45;
     }
@@ -176,8 +178,9 @@
     { "type": "range", "id": "padding_top", "label": "Top spacing", "min": 32, "max": 144, "step": 4, "unit": "px", "default": 96 },
     { "type": "range", "id": "padding_bottom", "label": "Bottom spacing", "min": 32, "max": 144, "step": 4, "unit": "px", "default": 96 },
     { "type": "header", "content": "Style" },
-    { "type": "font_picker", "id": "heading_font", "label": "Heading font", "default": "times_new_roman_n4" },
+    { "type": "font_picker", "id": "heading_font", "label": "Title font", "default": "times_new_roman_n4" },
     { "type": "range", "id": "heading_size", "label": "Heading size", "min": 32, "max": 88, "step": 2, "unit": "px", "default": 64 },
+    { "type": "font_picker", "id": "subtitle_font", "label": "Subtitle font", "default": "abel_n4" },
     { "type": "range", "id": "subtitle_size", "label": "Subtitle size", "min": 12, "max": 24, "step": 1, "unit": "px", "default": 17 },
     { "type": "range", "id": "copy_size", "label": "Card text size", "min": 12, "max": 22, "step": 1, "unit": "px", "default": 16 },
     { "type": "color", "id": "background_color", "label": "Background", "default": "#e5e6dc" },

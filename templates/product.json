@@ -513,6 +513,7 @@
             "padding_bottom": 96,
             "heading_font": "times_new_roman_n4",
             "heading_size": 64,
+            "subtitle_font": "abel_n4",
             "subtitle_size": 17,
             "copy_size": 16,
             "background_color": "#e5e6dc",
