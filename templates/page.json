@@ -48,6 +48,8 @@
                 "font_size": "1rem",
                 "line_height": "normal",
                 "letter_spacing": "normal",
+                "paragraph_line_height": 0,
+                "paragraph_spacing": 0,
                 "case": "none",
                 "wrap": "pretty",
                 "color": "var(--color-foreground)",
@@ -113,6 +115,8 @@
                     "font_size": "1rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
+                    "paragraph_line_height": 0,
+                    "paragraph_spacing": 0,
                     "case": "none",
                     "wrap": "pretty",
                     "color": "var(--color-foreground)",
@@ -138,6 +142,8 @@
                     "font_size": "1rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
+                    "paragraph_line_height": 0,
+                    "paragraph_spacing": 0,
                     "case": "none",
                     "wrap": "pretty",
                     "color": "var(--color-foreground)",
@@ -180,6 +186,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "t:names.editorial",
       "settings": {
         "media_position": "left",
@@ -198,7 +205,6 @@
         "heading": {
           "type": "text",
           "name": "Title",
-          "disabled": true,
           "settings": {
             "text": "<h1>{{ closest.page.title }}</h1>",
             "width": "100%",
@@ -209,6 +215,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -260,6 +268,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -276,6 +286,7 @@
         "text_jDKLeh": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<p>We started Retro Chroma with a simple belief. A home is collected over time. It grows through instinct, memory, and the things you keep because they continue to mean something. We are not here to define a finished look. We want to help you create a home that feels personal, lived in, and open to change.</p>",
             "width": "100%",
@@ -286,6 +297,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -302,6 +315,7 @@
         "text_VmNbxy": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<p>We choose pieces that change the way a room feels without making it look staged. </p>",
             "width": "fit-content",
@@ -312,6 +326,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -328,6 +344,7 @@
         "text_jX4BBj": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<p>The things around us shape ordinary moments more than we tend to notice. They can soften a room at the end of the day or make a familiar corner feel newly seen.</p><p>Our hope is that the things you find at Retro Chroma stay with you beyond a passing mood or season. They should settle naturally into your home and become part of how you live.</p>",
             "width": "100%",
@@ -338,6 +355,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -354,6 +373,7 @@
         "text_BEzjan": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<p>We work with makers and manufacturing partners whose work fits our point of view.</p>",
             "width": "fit-content",
@@ -364,6 +384,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -380,6 +402,7 @@
         "text_xhmmQX": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<p>We look closely at material, finish, proportion, and how something feels in daily use. A new addition has to hold interest beyond the first photograph and live comfortably alongside what is already in your home.</p><p>Before shipment, each order is inspected to make sure it meets our standards.</p>",
             "width": "100%",
@@ -390,6 +413,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -406,6 +431,7 @@
         "text_MD4zpG": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<h2>Good design should feel special, and the price should make sense.</h2>",
             "width": "fit-content",
@@ -416,6 +442,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -432,6 +460,7 @@
         "text_eYUdQq": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<p>We believe good design should have a place in everyday life. For us, thoughtful pricing is part of that. </p><p>We want our prices to feel considered and honest, reflecting the object, the work behind it, and the care involved in bringing it to you. The value should be in what you receive, not in an inflated brand premium or exclusivity for its own sake.</p>",
             "width": "100%",
@@ -442,6 +471,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -457,13 +488,13 @@
         },
         "page-content": {
           "type": "page-content",
-          "disabled": true,
           "settings": {},
           "blocks": {}
         },
         "text_KLTKhm": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<h2>Company Info</h2>",
             "width": "fit-content",
@@ -474,6 +505,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
@@ -490,6 +523,7 @@
         "text_tdyGYM": {
           "type": "text",
           "name": "t:names.text",
+          "disabled": true,
           "settings": {
             "text": "<p>Voyz Limited, trading as Retro Chroma<br/><strong>Administrative Address:</strong> Flat F, 17/F, Amber Court, Fanling Town Centre, Fanling, New Territories, Hong Kong</p><p><em>\"Retro Chroma\" is an independent brand operated by Voyz Limited. We are not affiliated, associated, authorized, endorsed by, or in any way officially connected with Feilo Sylvania or their \"ToLEDo Retro Chroma\" product line, or any of their subsidiaries or affiliates.</em></p>",
             "width": "100%",
@@ -500,6 +534,8 @@
             "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
+            "paragraph_line_height": 0,
+            "paragraph_spacing": 0,
             "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
