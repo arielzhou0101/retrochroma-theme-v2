@@ -1401,6 +1401,7 @@
         "ai_gen_block_caa9b30_kL7aej",
         "ai_gen_block_caa9b30_hiBx8L"
       ],
+      "disabled": true,
       "name": "仿版 Image with text",
       "settings": {
         "content_direction": "column",
