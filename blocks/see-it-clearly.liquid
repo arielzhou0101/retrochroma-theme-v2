@@ -13,6 +13,11 @@
 {% if card_count > 0 %}
   {% style %}
     .see-it-clearly-{{ section_id }} {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
       background: {{ block.settings.background_color }};
       color: {{ block.settings.text_color }};
       padding: {{ block.settings.padding_top }}px 0 {{ block.settings.padding_bottom }}px;
