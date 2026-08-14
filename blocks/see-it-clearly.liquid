@@ -1,0 +1,174 @@
+{% liquid
+  assign has_cards = false
+  if block.settings.card_1_image != blank or block.settings.card_2_image != blank or block.settings.card_3_image != blank or block.settings.card_4_image != blank
+    assign has_cards = true
+  endif
+  assign section_id = block.id | replace: '_', '' | downcase
+%}
+
+{% if has_cards %}
+  {% style %}
+    .see-it-clearly-{{ section_id }} {
+      background: {{ block.settings.background_color }};
+      color: {{ block.settings.text_color }};
+      padding: {{ block.settings.padding_top }}px 0 {{ block.settings.padding_bottom }}px;
+    }
+
+    .see-it-clearly__inner-{{ section_id }} {
+      max-width: 1420px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .see-it-clearly__header-{{ section_id }} {
+      max-width: 860px;
+      margin: 0 auto 54px;
+      text-align: center;
+    }
+
+    .see-it-clearly__title-{{ section_id }} {
+      margin: 0;
+      color: {{ block.settings.text_color }};
+      font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+      font-style: normal;
+      font-weight: {{ block.settings.heading_font.weight }};
+      font-size: {{ block.settings.heading_size }}px;
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+    }
+
+    .see-it-clearly__subtitle-{{ section_id }} {
+      margin: 16px auto 0;
+      max-width: 540px;
+      font-size: {{ block.settings.subtitle_size }}px;
+      line-height: 1.45;
+    }
+
+    .see-it-clearly__subtitle-{{ section_id }} p { margin: 0; }
+
+    .see-it-clearly__cards-{{ section_id }} {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: {{ block.settings.card_gap }}px;
+    }
+
+    .see-it-clearly__card-{{ section_id }} { min-width: 0; }
+
+    .see-it-clearly__image-{{ section_id }} {
+      display: block;
+      aspect-ratio: {{ block.settings.image_ratio }};
+      width: 100%;
+      object-fit: cover;
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .see-it-clearly__copy-{{ section_id }} {
+      margin-top: 16px;
+      font-size: {{ block.settings.copy_size }}px;
+      line-height: 1.42;
+    }
+
+    .see-it-clearly__copy-{{ section_id }} > :first-child { margin-top: 0; }
+    .see-it-clearly__copy-{{ section_id }} > :last-child { margin-bottom: 0; }
+    .see-it-clearly__copy-{{ section_id }} h1,
+    .see-it-clearly__copy-{{ section_id }} h2,
+    .see-it-clearly__copy-{{ section_id }} h3 { font: inherit; font-weight: 600; letter-spacing: 0.02em; }
+
+    @media screen and (max-width: 989px) {
+      .see-it-clearly__cards-{{ section_id }} { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media screen and (max-width: 749px) {
+      .see-it-clearly-{{ section_id }} {
+        padding: {{ block.settings.padding_top | times: 0.65 }}px 0 {{ block.settings.padding_bottom | times: 0.65 }}px;
+        overflow: hidden;
+      }
+
+      .see-it-clearly__inner-{{ section_id }} { padding: 0 16px; }
+      .see-it-clearly__header-{{ section_id }} { margin-bottom: 32px; }
+      .see-it-clearly__title-{{ section_id }} { font-size: {{ block.settings.heading_size | times: 0.64 }}px; }
+      .see-it-clearly__cards-{{ section_id }} {
+        display: flex;
+        width: calc(100% + 16px);
+        overflow-x: auto;
+        gap: 16px;
+        padding: 0 16px 8px 0;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .see-it-clearly__cards-{{ section_id }}::-webkit-scrollbar { display: none; }
+      .see-it-clearly__card-{{ section_id }} { flex: 0 0 min(74vw, 360px); scroll-snap-align: start; }
+      .see-it-clearly__copy-{{ section_id }} { margin-top: 12px; }
+    }
+  {% endstyle %}
+
+  <section class="see-it-clearly-{{ section_id }}" {{ block.shopify_attributes }}>
+    <div class="see-it-clearly__inner-{{ section_id }}">
+      <header class="see-it-clearly__header-{{ section_id }}">
+        <h2 class="see-it-clearly__title-{{ section_id }}">{{ block.settings.heading }}</h2>
+        {% if block.settings.show_subtitle and block.settings.subtitle != blank %}
+          <div class="see-it-clearly__subtitle-{{ section_id }}">{{ block.settings.subtitle }}</div>
+        {% endif %}
+      </header>
+
+      <div class="see-it-clearly__cards-{{ section_id }}">
+        {% for index in (1..4) %}
+          {% liquid
+            assign image_key = 'card_' | append: index | append: '_image'
+            assign copy_key = 'card_' | append: index | append: '_copy'
+            assign card_image = block.settings[image_key]
+            assign card_copy = block.settings[copy_key]
+            assign image_class = 'see-it-clearly__image-' | append: section_id
+          %}
+          {% if card_image != blank %}
+            <article class="see-it-clearly__card-{{ section_id }}">
+              {{ card_image | image_url: width: 1000 | image_tag: class: image_class, loading: 'lazy', widths: '360, 540, 720, 1000', sizes: '(min-width: 990px) 25vw, (min-width: 750px) 50vw, 74vw' }}
+              {% if card_copy != blank %}
+                <div class="see-it-clearly__copy-{{ section_id }}">{{ card_copy }}</div>
+              {% endif %}
+            </article>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "See it Clearly",
+  "tag": null,
+  "settings": [
+    { "type": "header", "content": "Heading" },
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "See it Clearly" },
+    { "type": "checkbox", "id": "show_subtitle", "label": "Show subtitle", "default": false },
+    { "type": "richtext", "id": "subtitle", "label": "Subtitle" },
+    { "type": "header", "content": "Card 1" },
+    { "type": "image_picker", "id": "card_1_image", "label": "Image" },
+    { "type": "richtext", "id": "card_1_copy", "label": "Text" },
+    { "type": "header", "content": "Card 2" },
+    { "type": "image_picker", "id": "card_2_image", "label": "Image" },
+    { "type": "richtext", "id": "card_2_copy", "label": "Text" },
+    { "type": "header", "content": "Card 3" },
+    { "type": "image_picker", "id": "card_3_image", "label": "Image" },
+    { "type": "richtext", "id": "card_3_copy", "label": "Text" },
+    { "type": "header", "content": "Card 4" },
+    { "type": "image_picker", "id": "card_4_image", "label": "Image" },
+    { "type": "richtext", "id": "card_4_copy", "label": "Text" },
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "image_ratio", "label": "Image ratio", "options": [{ "value": "4 / 5", "label": "Portrait 4:5" }, { "value": "3 / 4", "label": "Portrait 3:4" }, { "value": "1 / 1", "label": "Square" }], "default": "3 / 4" },
+    { "type": "range", "id": "card_gap", "label": "Card spacing", "min": 12, "max": 48, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_top", "label": "Top spacing", "min": 32, "max": 144, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom spacing", "min": 32, "max": 144, "step": 4, "unit": "px", "default": 96 },
+    { "type": "header", "content": "Style" },
+    { "type": "font_picker", "id": "heading_font", "label": "Heading font", "default": "abel_n4" },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 32, "max": 88, "step": 2, "unit": "px", "default": 64 },
+    { "type": "range", "id": "subtitle_size", "label": "Subtitle size", "min": 12, "max": 24, "step": 1, "unit": "px", "default": 17 },
+    { "type": "range", "id": "copy_size", "label": "Card text size", "min": 12, "max": 22, "step": 1, "unit": "px", "default": 16 },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#e5e6dc" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#111111" }
+  ],
+  "presets": [{ "name": "See it Clearly" }]
+}
+{% endschema %}
