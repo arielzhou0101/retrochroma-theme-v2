@@ -97,18 +97,17 @@
       .see-it-clearly__title-{{ section_id }} { font-size: {{ block.settings.heading_size | times: 0.64 }}px; }
       .see-it-clearly__cards-{{ section_id }} {
         display: flex;
-        width: auto;
-        margin: 0 -16px;
+        width: calc(100% + 16px);
+        margin: 0;
         overflow-x: auto;
         gap: 16px;
-        padding: 0 16px 8px;
-        justify-content: flex-start;
+        padding: 0 16px 8px 0;
         scroll-snap-type: x mandatory;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
       }
       .see-it-clearly__cards-{{ section_id }}::-webkit-scrollbar { display: none; }
-      .see-it-clearly__card-{{ section_id }} { flex: 0 0 min(82vw, 360px); scroll-snap-align: start; }
+      .see-it-clearly__card-{{ section_id }} { flex: 0 0 280px; scroll-snap-align: start; }
       .see-it-clearly__copy-{{ section_id }} { margin-top: 12px; }
     }
   {% endstyle %}
