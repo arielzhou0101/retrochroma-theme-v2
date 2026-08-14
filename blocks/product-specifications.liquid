@@ -42,9 +42,10 @@
 
   .product-specifications__image {
     display: block;
-    width: 100%;
+    width: 68%;
+    max-width: 420px;
     height: auto;
-    margin-bottom: 18px;
+    margin: 0 auto 18px;
     background: color-mix(in srgb, var(--color-foreground) 4%, transparent);
   }
 
@@ -104,6 +105,10 @@
   }
 
   @media screen and (width < 750px) {
+    .product-specifications__image {
+      width: 82%;
+    }
+
     .product-specifications__row {
       grid-template-columns: minmax(82px, 0.7fr) minmax(0, 1.3fr);
       gap: 12px;
