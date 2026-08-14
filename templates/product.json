@@ -285,6 +285,18 @@
               },
               "blocks": {}
             },
+            "text_HdiLen": {
+              "type": "product-details-heading",
+              "name": "Description heading",
+              "settings": {
+                "heading": "WHY IT MADE THE EDIT",
+                "padding-block-start": 0,
+                "padding-block-end": 12,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
             "product_description_LfDYCg": {
               "type": "product-description",
               "name": "t:names.product_description",
@@ -334,18 +346,6 @@
                 "background_color": "#00000026",
                 "corner_radius": 0,
                 "padding-block-start": 10,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "text_HdiLen": {
-              "type": "product-details-heading",
-              "name": "Description heading",
-              "settings": {
-                "heading": "WHY IT MADE THE EDIT",
-                "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
