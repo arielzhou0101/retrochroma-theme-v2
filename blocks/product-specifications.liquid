@@ -10,8 +10,7 @@
   assign product_details = specifications_product.metafields.custom.product_details.value
   assign specifications = product_details.specifications
   assign notes = product_details.notes
-  assign measurement_image = product_details.measurement_image
-  assign measurement_image_url = measurement_image.url
+  assign measurement_image = specifications_product.metafields.custom.measurement_image.value
   assign measurement_image_alt = measurement_image.alt | default: specifications_product.title
 %}
 
@@ -122,15 +121,16 @@
       <h2 class="product-specifications__heading">{{ block.settings.heading | escape }}</h2>
     {% endif %}
 
-    {% if measurement_image_url != blank %}
-      <img
-        class="product-specifications__image"
-        src="{{ measurement_image_url | escape }}"
-        alt="{{ measurement_image_alt | escape }}"
-        loading="lazy"
-        width="1200"
-        height="1200"
-      >
+    {% if measurement_image != blank %}
+      {{
+        measurement_image
+        | image_url: width: 1200
+        | image_tag:
+          class: 'product-specifications__image',
+          loading: 'lazy',
+          widths: '360, 540, 720, 900, 1200',
+          alt: measurement_image_alt
+      }}
     {% endif %}
 
     {% if specifications != blank %}
