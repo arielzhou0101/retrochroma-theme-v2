@@ -1420,7 +1420,6 @@
     },
     "divider_kw73rq": {
       "type": "divider",
-      "disabled": true,
       "name": "t:names.divider_section",
       "settings": {
         "color_scheme": "scheme-077f6800-e810-448b-bc4e-7b8604edcc10",
