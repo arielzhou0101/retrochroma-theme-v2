@@ -396,6 +396,18 @@
               },
               "blocks": {}
             },
+            "product_specifications_N7qPLu": {
+              "type": "product-specifications",
+              "name": "Product specifications",
+              "settings": {
+                "heading": "Specifications",
+                "padding-block-start": 16,
+                "padding-block-end": 16,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
             "accordion_CWUgfK": {
               "type": "accordion",
               "name": "Accordion",
@@ -530,6 +542,7 @@
             "text_AVg9L8",
             "text_HdiLen",
             "text_MQjAGL",
+            "product_specifications_N7qPLu",
             "accordion_CWUgfK",
             "series_recommendations_after_shipping"
           ]
