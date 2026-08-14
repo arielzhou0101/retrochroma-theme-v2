@@ -343,6 +343,7 @@
             "text_HdiLen": {
               "type": "text",
               "name": "t:names.text",
+              "disabled": true,
               "settings": {
                 "text": "<p>PRODUCT DETAILS</p>",
                 "width": "fit-content",
