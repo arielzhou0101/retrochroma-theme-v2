@@ -23,49 +23,6 @@
     min-width: 100%;
   }
 
-  .product-information__media-series-recommendations {
-    width: 100%;
-    order: 2;
-  }
-
-  @media screen and (width >= 750px) {
-    .product-information__media-series-recommendations {
-      margin-block-start: 48px;
-    }
-
-    .product-information__grid:not(.product-information__grid--half).product-information--media-left
-      .product-information__media-series-recommendations {
-      grid-column: 2 / 3;
-      padding-inline-start: calc(var(--gap, 0) / 2);
-    }
-
-    .product-information__grid:not(.product-information__grid--half).product-information--media-right
-      .product-information__media-series-recommendations {
-      grid-column: 1 / 2;
-      padding-inline-end: calc(var(--gap, 0) / 2);
-    }
-
-    .product-information__grid--half.product-information--media-left
-      .product-information__media-series-recommendations {
-      grid-column: 3 / 4;
-    }
-
-    .product-information__grid--half.product-information--media-right
-      .product-information__media-series-recommendations {
-      grid-column: 2 / 3;
-    }
-
-    .section--full-width .product-information__grid--half.product-information--media-left
-      .product-information__media-series-recommendations {
-      grid-column: 3 / -1;
-    }
-
-    .section--full-width .product-information__grid--half.product-information--media-right
-      .product-information__media-series-recommendations {
-      grid-column: 1 / 3;
-    }
-  }
-
   /* Mobile styles */
   @media screen and (width < 750px) {
     .product-information__media {
@@ -79,11 +36,6 @@
       position: static;
     }
 
-    .product-information__media-series-recommendations {
-      grid-column: 2 / 3;
-      order: 2;
-      margin-block-start: 0;
-    }
     .product-details {
       grid-column: 2 / 3;
     }
@@ -306,14 +258,6 @@
         {{ details }}
       {% endif %}
     {% endfor %}
-
-    <div class="product-information__media-series-recommendations">
-      {%- content_for 'block',
-        type: 'series_recommendations',
-        id: 'series_recommendations_below_media',
-        closest.product: section.settings.product
-      -%}
-    </div>
 
   </div>
 

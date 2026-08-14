@@ -40,18 +40,6 @@
           },
           "blocks": {}
         },
-        "series_recommendations_below_media": {
-          "type": "series_recommendations",
-          "static": true,
-          "settings": {
-            "product": "",
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
         "product-details": {
           "type": "_product-details",
           "static": true,
@@ -513,6 +501,18 @@
                 "accordion_row_VyFryh",
                 "accordion_row_aaFerA"
               ]
+            },
+            "series_recommendations_after_shipping": {
+              "type": "series_recommendations",
+              "static": true,
+              "settings": {
+                "product": "",
+                "padding-block-start": 20,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
             }
           },
           "block_order": [
@@ -531,7 +531,8 @@
             "text_AVg9L8",
             "text_HdiLen",
             "text_MQjAGL",
-            "accordion_CWUgfK"
+            "accordion_CWUgfK",
+            "series_recommendations_after_shipping"
           ]
         }
       },
