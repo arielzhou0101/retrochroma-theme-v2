@@ -1,12 +1,16 @@
 {% liquid
-  assign has_cards = false
-  if block.settings.card_1_image != blank or block.settings.card_2_image != blank or block.settings.card_3_image != blank or block.settings.card_4_image != blank
-    assign has_cards = true
-  endif
+  assign card_count = 0
+  for index in (1..4)
+    assign image_key = 'card_' | append: index | append: '_image'
+    assign copy_key = 'card_' | append: index | append: '_copy'
+    if block.settings[image_key] != blank and block.settings[copy_key] != blank
+      assign card_count = card_count | plus: 1
+    endif
+  endfor
   assign section_id = block.id | replace: '_', '' | downcase
 %}
 
-{% if has_cards %}
+{% if card_count > 0 %}
   {% style %}
     .see-it-clearly-{{ section_id }} {
       background: {{ block.settings.background_color }};
@@ -30,7 +34,6 @@
       margin: 0;
       color: {{ block.settings.text_color }};
       font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
-      font-style: normal;
       font-weight: {{ block.settings.heading_font.weight }};
       font-size: {{ block.settings.heading_size }}px;
       line-height: 1.06;
@@ -50,7 +53,12 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: {{ block.settings.card_gap }}px;
+      margin: 0 auto;
     }
+
+    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-1 { grid-template-columns: minmax(0, 1fr); max-width: 396px; }
+    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 816px; }
+    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1236px; }
 
     .see-it-clearly__card-{{ section_id }} { min-width: 0; }
 
@@ -89,16 +97,18 @@
       .see-it-clearly__title-{{ section_id }} { font-size: {{ block.settings.heading_size | times: 0.64 }}px; }
       .see-it-clearly__cards-{{ section_id }} {
         display: flex;
-        width: calc(100% + 16px);
+        width: auto;
+        margin: 0 -16px;
         overflow-x: auto;
         gap: 16px;
-        padding: 0 16px 8px 0;
+        padding: 0 16px 8px;
+        justify-content: flex-start;
         scroll-snap-type: x mandatory;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
       }
       .see-it-clearly__cards-{{ section_id }}::-webkit-scrollbar { display: none; }
-      .see-it-clearly__card-{{ section_id }} { flex: 0 0 min(74vw, 360px); scroll-snap-align: start; }
+      .see-it-clearly__card-{{ section_id }} { flex: 0 0 min(82vw, 360px); scroll-snap-align: start; }
       .see-it-clearly__copy-{{ section_id }} { margin-top: 12px; }
     }
   {% endstyle %}
@@ -106,13 +116,15 @@
   <section class="see-it-clearly-{{ section_id }}" {{ block.shopify_attributes }}>
     <div class="see-it-clearly__inner-{{ section_id }}">
       <header class="see-it-clearly__header-{{ section_id }}">
-        <h2 class="see-it-clearly__title-{{ section_id }}">{{ block.settings.heading }}</h2>
+        {% if block.settings.heading != blank %}
+          <h2 class="see-it-clearly__title-{{ section_id }}">{{ block.settings.heading }}</h2>
+        {% endif %}
         {% if block.settings.show_subtitle and block.settings.subtitle != blank %}
           <div class="see-it-clearly__subtitle-{{ section_id }}">{{ block.settings.subtitle }}</div>
         {% endif %}
       </header>
 
-      <div class="see-it-clearly__cards-{{ section_id }}">
+      <div class="see-it-clearly__cards-{{ section_id }} see-it-clearly__cards--count-{{ card_count }}">
         {% for index in (1..4) %}
           {% liquid
             assign image_key = 'card_' | append: index | append: '_image'
@@ -121,12 +133,10 @@
             assign card_copy = block.settings[copy_key]
             assign image_class = 'see-it-clearly__image-' | append: section_id
           %}
-          {% if card_image != blank %}
+          {% if card_image != blank and card_copy != blank %}
             <article class="see-it-clearly__card-{{ section_id }}">
               {{ card_image | image_url: width: 1000 | image_tag: class: image_class, loading: 'lazy', widths: '360, 540, 720, 1000', sizes: '(min-width: 990px) 25vw, (min-width: 750px) 50vw, 74vw' }}
-              {% if card_copy != blank %}
-                <div class="see-it-clearly__copy-{{ section_id }}">{{ card_copy }}</div>
-              {% endif %}
+              <div class="see-it-clearly__copy-{{ section_id }}">{{ card_copy }}</div>
             </article>
           {% endif %}
         {% endfor %}
@@ -162,7 +172,7 @@
     { "type": "range", "id": "padding_top", "label": "Top spacing", "min": 32, "max": 144, "step": 4, "unit": "px", "default": 96 },
     { "type": "range", "id": "padding_bottom", "label": "Bottom spacing", "min": 32, "max": 144, "step": 4, "unit": "px", "default": 96 },
     { "type": "header", "content": "Style" },
-    { "type": "font_picker", "id": "heading_font", "label": "Heading font", "default": "abel_n4" },
+    { "type": "font_picker", "id": "heading_font", "label": "Heading font", "default": "times_new_roman_n4" },
     { "type": "range", "id": "heading_size", "label": "Heading size", "min": 32, "max": 88, "step": 2, "unit": "px", "default": 64 },
     { "type": "range", "id": "subtitle_size", "label": "Subtitle size", "min": 12, "max": 24, "step": 1, "unit": "px", "default": 17 },
     { "type": "range", "id": "copy_size", "label": "Card text size", "min": 12, "max": 22, "step": 1, "unit": "px", "default": 16 },
