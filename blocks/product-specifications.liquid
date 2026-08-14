@@ -149,17 +149,22 @@
     {% if notes != blank %}
       <div class="product-specifications__notes">
         {% for note in notes %}
-          {% if note.text != blank or note.link_url != blank %}
+          {% liquid
+            assign note_text = note['text']
+            assign note_link_url = note['link_url']
+            assign note_link_label = note['link_label']
+          %}
+          {% if note_text != blank or note_link_url != blank %}
             <div class="product-specifications__note">
               {% if note.heading != blank %}
                 <h3 class="product-specifications__note-heading">{{ note.heading | escape }}</h3>
               {% endif %}
-              {% if note.text != blank %}
-                <p class="product-specifications__note-text">{{ note.text | escape | newline_to_br }}</p>
+              {% if note_text != blank %}
+                <p class="product-specifications__note-text">{{ note_text | escape | newline_to_br }}</p>
               {% endif %}
-              {% if note.link_url != blank and note.link_label != blank %}
-                <a class="product-specifications__note-text" href="{{ note.link_url | escape }}" target="_blank">
-                  {{- note.link_label | escape -}}
+              {% if note_link_url != blank and note_link_label != blank %}
+                <a class="product-specifications__note-text" href="{{ note_link_url | escape }}" target="_blank" rel="noopener">
+                  {{- note_link_label | escape -}}
                 </a>
               {% endif %}
             </div>
