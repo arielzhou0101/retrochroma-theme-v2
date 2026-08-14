@@ -25,12 +25,13 @@
 
   .product-information__media-series-recommendations {
     width: 100%;
-    margin-block-start: 24px;
+    order: 2;
   }
 
   @media screen and (width >= 750px) {
-    .product-information__media:has(.product-information__media-series-recommendations) > media-gallery {
-      position: static;
+    .product-information__media-series-recommendations {
+      grid-column: 1 / -1;
+      margin-block-start: 48px;
     }
   }
 
@@ -256,13 +257,6 @@
           id: 'media-gallery',
           closest.product: section.settings.product
         -%}
-        <div class="product-information__media-series-recommendations">
-          {%- content_for 'block',
-            type: 'series_recommendations',
-            id: 'series_recommendations_below_media',
-            closest.product: section.settings.product
-          -%}
-        </div>
       </div>
     {% endcapture %}
 
@@ -281,6 +275,14 @@
         {{ details }}
       {% endif %}
     {% endfor %}
+
+    <div class="product-information__media-series-recommendations">
+      {%- content_for 'block',
+        type: 'series_recommendations',
+        id: 'series_recommendations_below_media',
+        closest.product: section.settings.product
+      -%}
+    </div>
 
   </div>
 
