@@ -504,7 +504,6 @@
             },
             "series_recommendations_after_shipping": {
               "type": "series_recommendations",
-              "static": true,
               "settings": {
                 "product": "{{ closest.product }}",
                 "padding-block-start": 20,
