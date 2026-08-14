@@ -373,7 +373,7 @@
               "type": "product-specifications",
               "name": "Product details",
               "settings": {
-                "heading": "Product Details",
+                "heading": "The details, in full.",
                 "padding-block-start": 24,
                 "padding-block-end": 16,
                 "padding-inline-start": 0,
