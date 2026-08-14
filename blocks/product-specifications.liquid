@@ -105,6 +105,27 @@
     text-align: right;
   }
 
+  .product-specifications__reference-link {
+    display: inline-flex;
+    justify-self: end;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.45;
+    text-align: right;
+    text-decoration: underline;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .product-specifications__reference-arrow {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
   @media screen and (width < 750px) {
     .product-specifications__image {
       width: 82%;
@@ -161,19 +182,30 @@
             assign note_link_label = note['link_label']
           %}
           {% if note_text != blank or note_link_url != blank %}
-            <div class="product-specifications__note">
-              {% if note.heading != blank %}
-                <h3 class="product-specifications__note-heading">{{ note.heading | escape }}</h3>
-              {% endif %}
-              {% if note_text != blank %}
-                <p class="product-specifications__note-text">{{ note_text | escape | newline_to_br }}</p>
-              {% endif %}
-              {% if note_link_url != blank and note_link_label != blank %}
-                <a class="product-specifications__note-text" href="{{ note_link_url | escape }}" target="_blank" rel="noopener">
-                  {{- note_link_label | escape -}}
+            {% if note_text == blank and note_link_url != blank and note_link_label != blank %}
+              <div class="product-specifications__row">
+                <span class="product-specifications__label">{{ note.heading | escape }}</span>
+                <a class="product-specifications__reference-link" href="{{ note_link_url | escape }}" target="_blank" rel="noopener">
+                  <span>{{ note_link_label | escape }}</span>
+                  <span class="product-specifications__reference-arrow" aria-hidden="true">↗</span>
                 </a>
-              {% endif %}
-            </div>
+              </div>
+            {% else %}
+              <div class="product-specifications__note">
+                {% if note.heading != blank %}
+                  <h3 class="product-specifications__note-heading">{{ note.heading | escape }}</h3>
+                {% endif %}
+                {% if note_text != blank %}
+                  <p class="product-specifications__note-text">{{ note_text | escape | newline_to_br }}</p>
+                {% endif %}
+                {% if note_link_url != blank and note_link_label != blank %}
+                  <a class="product-specifications__reference-link" href="{{ note_link_url | escape }}" target="_blank" rel="noopener">
+                    <span>{{ note_link_label | escape }}</span>
+                    <span class="product-specifications__reference-arrow" aria-hidden="true">↗</span>
+                  </a>
+                {% endif %}
+              </div>
+            {% endif %}
           {% endif %}
         {% endfor %}
       </div>
