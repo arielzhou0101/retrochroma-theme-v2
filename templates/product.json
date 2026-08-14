@@ -601,23 +601,10 @@
             "card_background": "#ffffff"
           },
           "blocks": {}
-        },
-        "divider_AFeQfG": {
-          "type": "_divider",
-          "name": "t:names.divider",
-          "settings": {
-            "thickness": 1,
-            "corner_radius": "square",
-            "width_percent": 100,
-            "padding-block-start": 0,
-            "padding-block-end": 0
-          },
-          "blocks": {}
         }
       },
       "block_order": [
-        "ai_gen_block_cc42220_h4G6Lb",
-        "divider_AFeQfG"
+        "ai_gen_block_cc42220_h4G6Lb"
       ],
       "name": "customer snapshot",
       "settings": {
