@@ -601,23 +601,10 @@
             "card_background": "#ffffff"
           },
           "blocks": {}
-        },
-        "divider_AFeQfG": {
-          "type": "_divider",
-          "name": "t:names.divider",
-          "settings": {
-            "thickness": 1,
-            "corner_radius": "square",
-            "width_percent": 100,
-            "padding-block-start": 0,
-            "padding-block-end": 0
-          },
-          "blocks": {}
         }
       },
       "block_order": [
-        "ai_gen_block_cc42220_h4G6Lb",
-        "divider_AFeQfG"
+        "ai_gen_block_cc42220_h4G6Lb"
       ],
       "name": "customer snapshot",
       "settings": {
@@ -1401,6 +1388,7 @@
         "ai_gen_block_caa9b30_kL7aej",
         "ai_gen_block_caa9b30_hiBx8L"
       ],
+      "disabled": true,
       "name": "仿版 Image with text",
       "settings": {
         "content_direction": "column",
@@ -1432,6 +1420,7 @@
     },
     "divider_kw73rq": {
       "type": "divider",
+      "disabled": true,
       "name": "t:names.divider_section",
       "settings": {
         "color_scheme": "scheme-077f6800-e810-448b-bc4e-7b8604edcc10",
