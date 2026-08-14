@@ -60,12 +60,13 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: {{ block.settings.card_gap }}px;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
-    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-1 { grid-template-columns: minmax(0, 1fr); max-width: 396px; }
-    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 816px; }
-    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1236px; }
+    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-1 { grid-template-columns: minmax(0, 1fr); max-width: 282px; }
+    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 588px; }
+    .see-it-clearly__cards-{{ section_id }}.see-it-clearly__cards--count-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 894px; }
 
     .see-it-clearly__card-{{ section_id }} { min-width: 0; }
 
