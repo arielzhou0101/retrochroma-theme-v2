@@ -374,7 +374,7 @@
               "name": "Product details",
               "settings": {
                 "heading": "Product Details",
-                "padding-block-start": 16,
+                "padding-block-start": 24,
                 "padding-block-end": 16,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
