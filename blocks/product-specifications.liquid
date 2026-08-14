@@ -129,7 +129,7 @@
     border-bottom: 0;
   }
 
-  .product-specifications__table > .product-specifications__row:last-child,
+  .product-specifications__table:not(.product-specifications__table--has-notes) > .product-specifications__row:last-child,
   .product-specifications__notes > .product-specifications__row:last-child {
     border-bottom: 0;
   }
@@ -174,7 +174,7 @@
     {% endif %}
 
     {% if specifications != blank %}
-      <dl class="product-specifications__table">
+      <dl class="product-specifications__table{% if notes != blank %} product-specifications__table--has-notes{% endif %}">
         {% for specification in specifications %}
           {% if specification.label != blank and specification.value != blank %}
             <div class="product-specifications__row">
