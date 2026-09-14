@@ -334,12 +334,7 @@
           }}
         {%- endcapture -%}
     
-        {%- render 'slideshow-slide',
-          slide_id: 'metafield',         # 唯一 ID，避免与 media.id 冲突
-          index: 0,                      # 置于第一张
-          children: slideshow_children,
-          class: 'product-media-container'
-        -%}
+        {%- render 'slideshow-slide', slide_id: 'metafield', index: 0, children: slideshow_children, class: 'product-media-container' -%}
       {% endif %}
     
       {%- comment -%}
@@ -379,17 +374,7 @@
           {% endunless %}
         {% endif %}
     
-        {%- render 'slideshow-slide',
-          slide_id: media.id,
-          index: forloop.index
-            | plus: (card_image_metafield != blank)   # 如果前面插了 metafield，要把索引往后偏移
-          ,
-          children: slideshow_children,
-          class: class,
-          attributes: attributes,
-          hidden: hidden,
-          media_fit: media_fit
-        -%}
+        {%- render 'slideshow-slide', slide_id: media.id, index: forloop.index, plus: card_image_metafield, children: slideshow_children, class: class, attributes: attributes, hidden: hidden, media_fit: media_fit -%}
       {% endfor %}
     {% endcapture %}
     
@@ -414,4 +399,36 @@
     {{ slideshow_placeholder }}
   {%- endif -%}
   {{ children }}
-</div>
+</div>{%- comment -%}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {%- render 'slideshow-slide',
+              slide_id: 'metafield',         # 唯一 ID，避免与 media.id 冲突
+              index: 0,                      # 置于第一张
+              children: slideshow_children,
+              class: 'product-media-container'
+            -%}
+  to: "{%- render 'slideshow-slide', slide_id: 'metafield', index: 0, children: slideshow_children,
+    class: 'product-media-container' -%}"
+  position: 12720..12849
+- from: |-
+    {%- render 'slideshow-slide',
+              slide_id: media.id,
+              index: forloop.index
+                | plus: (card_image_metafield != blank)   # 如果前面插了 metafield，要把索引往后偏移
+              ,
+              children: slideshow_children,
+              class: class,
+              attributes: attributes,
+              hidden: hidden,
+              media_fit: media_fit
+            -%}
+  to: "{%- render 'slideshow-slide', slide_id: media.id, index: forloop.index, plus:
+    card_image_metafield, children: slideshow_children, class: class, attributes:
+    attributes, hidden: hidden, media_fit: media_fit -%}"
+  position: 14082..14290
+{%- endcomment -%}
