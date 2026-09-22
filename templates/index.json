@@ -83,11 +83,11 @@
               "name": "t:names.text",
               "disabled": true,
               "settings": {
-                "text": "<p>At Retro Chroma, we source markets and workshops worldwide to bring you lamps that are built to last, priced for real life and ready to cast stories in light.</p>",
+                "text": "<p>FALL THANK-YOU SALE</p><p>Sept 22-Oct 10</p>",
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "paragraph",
+                "type_preset": "h4",
                 "font": "var(--font-body--family)",
                 "font_size": "1rem",
                 "line_height": "normal",
@@ -163,6 +163,24 @@
         "reflection_opacity": 75,
         "padding-block-start": 0,
         "padding-block-end": 31
+      }
+    },
+    "countdown_timer_jQKj8A": {
+      "type": "countdown-timer",
+      "name": "Countdown Timer",
+      "settings": {
+        "heading_main": "FALL THANK-YOU SALE",
+        "heading_sub": "Sept 22 - Oct 10",
+        "heading_typography": "heading-4",
+        "subheading_typography": "heading-5",
+        "heading_spacing": 8,
+        "end_time": "2026-10-10T23:59:00Z",
+        "background_color": "#EBD7BB",
+        "text_color": "#591F00",
+        "button_label": "",
+        "button_link": "",
+        "block_spacing_mobile": 20,
+        "section_vertical_padding": 20
       }
     },
     "product_list_EDUBdR": {
@@ -1080,6 +1098,7 @@
   },
   "order": [
     "hero_iLBwPd",
+    "countdown_timer_jQKj8A",
     "product_list_EDUBdR",
     "product_list_Y3Fawz",
     "product_list_BgxtQy",

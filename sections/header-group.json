@@ -17,7 +17,7 @@
         "announcement_mxxhta": {
           "type": "_announcement",
           "settings": {
-            "text": "✨FREE STANDARD SHIPPING FOR ALL ITEMS!",
+            "text": "<strong>FREE STANDARD SHIPPING FOR ALL ITEMS!</strong>",
             "link": "shopify://collections/all",
             "font": "var(--font-heading--family)",
             "font_size": "var(--font-size--body-md)",
