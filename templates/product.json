@@ -1415,6 +1415,24 @@
         "padding-block-end": 16
       }
     },
+    "countdown_timer_DxKacU": {
+      "type": "countdown-timer",
+      "name": "Countdown Timer",
+      "settings": {
+        "heading_main": "FALL THANK-YOU SALE",
+        "heading_sub": "Sept 22 - Oct 10",
+        "heading_typography": "heading-4",
+        "subheading_typography": "heading-5",
+        "heading_spacing": 8,
+        "end_time": "2026-10-10T23:59:00Z",
+        "background_color": "#ebd7bb",
+        "text_color": "#591f00",
+        "button_label": "",
+        "button_link": "",
+        "block_spacing_mobile": 20,
+        "section_vertical_padding": 20
+      }
+    },
     "17702098286709f19d": {
       "type": "_blocks",
       "blocks": {
@@ -1917,6 +1935,7 @@
   },
   "order": [
     "main",
+    "countdown_timer_DxKacU",
     "see_it_clearly",
     "178048022599d64756",
     "section_49b8DM",
