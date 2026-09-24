@@ -101,6 +101,7 @@
       data-template="{{ template }}"
     >
       {{ content_for_layout }}
+      {% render 'rc-pdp-tracking', product: product %}
     </main>
 
     {% sections 'footer-group' %}

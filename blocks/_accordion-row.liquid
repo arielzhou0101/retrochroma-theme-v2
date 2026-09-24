@@ -11,6 +11,10 @@
 
   <details
     class="details"
+    {% assign tracking_block_key = block.id | split: '__' | last %}
+    {% if request.page_type == 'product' and tracking_block_key == 'accordion_row_aaFerA' %}
+      data-pdp-accordion="shipping_returns"
+    {% endif %}
     {{ block.shopify_attributes }}
   >
     <summary class="details__header">

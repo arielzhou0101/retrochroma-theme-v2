@@ -168,6 +168,10 @@
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div
+  {% assign tracking_section_key = section.id | split: "__" | last %}
+  {% if request.page_type == "product" and tracking_section_key == "product_list_kqbaWd" %}
+    data-pdp-region="recommendations_lower"
+  {% endif %}
   class="
     section
     section--{{ section.settings.section_width }}

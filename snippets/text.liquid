@@ -5,6 +5,7 @@
   @param {string} [fallback_text] - fallback text if settings.text does not exist
   @param {string} [width] - width of the text block
   @param {object} block - block object
+  @param {string} [tracking_section] - PDP content region
 {%- enddoc -%}
 
 {% stylesheet %}
@@ -191,7 +192,16 @@
   endcapture
 %}
 
+{% liquid
+  assign tracking_block_key = block.id | split: '__' | last
+  if request.page_type == 'product' and tracking_block_key == 'text_9GBJHy'
+    assign tracking_section = 'brand_story'
+  endif
+%}
 {% capture attributes %}
+  {% if request.page_type == 'product' and tracking_section != blank %}
+    data-pdp-region="{{ tracking_section | escape }}"
+  {% endif %}
   class="{{ class }} spacing-style text-block text-block--{{ block.id }} {{ block.settings.type_preset }}
     {{ text_block_classes }}
   "
