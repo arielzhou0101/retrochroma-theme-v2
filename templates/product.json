@@ -473,6 +473,25 @@
         "padding-block-end": 32
       }
     },
+    "countdown_timer_DxKacU": {
+      "type": "countdown-timer",
+      "disabled": true,
+      "name": "Countdown Timer",
+      "settings": {
+        "heading_main": "FALL THANK-YOU SALE",
+        "heading_sub": "Sept 22 - Oct 10",
+        "heading_typography": "heading-4",
+        "subheading_typography": "heading-5",
+        "heading_spacing": 8,
+        "end_time": "2026-10-10T23:59:00Z",
+        "background_color": "#ebd7bb",
+        "text_color": "#591f00",
+        "button_label": "",
+        "button_link": "",
+        "block_spacing_mobile": 20,
+        "section_vertical_padding": 20
+      }
+    },
     "see_it_clearly": {
       "type": "_blocks",
       "blocks": {
@@ -1413,24 +1432,6 @@
         "alignment_horizontal": "center",
         "padding-block-start": 16,
         "padding-block-end": 16
-      }
-    },
-    "countdown_timer_DxKacU": {
-      "type": "countdown-timer",
-      "name": "Countdown Timer",
-      "settings": {
-        "heading_main": "FALL THANK-YOU SALE",
-        "heading_sub": "Sept 22 - Oct 10",
-        "heading_typography": "heading-4",
-        "subheading_typography": "heading-5",
-        "heading_spacing": 8,
-        "end_time": "2026-10-10T23:59:00Z",
-        "background_color": "#ebd7bb",
-        "text_color": "#591f00",
-        "button_label": "",
-        "button_link": "",
-        "block_spacing_mobile": 20,
-        "section_vertical_padding": 20
       }
     },
     "17702098286709f19d": {
