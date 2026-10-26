@@ -352,6 +352,17 @@
               },
               "blocks": {}
             },
+            "series_recommendations_after_shipping": {
+              "type": "series_recommendations",
+              "settings": {
+                "product": "{{ closest.product }}",
+                "padding-block-start": 20,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
             "product_specifications_N7qPLu": {
               "type": "product-specifications",
               "name": "Product details",
@@ -427,17 +438,6 @@
               "block_order": [
                 "accordion_row_aaFerA"
               ]
-            },
-            "series_recommendations_after_shipping": {
-              "type": "series_recommendations",
-              "settings": {
-                "product": "{{ closest.product }}",
-                "padding-block-start": 20,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
             }
           },
           "block_order": [
@@ -455,9 +455,9 @@
             "text_HdiLen",
             "product_description_LfDYCg",
             "text_AVg9L8",
+            "series_recommendations_after_shipping",
             "product_specifications_N7qPLu",
-            "accordion_CWUgfK",
-            "series_recommendations_after_shipping"
+            "accordion_CWUgfK"
           ]
         }
       },
