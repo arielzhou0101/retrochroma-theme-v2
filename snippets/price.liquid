@@ -87,13 +87,13 @@
 
 <div ref="priceContainer"{% unless is_product_page_price %} class="price-container--card"{% endunless %}>
   <span class="price-container__content">
-    {% if show_sale_price_first == false and compare_at_price > price %}
+    {% if show_sale_price_first == false and is_sale %}
       <s class="compare-at-price">{{ compare_at_price }}</s>
     {% endif %}
 
     <span class="price{% if is_sale %} price--sale{% endif %}">{{ price | default: '&nbsp;' }}</span>
 
-    {% if show_sale_price_first == true and compare_at_price > price %}
+    {% if show_sale_price_first == true and is_sale %}
       <s class="compare-at-price">{{ compare_at_price }}</s>
     {% endif %}
 
